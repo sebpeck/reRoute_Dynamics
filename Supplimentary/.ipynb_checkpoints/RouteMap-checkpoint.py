@@ -327,6 +327,11 @@ class RouteMap:
         return gpd.GeoDataFrame(self._route_df)
     
     
+    def load_from_gdf(self, gdf):
+        self._route_df = pd.read_csv(gdf)
+        return self
+    
+    
     def remove_stops(self):
         self._route_df['is_stop'] = False
         return None
