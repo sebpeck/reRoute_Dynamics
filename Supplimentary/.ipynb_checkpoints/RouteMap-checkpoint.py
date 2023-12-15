@@ -387,7 +387,7 @@ class RouteMap:
         distance = self.get_distances()['point_distances[km]']
         grade = elevation / distance
         grade = grade.clip(upper=.10, lower=-.10)
-        return grade
+        return grade*100
     
     def erica_grade(self):
         grade_SG = [0]
@@ -414,7 +414,7 @@ class RouteMap:
         '''
         # Get acceleration due to hills
         # FOR TRUE VALUE, NEEDS BUS FRICITON COEFF
-        grade = self.get_grade().copy()
+        grade = self.get_grade().copy()/100
         grad_angle = np.arctan(grade)
         grav_accel = 9.81 # m/s^2
         accel_vect = grav_accel * np.sin(grad_angle)
@@ -427,7 +427,7 @@ class RouteMap:
         '''
         
         # Get acceleration due to route friction
-        grade = self.get_grade().copy()
+        grade = self.get_grade().copy()/100
         grad_angle = np.arctan(grade)
         grav_accel = 9.81 # m/s^2
         accel_vect = grav_accel * np.cos(grad_angle)
