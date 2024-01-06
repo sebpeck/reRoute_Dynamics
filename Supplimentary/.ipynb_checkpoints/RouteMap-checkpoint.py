@@ -324,7 +324,10 @@ class RouteMap:
         
         
     def get_gdf(self):
-        return gpd.GeoDataFrame(self._route_df)
+        # Convert the geometry to an actual geometry, and set the coordinate system to lat lon
+        self._route_df['geometry'] = gpd.GeoSeries.from_wkt(self._route_df['geometry'].astype(str))
+        gdf = gpd.GeoDataFrame(self._route_df, geometry="geometry").set_crs('EPSG:4326')
+        return gdf
     
     
     def load_from_gdf(self, gdf):
