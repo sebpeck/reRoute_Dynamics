@@ -258,7 +258,7 @@ class TripDynamics:
                 d_power, d_t = bus.accelerate_v2(point_dist)
                 
             # if the starting celocity is greater than the speed limit, 
-            elif(start_velocity > point_sp_lim):
+            elif(start_velocity > point_sp_lim+point_sp_lim/10):
                 status = "speed_lim_brk"
                 # find the distance needed to reach speed limit
                 b_dist = ((point_sp_lim)**2 - start_velocity**2)/2 /(bus.get_b_accel())
