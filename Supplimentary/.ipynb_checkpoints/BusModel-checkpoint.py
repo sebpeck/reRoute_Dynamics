@@ -13,7 +13,7 @@ class BusModel:
                  fric_coeff = .01, # default from erica's
                  motor_eff = .916, # unknown source
                  invert_eff = .971, # unknown source
-                 max_power = 160, # kW
+                 max_power = 160, # kW, output motor
                  regen = .6, # unknown source
                  eff_aux = .89, # unknown source, Auxulliary system efficiency?
                  aux_load = 0, # W, no default system load
@@ -420,6 +420,9 @@ class BusModel:
         
         Returns:
         inertial force of the bus, in Newtons.
+        
+        TODO:
+        Ask about Intertial Factor - What does it represent? Rolling resistancE?
         '''
         
         # Use the intertial factor, current mass, and current acceleration,

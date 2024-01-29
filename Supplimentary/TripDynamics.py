@@ -246,7 +246,7 @@ class TripDynamics:
             # is less than half the point distance resolution, then brake
             #TODO: THIS BRAKING ISNT TOTALLY ACCURATE AND OVERBRAKES SOMETIMES
             # D_energy = Force * dist
-            elif ((dist_to_stop < (stopping_dist + point_dist)) and is_stopping and (self._ridership_change[i] != 0)):
+            elif ((dist_to_stop < (stopping_dist + point_dist)) and is_stopping and (abs(self._ridership_change[i]) > 0)):
                 status = "Stopping_brake"
                 d_power, d_t = bus.brake(point_dist, .8)
             #elif((dist_to_stop-stopping_dist)<= point_dist):

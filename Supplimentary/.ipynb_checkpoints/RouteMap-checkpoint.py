@@ -41,6 +41,7 @@ class RouteMap:
         self._route_df['point_distances[km]'] = self.calc_point_distances()
         self._route_df['cumulative_distance[km]'] = self.calc_cum_distances()
         
+        
         # if there is speed limit data,
         if (str(type(stops)) != "<class 'NoneType'>"):
             
@@ -373,6 +374,27 @@ class RouteMap:
     def get_distances(self):
         return self._route_df[['point_distances[km]', 'cumulative_distance[km]']].copy()
     
+    
+    def calc_travel_distances(self):
+        '''
+        calc_travel_distances takes the 'crow flight' distances and uses the elevation
+        in order to calculate the true distances traveled.
+        
+        Parameters:
+        None. 
+        
+        Returns:
+        a pandas series containing the point distances truly travelled.
+        '''
+        dist = self._route_df['point_distances[km]'].copy()
+        elev = self._route_df['elevation[km]'].copy()
+        diff_elev = elev.diff()
+        
+        #Pythagorean Theorem
+        true_dist = (dist**2 + diff_elev**2)**(1/2)
+        
+        return true_dist
+        
     
     def erica_distances(self):
         '''
