@@ -18,8 +18,10 @@ class TripDynamics:
         self._route_data = self._route_map.get_gdf()
         self._route_data['riders'] = self.generate_rider_profile()
         self._route_data['bus_mass'] = self.generate_mass_profile()
+        #Presently unused and innacurate
         self._route_data['f_grav'] = self._route_data['bus_mass'] * self._route_map.get_hill_accel()
         self._route_data['f_fric'] = self._route_data['bus_mass'] * self._route_map.get_fric_accel()  * self._bus_model.get_fric_coeff()
+        
         self._trip_data = None
         
     
@@ -247,9 +249,6 @@ class TripDynamics:
             #TODO: THIS BRAKING ISNT TOTALLY ACCURATE AND OVERBRAKES SOMETIMES
             # D_energy = Force * dist
             elif ((dist_to_stop < (stopping_dist + point_dist)) and is_stopping and (abs(self._ridership_change[i]) > 0)):
-                print((dist_to_stop < (stopping_dist + point_dist)))
-                print(is_stopping)
-                print(abs(self._ridership_change[i]) > 0)
                 status = "Stopping_brake"
                 d_power, d_t = bus.brake(point_dist, .8)
             #elif((dist_to_stop-stopping_dist)<= point_dist):

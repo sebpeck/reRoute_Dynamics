@@ -350,6 +350,8 @@ class BusModel:
         # The current external acceleration from what was passed
         current_ext_acc = ext_acc
         
+        ## THIS RIGHT HERE, CHIEF! THIS IS THE PROBLEM!!!!
+
         # Get current bus mass
         cur_mass = self._current_mass
         
@@ -361,7 +363,7 @@ class BusModel:
         
         # The engine force should compensate to balance
         # the difference between the inertia and the external force
-        eng_force = -(ext_force)
+        eng_force = in_force-(ext_force)
         
         # get the energy to maintain the force for the distance
         maintain_energy_raw = eng_force*dist

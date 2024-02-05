@@ -18,8 +18,10 @@ class TripDynamics:
         self._route_data = self._route_map.get_gdf()
         self._route_data['riders'] = self.generate_rider_profile()
         self._route_data['bus_mass'] = self.generate_mass_profile()
+        #Presently unused and innacurate
         self._route_data['f_grav'] = self._route_data['bus_mass'] * self._route_map.get_hill_accel()
         self._route_data['f_fric'] = self._route_data['bus_mass'] * self._route_map.get_fric_accel()  * self._bus_model.get_fric_coeff()
+        
         self._trip_data = None
         
     
