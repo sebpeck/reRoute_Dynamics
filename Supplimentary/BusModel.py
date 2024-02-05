@@ -155,6 +155,9 @@ class BusModel:
         return self._current_velocity
     
     
+    def get_acceleration()
+    
+    
     def set_v(self, v):
         self._current_velocity = v
     
@@ -325,7 +328,7 @@ class BusModel:
         braking_energy_raw = braking_force*dist
         self._current_accel = braking_acc
         
-        # Calculate the power of the brakign and the change in distance
+        # Calculate the power of the braking and the change in distance
         power_calc = braking_energy_raw/((final_v - v0)/braking_acc)
         dt = dist / (abs(final_v - v0)/2)
         
@@ -349,8 +352,6 @@ class BusModel:
         
         # The current external acceleration from what was passed
         current_ext_acc = ext_acc
-        
-        ## THIS RIGHT HERE, CHIEF! THIS IS THE PROBLEM!!!!
 
         # Get current bus mass
         cur_mass = self._current_mass
@@ -358,12 +359,9 @@ class BusModel:
         # get the external force from the mass and acceleration
         ext_force = cur_mass * current_ext_acc
         
-        # get the force of inertia
-        in_force = self.get_inertial_force()
-        
         # The engine force should compensate to balance
-        # the difference between the inertia and the external force
-        eng_force = in_force-(ext_force)
+        # the difference between the external forces
+        eng_force = -(ext_force)
         
         # get the energy to maintain the force for the distance
         maintain_energy_raw = eng_force*dist
@@ -413,24 +411,24 @@ class BusModel:
         return air_drag # acceleration of air drag
     
     
-    def get_inertial_force(self):
+    def get_inertial_acceleration(self):
         '''
-        get_inertial_force calculates the current force of intertia the bus is undergoing.
+        get_inertial_acceleration calculates the current acceleration of intertia the bus is undergoing.
         
         Parameters:
         N/A
         
         Returns:
-        inertial force of the bus, in Newtons.
+        inertial acceleration of the bus, in Newtons.
         
         TODO:
         Ask about Intertial Factor - What does it represent? Rolling resistancE?
         '''
         
         # Use the intertial factor, current mass, and current acceleration,
-        # to et inertial force.
-        inertia = self._i_factor * self._current_mass * self._current_accel
-        return inertia # Force of inertia
+        # to get inertial acceleration.
+        inertia = (self._i_factor * self._current_mass * self._current_accel) / self._current_mass
+        return inertia # acceleration of inertia
     
     
     def update_riders(self, val, cat='change'):

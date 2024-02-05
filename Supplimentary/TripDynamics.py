@@ -160,6 +160,7 @@ class TripDynamics:
         route['power_needed[W]'] = 0
         route['st'] = 0
         route['time_change[s]'] = 0
+        route['inertial_force'] = 0
         
         # Generate empty lists to hold the same values as above.
         vel_list = []
@@ -168,6 +169,7 @@ class TripDynamics:
         power = []
         st_ls = []
         dt_ls = []
+        in_ls = []
         
         
         # get the accelerational profile of the bus.
@@ -222,8 +224,12 @@ class TripDynamics:
             # get the acceleration due to gravity at the point
             a_hill = hill_a_prof[i]
             
-            # combine the accelerations to get external acceleration
-            ext_a = a_drag + a_fric + a_hill
+            # get the acceleration due to inertia
+            a_inert = bus.get_inertial_acceleration()
+            in_ls.append(a_inert * bus.get_mass())
+            
+            # combine the accelerations to get external (to the bus's motor) acceleration
+            ext_a = a_drag + a_fric + a_hill + a_inert
             
             # calculate the stopping distance based on the starting velocity and external acceleration
             stopping_dist = bus.get_braking_distance(start_velocity, ext_a) #meters
@@ -287,6 +293,7 @@ class TripDynamics:
         route.iloc[1:-1, route.columns.get_loc('power_needed[W]')] = power
         route.iloc[1:-1, route.columns.get_loc('st')] = st_ls
         route.iloc[1:-1, route.columns.get_loc('time_change[s]')] = dt_ls
+        route.iloc[1:-1, route.columns.get_loc('inertial_force')] = in_ls
         route['elapsed_time[s]'] = route['time_change[s]'].cumsum()
         
         # Set the route GDF to an instance variable, then return it.
