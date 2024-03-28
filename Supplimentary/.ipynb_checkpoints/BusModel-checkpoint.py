@@ -17,7 +17,7 @@ class BusModel:
                  regen = .6, # unknown source
                  eff_aux = .89, # unknown source, Auxulliary system efficiency?
                  aux_load = 0, # W, no default system load
-                 a_braking = -1.5, #m/s^2
+                 a_braking = -1.5, #m/s^2 # https://www.apta.com/wp-content/uploads/APTA-BTS-BC-RP-001-05_Rev1.pdf <-- Possible source, handbrake road minimum is ~1.5
                  final_a = .4, # m/s^2, defualt acceleration after profile finishes
                  max_velocity = 26.8224, # m/s, = 60 mph
                  maintain_acceleration = False, # boolean for if bus should maintain the last a in 
@@ -155,15 +155,13 @@ class BusModel:
         return self._current_velocity
     
     
-    def get_acceleration()
-    
-    
     def set_v(self, v):
         self._current_velocity = v
     
     
     def max_velocity(self):
         return self._max_v
+    
     
     def accelerate(self, dist):
         '''
@@ -227,6 +225,7 @@ class BusModel:
         # Return the power used
         return power_used
     
+    
     def accelerate_v2(self, dist):
         '''
         accelerate_v2() takes in a distance value, and determines the power
@@ -284,7 +283,6 @@ class BusModel:
             
             # Index by one.
             i+=1
-            
         # Get the final velocity value and elapsed time
         final_v = prof['vel.[m/s]'].iloc[i]
         dt = prof['time[s]'].iloc[i]
@@ -300,7 +298,7 @@ class BusModel:
         # return the power used and the elapsed time
         return power_used, dt
         
-        
+           
     def brake(self, dist, braking_factor):
         '''
         brake() takes in a distance and braking factor,
@@ -374,7 +372,7 @@ class BusModel:
         return power_calc, dt
     
     
-    def get_braking_distance(self, velocity, ext_acc):
+    def get_braking_distance(self, velocity, braking_factor, ext_acc):
         '''
         get_braking_distance() takes in a velocity and the current external accelerations,
         and provides a calculation as to how far the bus would have to brake to reach a velocity of zero.
@@ -387,12 +385,20 @@ class BusModel:
         a distance, in meters, of how far the bus would have to brake to reach a velocity of zero.
         '''
         
+        # Get the intrinsic accelerations of the bus
+        inertial_accel = self._current_accel * self._i_factor
+        wind_accel = self.get_aerodynamic_drag(velocity, 0, 1.2)
+        
+        # Combine to get the net acceleration on the bus
+        net_accel = inertial_accel - wind_accel - ext_acc
+        a_bus = net_accel + self._a_braking*braking_factor
+        
         # Using the kinematics equation vf^2 = vi^2 + 2a(dX) to get
         # braking distance
-        return -1*round((velocity**2 / (2*(self._a_braking - ext_acc))), 5) # Convert to meters
+        return round((-velocity**2 / (2*(a_bus))), 5) # Convert to meters
 
     
-    def get_aerodynamic_drag(self, wind_speed, air_density):
+    def get_aerodynamic_drag(self, bus_speed, wind_speed, air_density):
         '''
         get_aerodynamic_drag takes in wind speed and air density, and returns
         the acceleration, in m/s^2, they provide.
@@ -405,7 +411,7 @@ class BusModel:
         aerodynamic acceleration, in m/s^2.
         '''
         # Using the drag coefficient, bus frontal area, and passed parameters, calculate the acceleration of air due to drag
-        air_drag = (self._drag_coeff * self._bus_front_area * (air_density/2) * (self._current_velocity - wind_speed)**2)/self._current_mass
+        air_drag = (self._drag_coeff * self._bus_front_area * (air_density/2) * (bus_speed - wind_speed)**2)/self._current_mass
         
         # Return said value.
         return air_drag # acceleration of air drag
@@ -421,8 +427,6 @@ class BusModel:
         Returns:
         inertial acceleration of the bus, in Newtons.
         
-        TODO:
-        Ask about Intertial Factor - What does it represent? Rolling resistancE?
         '''
         
         # Use the intertial factor, current mass, and current acceleration,
@@ -463,6 +467,9 @@ class BusModel:
     def get_mass(self):
         return self._current_mass
     
+    def get_acceleration(self):
+        return self._current_accel
+    
     def get_fric_coeff(self):
         return self._fric_coeff
 
@@ -483,3 +490,181 @@ class BusModel:
     
     def get_regen_eff(self):
         return self._regen
+    
+    def accelerate_v3(self, dist, ext_acc):
+        
+        # Get acceleration profile
+        prof = self.get_accel_profile().copy()
+        
+        # get current mass and velocity
+        mass = self._current_mass
+        vel = self._current_velocity
+        
+        # set a variable for the route acceleration
+        route_accel = ext_acc
+        
+        # Calculate inertial acceleration
+        inertial_accel = prof['accel.[m/s^2]']*self._i_factor
+        inertial_accel = inertial_accel.shift(1)
+        
+        # get the acceleration of drag, with wind speed of 0 and air density of
+        # 1.2 kg/m^3, to be adjustible later
+        wind_accel = prof.apply(lambda x: self.get_aerodynamic_drag(x['vel.[m/s]'], 0, 1.2), axis=1)
+        
+        # calculate the true acceleration needed to reach the target acceleration
+        net_acc_for_target = prof['accel.[m/s^2]'] - inertial_accel + wind_accel + route_accel
+        
+        # calculate the net power needed for each step in kW
+        power_est = net_acc_for_target*mass*prof['vel.[m/s]']/1000
+        
+        # Upper and lower limits of motor output
+        power_est = power_est.where(power_est < 160, 160)
+        power_est = power_est.where(power_est > 0, 0)
+        
+        # If a value is lower than 100 watts, set it to zero, then replace with
+        # the second lowest power output in the profile. This is being done to
+        # avoid weird jagged motions and what could be considered noise.
+        power_est[power_est < .1] = 0
+        power_est[power_est == 0] = sorted(list(power_est.unique()))[1]
+        
+        #limit the acceleration by power limiter (read, true acceleration of motor)
+        limited_acceleration = power_est*1000/mass/prof['vel.[m/s]']
+        
+        # convert the limited_acceleration back to true acceleration by removing externalities
+        net_acc = (limited_acceleration + inertial_accel - wind_accel - route_accel)
+        
+        # get the true bus velocities, swap nan for zero
+        net_vel = (net_acc*prof['dt']).cumsum()
+        net_vel = net_vel.fillna(0)
+        
+        # get the travel distances 
+        net_dist = (net_vel*prof['dt']).cumsum()
+        net_dist = net_dist.fillna(0)
+        
+        # Get the closest index to the current velocity
+        v_closest_index = list((net_vel-vel).abs().argsort())[0]
+        
+        # set the closest index of velocity as the basis for dist=0
+        net_dist = net_dist - net_dist[v_closest_index]
+        
+        # find the distance index closest to travel distance
+        d_closest_index = list((net_dist-dist).abs().argsort())[0]
+        
+        # get final velocity, set to bus velocity
+        self._current_velocity = net_vel[d_closest_index]
+        
+        # get final acc, set to bus acc
+        self._current_accel = 0
+        
+        # get mean power used:
+        mean_power = power_est[v_closest_index:d_closest_index+1].mean()
+        
+        # get elapsed time
+        dt = prof['dt'][v_closest_index:d_closest_index+1].sum()
+        
+        return mean_power*1000, dt
+    
+    
+    
+    def brake_v2(self, dist, braking_factor, ext_acc):
+        '''
+        brake_v2() takes in a distance and braking factor and external acceleration,
+        and determines the power and elapsed time for the bus to
+        experience those conditions.
+        '''
+        
+        # Get the current velocity and braking acceleration, 
+        # using the factor to help determine how intense the braking is.
+        v0 = self._current_velocity
+        braking_acc = self._a_braking*braking_factor
+        
+        # determine the external accelerations from intrinsic bus factors
+        route_accel = ext_acc
+        inertial_accel = self._current_accel * self._i_factor
+        wind_accel = self.get_aerodynamic_drag(v0, 0, 1.2)
+        
+        # Generate the net acceleration the bus is experiencing, a_bus
+        net_accel = inertial_accel - wind_accel - route_accel
+        a_bus = net_accel + braking_acc
+        
+        vf = 0
+        # use kinematic equation to calculate final velocity,
+        # Check to ensure calc is possible.
+        if (v0**2 > np.abs(2*a_bus*dist)):
+            vf = np.sqrt(v0**2 + 2*a_bus*dist)
+            # if final velocity is slower than .1 m/s, set it to be zero
+            if (vf < .1):
+                vf = 0
+        else:
+            vf = 0
+
+        
+        #get the change in time from kinematics equations
+        dt = ((vf - v0)/a_bus)
+        
+        # Calculate the power of the braking
+        power_calc = braking_acc*self._current_mass*dist/dt
+        
+        #Set the velocity and acceleration of the bus.
+        self._current_velocity = vf
+        self._current_acceleration = a_bus
+        
+        # return the power and elapsed time.
+        return power_calc, dt
+    
+    
+    
+    def maintain_v2(self, dist, ext_acc):
+        '''
+        maintain_v2() takes in distance traveled and the external 
+        accelerational forces, and calculates the power needed to
+        maintain the current velocity and the elapsed time.
+        
+        Parameters:
+        dist: distance of travel in meters as a float.
+        ext_acc: external accelerative force the bus is currently experiencing.
+        
+        Returns:
+        a touple containing the power [W] used and the elapsed time [s]. 
+        '''
+        
+        # The current external acceleration from what was passed
+        route_accel = ext_acc
+        
+        # Get current velocity
+        v1 = self._current_velocity
+        
+        # Get the intrinsic accelerations of the bus
+        #print(self._current_accel)
+        inertial_accel = self._current_accel * self._i_factor
+        wind_accel = self.get_aerodynamic_drag(v1, 0, 1.2)
+        
+        # Combine to get the net acceleration
+        out_accel = -inertial_accel + wind_accel + ext_acc
+
+        # Get current bus mass
+        cur_mass = self._current_mass
+        
+        # de-acceleration amount, starts matching and decreases if exceeding.
+        #labeled as engine acceleration, but also technically includes braking.
+        eng_accel = out_accel + .05
+        
+        power_calc = 99999999
+        dt = 0
+        vf = 0
+        a_bus = 0
+        while (power_calc > 160000):
+            eng_accel = eng_accel - .05
+            a_bus = out_accel - eng_accel
+            vf = np.sqrt(v1**2 + 2*(a_bus)*dist)
+            if ((a_bus) > .001):
+                dt = (vf-v1) / (a_bus)
+            else: 
+                dt = dist/v1
+            power_calc = cur_mass * eng_accel * dist / dt
+            
+        self._current_velocity = vf
+        self._current_accel = -a_bus
+
+        # return the energy value
+        return power_calc, dt

@@ -152,9 +152,13 @@ class TripDynamics:
         # get the maximum velocity for the defined bus
         max_v = bus.max_velocity()
         
+        # variable for how hard the driver presses on the brake while braking
+        braking_factor = 1
+        
         # define new columns for velocity, stop distance, state, and stopping distance,
         # Power needed, and time change.
         route['vel.[m/s]'] = 0
+        route['acc.[m/s^2]'] = 0
         route['stop_dist[m]'] = 0
         route['stppn_dist'] = 0
         route['power_needed[W]'] = 0
@@ -164,13 +168,12 @@ class TripDynamics:
         
         # Generate empty lists to hold the same values as above.
         vel_list = []
+        acc_list = []
         dist_list = []
         stp_d_ls = []
         power = []
         st_ls = []
         dt_ls = []
-        in_ls = []
-        
         
         # get the accelerational profile of the bus.
         accel_profile = bus.get_accel_profile()
@@ -200,10 +203,13 @@ class TripDynamics:
             # set the distance to the stop to a dummy variable of 0
             dist_to_stop = 0
             
+            # set the index of the next stop to dummy variable of 0
+            next_stop_index = 0
+            
             # get the list of stops as defined by the distance between each stop on the route,
             #including signals, in meters
             stops_remain = remaining_trip[(remaining_trip['is_stop'] == True) | (remaining_trip['is_signal'] == True)]['cumulative_distance[km]'].reset_index(drop=True)*1000 #convert to meters
-            
+
             # if there are remaining stops,
             if (len(stops_remain) != 0):
                 
@@ -211,12 +217,16 @@ class TripDynamics:
                 # and cumulative distance
                 dist_to_stop = stops_remain[0]-cum_dist # meters
                 
+                # set the next stop index, handle errors where for some reason there is no value for cumulative distance.
+                next_stop_match = route['cumulative_distance[km]'][route['cumulative_distance[km]'] == stops_remain[0]/1000]
+                if (len(next_stop_match) != 0):
+                    next_stop_index = route['cumulative_distance[km]'][route['cumulative_distance[km]'] == stops_remain[0]/1000].index[0]
+                else:
+                    # if there's nothing, assume the next stop index is in the next 10.
+                    next_stop_index = i+10
+                
             # get the current velocity of the bus
-            start_velocity = bus.velocity() 
-            
-            # get the acceleration of drag, with wind speed of 0 and air density of
-            # 1.2 kg/m^3, to be adjustible later
-            a_drag = bus.get_aerodynamic_drag(0, 1.2)
+            start_velocity = bus.velocity()  
             
             # get the acceleration of bus friction at the point
             a_fric = fric_a_prof[i]*bus_f_coef
@@ -224,15 +234,11 @@ class TripDynamics:
             # get the acceleration due to gravity at the point
             a_hill = hill_a_prof[i]
             
-            # get the acceleration due to inertia
-            a_inert = bus.get_inertial_acceleration()
-            in_ls.append(a_inert * bus.get_mass())
-            
             # combine the accelerations to get external (to the bus's motor) acceleration
-            ext_a = a_drag + a_fric + a_hill + a_inert
+            ext_a = a_fric - a_hill 
             
             # calculate the stopping distance based on the starting velocity and external acceleration
-            stopping_dist = bus.get_braking_distance(start_velocity, ext_a) #meters
+            stopping_dist = bus.get_braking_distance(start_velocity, braking_factor, ext_a) #meters
             
             # get the speed limit at current point
             point_sp_lim = route['speed_limit[km/s]'][i] * 1000 # meters
@@ -244,43 +250,42 @@ class TripDynamics:
             
             # Driving logic: -------------------------------------------------------
             #If at rest, accelerate for the distance between this and the next point
-            if ((start_velocity == 0)):
+            if (start_velocity < 0.1):
                 def decision(probability): return random.random() < probability
                 is_stopping = decision(1) # probability is always, currently setup for later.
                 status = "accel_from_0"
-                d_power, d_t = bus.accelerate_v2(point_dist)
+                d_power, d_t = bus.accelerate_v3(point_dist, ext_a)
                 
             # If the distance difference between stopping distance and distance to the stop
             # is less than half the point distance resolution, then brake
-            #TODO: THIS BRAKING ISNT TOTALLY ACCURATE AND OVERBRAKES SOMETIMES
-            # D_energy = Force * dist
-            elif ((dist_to_stop < (stopping_dist + point_dist)) and is_stopping and (abs(self._ridership_change[i]) > 0)):
+            
+            elif ((dist_to_stop < (stopping_dist + point_dist)) and is_stopping and (abs(self._ridership_change[next_stop_index]) > 0)):
                 status = "Stopping_brake"
-                d_power, d_t = bus.brake(point_dist, .8)
+                d_power, d_t = bus.brake_v2(point_dist, braking_factor, ext_a)
             #elif((dist_to_stop-stopping_dist)<= point_dist):
-
                 
-            # If the starting velocity is less than the speed limit, accelerate
-            elif(start_velocity < point_sp_lim - point_sp_lim/10):
+            # If the starting velocity is less than the speed limit, accelerate. Margin is 1/20th of speed limit.
+            elif(start_velocity < (point_sp_lim - point_sp_lim/20)):
                 status = "speed_lim_accel"
-                d_power, d_t = bus.accelerate_v2(point_dist)
+                d_power, d_t = bus.accelerate_v3(point_dist, ext_a)
                 
             # if the starting celocity is greater than the speed limit, 
-            elif(start_velocity > point_sp_lim+point_sp_lim/10):
+            elif(start_velocity > (point_sp_lim+point_sp_lim/20)):
                 status = "speed_lim_brk"
                 # find the distance needed to reach speed limit
                 b_dist = ((point_sp_lim)**2 - start_velocity**2)/2 /(bus.get_b_accel())
                 # brake for that distance
-                d_power, d_t = bus.brake(b_dist, .8)
+                d_power, d_t = bus.brake_v2(b_dist, braking_factor, ext_a)
             else:
                 status = "maintain_v"
-                d_power, d_t = bus.maintain(point_dist, ext_a)
+                d_power, d_t = bus.maintain_v2(point_dist, ext_a)
             # End driving logic ---------------------------------------------------------
             
             
             # Append all the statuses and data to their lists
             st_ls.append(status)
             vel_list.append(bus.velocity())
+            acc_list.append(bus.get_acceleration())
             dist_list.append(dist_to_stop)
             stp_d_ls.append(stopping_dist)
             power.append(d_power)
@@ -288,12 +293,13 @@ class TripDynamics:
         
         # convert the lists and apply them to the respective columns
         route.iloc[1:-1, route.columns.get_loc('vel.[m/s]')] = vel_list
+        route.iloc[1:-1, route.columns.get_loc('acc.[m/s^2]')] = acc_list
         route.iloc[1:-1, route.columns.get_loc('stop_dist[m]')] = dist_list
         route.iloc[1:-1, route.columns.get_loc('stppn_dist')] = stp_d_ls
         route.iloc[1:-1, route.columns.get_loc('power_needed[W]')] = power
         route.iloc[1:-1, route.columns.get_loc('st')] = st_ls
         route.iloc[1:-1, route.columns.get_loc('time_change[s]')] = dt_ls
-        route.iloc[1:-1, route.columns.get_loc('inertial_force')] = in_ls
+        
         route['elapsed_time[s]'] = route['time_change[s]'].cumsum()
         
         # Set the route GDF to an instance variable, then return it.
@@ -353,6 +359,7 @@ class TripDynamics:
         aux_eff = self._bus_model.get_auxill_efficiency()
         aux_load = self._bus_model.get_aux_load()
         regen_eff = self._bus_model.get_regen_eff()
+        max_regen = -100000
         
         # set the battery power to zero.
         bat_pow = 0
@@ -361,9 +368,12 @@ class TripDynamics:
         if (value >= 0):
             # Discharging, converting the needed power into power battery must exert
             bat_pow = value/(motor_eff*invert_eff) + (aux_load/aux_eff)
-        else:
-            #charging, the regenerative braking ALL the time
+        elif(value*regen_eff*motor_eff > max_regen):
+            #charging, the regenerative braking ALL the time, max regen is 100
             bat_pow = value*regen_eff*motor_eff + (aux_load/aux_eff)
+        else:
+            bat_pow = max_regen + (aux_load/aux_eff)
+            
             
         # Return the battery power.
         return bat_pow
