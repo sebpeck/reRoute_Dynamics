@@ -209,6 +209,8 @@ class TripDynamics:
             # get the list of stops as defined by the distance between each stop on the route,
             #including signals, in meters
             stops_remain = remaining_trip[(remaining_trip['is_stop'] == True) | (remaining_trip['is_signal'] == True)]['cumulative_distance[km]'].reset_index(drop=True)*1000 #convert to meters
+            
+            print(stops_remain)
 
             # if there are remaining stops,
             if (len(stops_remain) != 0):
@@ -259,7 +261,7 @@ class TripDynamics:
             # If the distance difference between stopping distance and distance to the stop
             # is less than half the point distance resolution, then brake
             
-            elif ((dist_to_stop < (stopping_dist + point_dist)) and is_stopping and (abs(self._ridership_change[next_stop_index]) > 0)):
+            elif ((dist_to_stop < (stopping_dist + point_dist)) and is_stopping and ((abs(self._ridership_change[next_stop_index]) > 0) or ())):
                 status = "Stopping_brake"
                 d_power, d_t = bus.brake_v2(point_dist, braking_factor, ext_a)
             #elif((dist_to_stop-stopping_dist)<= point_dist):
