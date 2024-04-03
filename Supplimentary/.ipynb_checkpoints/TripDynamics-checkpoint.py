@@ -165,6 +165,9 @@ class TripDynamics:
         route['st'] = 0
         route['time_change[s]'] = 0
         route['inertial_force'] = 0
+        route['r_change'] = abs(self._ridership_change) > 0
+        
+        #print(route['r_change'])
         
         # Generate empty lists to hold the same values as above.
         vel_list = []
@@ -178,8 +181,9 @@ class TripDynamics:
         # get the accelerational profile of the bus.
         accel_profile = bus.get_accel_profile()
         
+        random.seed(42)
         # Set up a boolean for checking if the bus will stop.
-        is_stopping=True
+        is_stopping = (random.randrange(3) == 0)
         
         # Loop through each point on the route
         for i in range(1, len(route)-1):
@@ -208,9 +212,7 @@ class TripDynamics:
             
             # get the list of stops as defined by the distance between each stop on the route,
             #including signals, in meters
-            stops_remain = remaining_trip[(remaining_trip['is_stop'] == True) | (remaining_trip['is_signal'] == True)]['cumulative_distance[km]'].reset_index(drop=True)*1000 #convert to meters
-            
-            print(stops_remain)
+            stops_remain = remaining_trip[((remaining_trip['is_stop'] == True) & remaining_trip['r_change'] == True) | ((remaining_trip['is_signal'] == True) & is_stopping)]['cumulative_distance[km]'].reset_index(drop=True)*1000 #convert to meters
 
             # if there are remaining stops,
             if (len(stops_remain) != 0):
@@ -261,7 +263,7 @@ class TripDynamics:
             # If the distance difference between stopping distance and distance to the stop
             # is less than half the point distance resolution, then brake
             
-            elif ((dist_to_stop < (stopping_dist + point_dist)) and is_stopping and ((abs(self._ridership_change[next_stop_index]) > 0) or ())):
+            elif ((dist_to_stop < (stopping_dist + point_dist))):#and (abs(self._ridership_change[next_stop_index]) > 0)):
                 status = "Stopping_brake"
                 d_power, d_t = bus.brake_v2(point_dist, braking_factor, ext_a)
             #elif((dist_to_stop-stopping_dist)<= point_dist):
@@ -277,7 +279,7 @@ class TripDynamics:
                 # find the distance needed to reach speed limit
                 b_dist = ((point_sp_lim)**2 - start_velocity**2)/2 /(bus.get_b_accel())
                 # brake for that distance
-                d_power, d_t = bus.brake_v2(b_dist, braking_factor, ext_a)
+                d_power, d_t = bus.brake_v2(b_dist, braking_factor-.3, ext_a)
             else:
                 status = "maintain_v"
                 d_power, d_t = bus.maintain_v2(point_dist, ext_a)

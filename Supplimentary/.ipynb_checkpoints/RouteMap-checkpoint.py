@@ -438,7 +438,6 @@ class RouteMap:
         returns a series of accelerations
         '''
         # Get acceleration due to hills
-        # FOR TRUE VALUE, NEEDS BUS FRICITON COEFF
         grade = self.get_grade().copy()/100
         grad_angle = np.arctan(grade)
         grav_accel = 9.81 # m/s^2
