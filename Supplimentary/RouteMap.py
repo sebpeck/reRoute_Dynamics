@@ -39,6 +39,7 @@ class RouteMap:
         
         # Calculate the distance between points and cumulative distance
         self._route_df['point_distances[km]'] = self.calc_point_distances()
+        
         self._route_df['cumulative_distance[km]'] = self.calc_cum_distances()
         
         
@@ -111,8 +112,12 @@ class RouteMap:
                                                                             x['lon2']),
                                              axis=1)
         
+        crow_dist = dist_traveled.shift(1)
+        
+        true_dist = ((self._route_df['elevation[km]'].diff())**2 + (crow_dist**2))**(.5)
+        
         # Return the distance series.
-        return dist_traveled.shift(1)
+        return true_dist
     
     
     def calc_cum_distances(self):
@@ -442,7 +447,7 @@ class RouteMap:
         grad_angle = np.arctan(grade)
         grav_accel = 9.81 # m/s^2
         accel_vect = grav_accel * np.sin(grad_angle)
-        return -accel_vect
+        return accel_vect
     
     
     def get_fric_accel(self):

@@ -167,8 +167,6 @@ class TripDynamics:
         route['inertial_force'] = 0
         route['r_change'] = abs(self._ridership_change) > 0
         
-        #print(route['r_change'])
-        
         # Generate empty lists to hold the same values as above.
         vel_list = []
         acc_list = []
@@ -184,6 +182,10 @@ class TripDynamics:
         random.seed(42)
         # Set up a boolean for checking if the bus will stop.
         is_stopping = (random.randrange(3) == 0)
+        
+        # Set up the final point of the route so that the bus actually stops there.
+        route.at[len(route)-2,'is_stop'] = True
+        route.at[len(route)-2, 'r_change'] = True
         
         # Loop through each point on the route
         for i in range(1, len(route)-1):
@@ -212,7 +214,7 @@ class TripDynamics:
             
             # get the list of stops as defined by the distance between each stop on the route,
             #including signals, in meters
-            stops_remain = remaining_trip[((remaining_trip['is_stop'] == True) & remaining_trip['r_change'] == True) | ((remaining_trip['is_signal'] == True) & is_stopping)]['cumulative_distance[km]'].reset_index(drop=True)*1000 #convert to meters
+            stops_remain = remaining_trip[((remaining_trip['is_stop'] == True) & remaining_trip['r_change'] == True)| ((remaining_trip['is_signal'] == True) & is_stopping)]['cumulative_distance[km]'].reset_index(drop=True)*1000 #convert to meters
 
             # if there are remaining stops,
             if (len(stops_remain) != 0):
@@ -239,13 +241,21 @@ class TripDynamics:
             a_hill = hill_a_prof[i]
             
             # combine the accelerations to get external (to the bus's motor) acceleration
-            ext_a = a_fric - a_hill 
+            ext_a = a_fric + a_hill 
             
             # calculate the stopping distance based on the starting velocity and external acceleration
             stopping_dist = bus.get_braking_distance(start_velocity, braking_factor, ext_a) #meters
             
             # get the speed limit at current point
             point_sp_lim = route['speed_limit[km/s]'][i] * 1000 # meters
+            
+            # Error correction for when speed limit has noise
+            stable_limit = True
+            if (i > 2 and i < len(route)-2):
+                # get a boolean for if any change in speed limit is stable:
+                mean_limit = (route['speed_limit[km/s]'][i-1:i+1]*1000).mean()
+                stable_limit = abs(point_sp_lim - mean_limit) < .1
+                point_sp_lim = mean_limit
             
             # set up a variable for status
             status = ""
@@ -255,23 +265,21 @@ class TripDynamics:
             # Driving logic: -------------------------------------------------------
             #If at rest, accelerate for the distance between this and the next point
             if (start_velocity < 0.1):
-                def decision(probability): return random.random() < probability
-                is_stopping = decision(1) # probability is always, currently setup for later.
                 status = "accel_from_0"
-                d_power, d_t = bus.accelerate_v3(point_dist, ext_a)
+                d_power, d_t = bus.accelerate_v4(point_dist, ext_a)
                 
             # If the distance difference between stopping distance and distance to the stop
             # is less than half the point distance resolution, then brake
             
-            elif ((dist_to_stop < (stopping_dist + point_dist))):#and (abs(self._ridership_change[next_stop_index]) > 0)):
+            elif ((dist_to_stop < (stopping_dist + point_dist))): #and (abs(self._ridership_change[next_stop_index]) > 0)):
                 status = "Stopping_brake"
-                d_power, d_t = bus.brake_v2(point_dist, braking_factor, ext_a)
+                d_power, d_t = bus.brake_v3(point_dist, braking_factor, ext_a)
             #elif((dist_to_stop-stopping_dist)<= point_dist):
                 
             # If the starting velocity is less than the speed limit, accelerate. Margin is 1/20th of speed limit.
             elif(start_velocity < (point_sp_lim - point_sp_lim/20)):
                 status = "speed_lim_accel"
-                d_power, d_t = bus.accelerate_v3(point_dist, ext_a)
+                d_power, d_t = bus.accelerate_v4(point_dist, ext_a)
                 
             # if the starting celocity is greater than the speed limit, 
             elif(start_velocity > (point_sp_lim+point_sp_lim/20)):
@@ -279,10 +287,10 @@ class TripDynamics:
                 # find the distance needed to reach speed limit
                 b_dist = ((point_sp_lim)**2 - start_velocity**2)/2 /(bus.get_b_accel())
                 # brake for that distance
-                d_power, d_t = bus.brake_v2(b_dist, braking_factor-.3, ext_a)
+                d_power, d_t = bus.brake_v3(b_dist, braking_factor-.2, ext_a)
             else:
                 status = "maintain_v"
-                d_power, d_t = bus.maintain_v2(point_dist, ext_a)
+                d_power, d_t = bus.maintain_v4(point_dist, ext_a)
             # End driving logic ---------------------------------------------------------
             
             
