@@ -6,21 +6,31 @@ import numpy as np
 import RouteMap as rm
 
 class TripDynamics:
-    def __init__(self, route_map, bus_model, bus_ridership, ridership_type='mean', seed=None):
+    def __init__(self,
+                 route_map,
+                 bus_model,
+                 bus_ridership,
+                 braking_aggresion = 1, # default 1 based on maximum braking aggression
+                 ridership_type='mean', # means how the ridership is taken, mean passengers on/off, or chance of passenger on/off. Chance currently unsure how to use.
+                 seed=42, # life, the universe, and everything
+                 stoplight_chance = .84615): # Defuault based on 120s cycle, 55s g, 65 red/yellow. https://wsdot.wa.gov/travel/operations-services/traffic-signals:
         self._route_map = route_map
         self._bus_model = bus_model
-        self._ridership_type = ridership_type
+        self._ridership_type = ridership_type 
         self._rand_seed = seed
+        self._braking_aggression = braking_aggresion 
+        self._stoplight_chance = stoplight_chance
+        
+        # Check ridership type
         if (self._ridership_type == 'mean'):
             self._ridership = bus_ridership
-        elif (self._ridership_type == 'chance'):
+        elif (self._ridership_type == 'chance')
             self._ridership = self.riders_from_chance(bus_ridership)
+        
+        # generate gdf, ridership, and bus mass
         self._route_data = self._route_map.get_gdf()
         self._route_data['riders'] = self.generate_rider_profile()
         self._route_data['bus_mass'] = self.generate_mass_profile()
-        #Presently unused and innacurate
-        self._route_data['f_grav'] = self._route_data['bus_mass'] * self._route_map.get_hill_accel()
-        self._route_data['f_fric'] = self._route_data['bus_mass'] * self._route_map.get_fric_accel()  * self._bus_model.get_fric_coeff()
         
         self._trip_data = None
         
@@ -128,14 +138,16 @@ class TripDynamics:
         bus_trip uses the route data and bus information to simulate the bus
         travelling according to a set logic, and returns the route geodataframe with new information
         on acceleration, time, and velocity.
+        
+        Parameters:
+        None
+        
+        Returns:
+        the geodataframe of all data involved in the process
         '''
         
         # get the route geodataframe
         route = self._route_map.get_gdf()
-        
-        # Get get the stop boolean column, setting the final
-        # two positions to stops to help ensure proper completion.
-        #route['is_stop'][:-2] == True
         
         # get the frictional acceleration profile of the route
         fric_a_prof = self._route_map.get_fric_accel()
@@ -153,7 +165,7 @@ class TripDynamics:
         max_v = bus.max_velocity()
         
         # variable for how hard the driver presses on the brake while braking
-        braking_factor = 1
+        braking_factor = self._braking_aggression
         
         # define new columns for velocity, stop distance, state, and stopping distance,
         # Power needed, and time change.
@@ -164,7 +176,6 @@ class TripDynamics:
         route['power_needed[W]'] = 0
         route['st'] = 0
         route['time_change[s]'] = 0
-        route['inertial_force'] = 0
         route['r_change'] = abs(self._ridership_change) > 0
         
         # Generate empty lists to hold the same values as above.
@@ -179,9 +190,8 @@ class TripDynamics:
         # get the accelerational profile of the bus.
         accel_profile = bus.get_accel_profile()
         
-        random.seed(42)
-        # Set up a boolean for checking if the bus will stop.
-        is_stopping = (random.randrange(3) == 0)
+        # Set the random seed
+        random.seed(self._rand_seed)
         
         # Set up the final point of the route so that the bus actually stops there.
         route.at[len(route)-2,'is_stop'] = True
@@ -212,8 +222,12 @@ class TripDynamics:
             # set the index of the next stop to dummy variable of 0
             next_stop_index = 0
             
+            # Set up a boolean for checking if the bus will stop. range based on closest integer to the inverse fraction provided
+            is_stopping = (random.randrange(int(round(1/self._stoplight_chance),0)) == 0)
+            
             # get the list of stops as defined by the distance between each stop on the route,
             #including signals, in meters
+            #                                    Check if it's a stop and that stop has a ridership change         or      check if its a signal and the bus is stopping
             stops_remain = remaining_trip[((remaining_trip['is_stop'] == True) & remaining_trip['r_change'] == True)| ((remaining_trip['is_signal'] == True) & is_stopping)]['cumulative_distance[km]'].reset_index(drop=True)*1000 #convert to meters
 
             # if there are remaining stops,
@@ -266,7 +280,7 @@ class TripDynamics:
             #If at rest, accelerate for the distance between this and the next point
             if (start_velocity < 0.1):
                 status = "accel_from_0"
-                d_power, d_t = bus.accelerate_v4(point_dist, ext_a)
+                d_power, d_t = bus.accelerate_v5(point_dist, ext_a)
                 
             # If the distance difference between stopping distance and distance to the stop
             # is less than half the point distance resolution, then brake
@@ -276,21 +290,20 @@ class TripDynamics:
                 d_power, d_t = bus.brake_v3(point_dist, braking_factor, ext_a)
             #elif((dist_to_stop-stopping_dist)<= point_dist):
                 
-            # If the starting velocity is less than the speed limit, accelerate. Margin is 1/20th of speed limit.
-            elif(start_velocity < (point_sp_lim - point_sp_lim/20)):
+            # If the starting velocity is less than the speed limit, accelerate. Margin is 1/25th of speed limit.
+            elif(start_velocity < (point_sp_lim - point_sp_lim/25)):
                 status = "speed_lim_accel"
-                d_power, d_t = bus.accelerate_v4(point_dist, ext_a)
+                d_power, d_t = bus.accelerate_v5(point_dist, ext_a)
                 
             # if the starting celocity is greater than the speed limit, 
-            elif(start_velocity > (point_sp_lim+point_sp_lim/20)):
+            elif(start_velocity > (point_sp_lim+point_sp_lim/25)):
                 status = "speed_lim_brk"
-                # find the distance needed to reach speed limit
-                b_dist = ((point_sp_lim)**2 - start_velocity**2)/2 /(bus.get_b_accel())
+                
                 # brake for that distance
-                d_power, d_t = bus.brake_v3(b_dist, braking_factor-.2, ext_a)
+                d_power, d_t = bus.brake_v3(point_dist, braking_factor-.4, ext_a)
             else:
                 status = "maintain_v"
-                d_power, d_t = bus.maintain_v4(point_dist, ext_a)
+                d_power, d_t = bus.maintain_v5(point_dist, ext_a)
             # End driving logic ---------------------------------------------------------
             
             
@@ -322,8 +335,10 @@ class TripDynamics:
     def get_all_data(self):
         '''
         get_all_data returns the dataframe generated after a trip is performed.
+        
         Parameters:
         N/A
+        
         Returns: 
         Dataframe of Trip data, or None if no trip has been performed.
         '''
