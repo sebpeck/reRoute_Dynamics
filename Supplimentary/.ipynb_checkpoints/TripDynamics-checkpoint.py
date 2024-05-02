@@ -24,7 +24,7 @@ class TripDynamics:
         # Check ridership type
         if (self._ridership_type == 'mean'):
             self._ridership = bus_ridership
-        elif (self._ridership_type == 'chance')
+        elif (self._ridership_type == 'chance'):
             self._ridership = self.riders_from_chance(bus_ridership)
         
         # generate gdf, ridership, and bus mass
