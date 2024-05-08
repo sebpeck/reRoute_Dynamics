@@ -415,7 +415,9 @@ class RouteMap:
     def get_grade(self):
         elevation = self.get_elevation().diff()
         distance = self.get_distances()['point_distances[km]']
-        grade = elevation / distance
+        # convert true distance back to flat pointwise distances
+        dist_flat = (distance**2 - elevation**2)**(1/2)
+        grade = elevation / dist_flat
         grade = grade.clip(upper=.10, lower=-.10)
         return grade*100
     
