@@ -223,7 +223,7 @@ class TripDynamics:
             next_stop_index = 0
             
             # Set up a boolean for checking if the bus will stop. range based on closest integer to the inverse fraction provided
-            is_stopping = (random.randrange(int(round(1/self._stoplight_chance),0)) == 0)
+            is_stopping = (random.randrange(int(round(1/self._stoplight_chance,0))) == 0)
             
             # get the list of stops as defined by the distance between each stop on the route,
             #including signals, in meters

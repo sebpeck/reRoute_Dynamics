@@ -581,9 +581,24 @@ class BusModel:
         
         # get the initial pass of final velocity
         v_f = v_i
-        
+            
+   
         # first pass calculation of power
         power_calc = (self._i_factor * bus_a + a_subsum) * m * v_i
+        
+        # check that the bus brakes are capable of slowing adequately
+        if (a_subsum + bus_a) < self._a_braking:
+            while (a_subsum+ bus_a) < self._a_braking:
+                
+                bus_a += .01
+                
+                # recalculate time based on kinematic equations
+                dt = ((2*bus_a*dist + v_i**2)**(1/2) - v_i) / bus_a 
+                
+                # get the new power calculation
+                power_calc = self.get_power(bus_a, dt, v_i, m, a_subsum, self._i_factor) 
+                
+            
     
         # if the preliminary power calculation exceeds the maximum power
         if power_calc > max_p:
@@ -598,7 +613,11 @@ class BusModel:
                 dt = ((2*bus_a*dist + v_i**2)**(1/2) - v_i) / bus_a 
                 
                 # get the new power calculation
-                power_calc = self.get_power(bus_a, dt, v_i, m, a_subsum, self._i_factor)
+                power_calc = self.get_power(bus_a, dt, v_i, m, a_subsum, self._i_factor)     
+    
+                
+                
+        
         
         # adjust the current velocity according to the bus acceleration
         self._current_velocity = v_i + bus_a * dt
