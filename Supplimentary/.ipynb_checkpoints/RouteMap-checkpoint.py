@@ -162,7 +162,7 @@ class RouteMap:
         route_bounds = hm.get_bounding_box(LineString(pts['geometry']))
         
         # use only the streets within the bounding box
-        streets = streets[streets['geometry'].apply(hm.get_bounding_box).apply(lambda x: shapely.contains(route_bounds, x)) == True]
+        streets = (streets[streets['geometry'].apply(hm.get_bounding_box).apply(lambda x: shapely.contains(route_bounds, x)) == True]).reset_index(drop=True)
         
         # Set an overall speed limit of zero
         pts['limit'] = 0
@@ -230,8 +230,21 @@ class RouteMap:
         # Get a copy of the joint geometry.
         joint_geometry = self._joint_geometry.copy()
         
+        bound_stops = stops.copy()
+        print('\t\t {}'.format(len(bound_stops)))
+        if (stop_type == 1):
+            pts = self._route_df.copy()
+            #generate the bounding box of the route:
+            route_bounds = hm.get_bounding_box(LineString(pts['geometry']))
+
+            # use only the points within the bounding box
+            bound_stops = (bound_stops[bound_stops.apply(hm.get_bounding_box).apply(lambda x: shapely.contains(route_bounds, x)) == True]).reset_index(drop=True)
+        print('\t\t\t {}'.format(len(bound_stops)))
+        
+        
         # Get the latitude and longitude of the stop data
-        stop_lat_lons = self.geo_to_la_lon(stops)
+        stop_lat_lons = self.geo_to_la_lon(bound_stops)
+        
         # set the default stop distance to 999,999,999 kilometers
         joint_geometry['stop_dist'] = 999999999
         
@@ -242,7 +255,7 @@ class RouteMap:
         for i in range(len(stop_lat_lons)):
             
             # If debugging, print progress
-            if self._debug: print('{0:.2f}%     '.format(i/len(joint_geometry)*100), end = "\r")
+            if self._debug: print('{0:.2f}%     '.format(i/len(stop_lat_lons)*100), end = "\r")
             
             # get the latitude and longitude of the current stop
             la1 = stop_lat_lons['latitude'][i]
@@ -274,7 +287,7 @@ class RouteMap:
             else:
                 # Otherwise, dont categorize it as a stop
                 joint_geometry.at[cord_id, 'is_stop'] = False
-                
+        print('\t\t\t\t {}'.format(len(joint_geometry[joint_geometry['is_stop'] == True])))
         # Return a pandas series of booleans for a stop with indexes corresponding to the route idxs.
         return joint_geometry['is_stop']
     
