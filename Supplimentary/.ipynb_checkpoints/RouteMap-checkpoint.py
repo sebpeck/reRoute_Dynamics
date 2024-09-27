@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 from scipy.signal import savgol_filter as sf
 from shapely.geometry import Point, LineString
+import shapely
 
 class RouteMap:
     def __init__(self,
@@ -156,6 +157,12 @@ class RouteMap:
         # Generate a copy of the speed limits and the route_dataframe geometry
         streets = limits.copy()
         pts = self._route_df.copy()
+        
+        #generate the bounding box of the route:
+        route_bounds = hm.get_bounding_box(LineString(pts['geometry']))
+        
+        # use only the streets within the bounding box
+        streets = streets[streets['geometry'].apply(hm.get_bounding_box).apply(lambda x: shapely.contains(route_bounds, x)) == True]
         
         # Set an overall speed limit of zero
         pts['limit'] = 0
