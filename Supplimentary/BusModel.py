@@ -359,9 +359,10 @@ class BusModel:
         del(acc_prof['t_f'])
         
         # create columns for initial velocity, power, and acceleration
-        acc_prof['vi'] = 0
-        acc_prof['power'] = 0
-        acc_prof['a_param'] = 0
+        acc_prof['vi'] = 0.0
+        acc_prof['power'] = 0.0
+        acc_prof['a_param'] =0.0
+
         
         # create varables for travel distance and iteratable for the while loop
         trav_dist = 0
