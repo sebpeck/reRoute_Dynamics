@@ -41,6 +41,7 @@ class RouteMap:
         # Calculate the distance between points and cumulative distance
         self._route_df['point_distances[km]'] = self.calc_point_distances()
         
+        
         self._route_df['cumulative_distance[km]'] = self.calc_cum_distances()
         
         
@@ -103,6 +104,27 @@ class RouteMap:
         in units of kilometers.
         """
         
+        crow_dist = self.crow_dist()
+        
+        true_dist = ((self._route_df['elevation[km]'].diff())**2 + (crow_dist**2))**(.5)
+        
+        # Return the distance series.
+        return true_dist
+    
+    def crow_dist(self):
+        """
+        crow_dist calculates the distances between the route points,
+        and returns a pandas series of distances between points in the route,
+        as the crow flies.
+        
+        Parameters:
+        None.
+        
+        Returns:
+        a series of distances with indexes corresponding to the route data,
+        in units of kilometers.
+        """
+        
         # Get a copy of the joint_geometry.
         joint_geometry = self._joint_geometry.copy()
 
@@ -114,11 +136,8 @@ class RouteMap:
                                              axis=1)
         
         crow_dist = dist_traveled.shift(1)
+        return crow_dist
         
-        true_dist = ((self._route_df['elevation[km]'].diff())**2 + (crow_dist**2))**(.5)
-        
-        # Return the distance series.
-        return true_dist
     
     
     def calc_cum_distances(self):
@@ -231,7 +250,6 @@ class RouteMap:
         joint_geometry = self._joint_geometry.copy()
         
         bound_stops = stops.copy()
-        print('\t\t {}'.format(len(bound_stops)))
         if (stop_type == 1):
             pts = self._route_df.copy()
             #generate the bounding box of the route:
@@ -239,7 +257,6 @@ class RouteMap:
 
             # use only the points within the bounding box
             bound_stops = (bound_stops[bound_stops.apply(hm.get_bounding_box).apply(lambda x: shapely.contains(route_bounds, x)) == True]).reset_index(drop=True)
-        print('\t\t\t {}'.format(len(bound_stops)))
         
         
         # Get the latitude and longitude of the stop data
@@ -287,7 +304,6 @@ class RouteMap:
             else:
                 # Otherwise, dont categorize it as a stop
                 joint_geometry.at[cord_id, 'is_stop'] = False
-        print('\t\t\t\t {}'.format(len(joint_geometry[joint_geometry['is_stop'] == True])))
         # Return a pandas series of booleans for a stop with indexes corresponding to the route idxs.
         return joint_geometry['is_stop']
     
