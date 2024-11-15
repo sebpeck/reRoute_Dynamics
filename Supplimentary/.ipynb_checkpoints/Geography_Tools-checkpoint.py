@@ -488,7 +488,10 @@ def query_elevation_series(geometry, gtiff_dir_ser, verbose=False):
     if verbose: verbose_line_updater("Elevation succesfully queried. Returning values.")
                 
     # convert to series and return.
-    return pd.Series(data_dict)
+    return pd.Series(data_dict).apply(lambda x: x[0])/1000
+
+
+### ---- Processing Tools ---- ###
 
 
 def combine_lidar_data(dsm, dx, max_grade=7.5):
@@ -518,4 +521,29 @@ def combine_lidar_data(dsm, dx, max_grade=7.5):
     # get the filtered elevation. 
     filtered = data.apply(lambda x: (int(abs(x.dsm_dy/x.dx*100)>max_grade) * x.rolling_dsm) + (int(abs(x.dsm_dy/x.dx*100)<=max_grade)*x.dsm), axis=1)
 
+    # return the values.
     return filtered.values
+
+
+
+def calculate_grades(dx, elevations, max_grade=7.5):
+    '''
+    calculate_grades takes the distance between points,
+    as well as the elevations at each point, and returns the grade at each point.
+    
+    Params:
+    dx - an iterable of distances between each point
+    elevations - an iterable of elevations corresponding to each point.
+    max_grade - an int representing the maximum grade a point can be without being clipped to.
+    
+    Returns:
+    iterable of the slope grade at each point. 
+    '''
+    
+    # calculate the grade percentage using the elevation difference and distance difference,
+    # and clip it to the max grade.
+    grades = (pd.Series(elevations).diff()/pd.Series(dx)*100).clip(max_grade, -max_grade)
+    
+    # return the grade.
+    return grades
+    
