@@ -10,6 +10,7 @@ from alive_progress import alive_bar
 import inspect
 import rasterio
 import os
+import scipy
 
 def haversine_formula(x1, y1, x2, y2):
     '''
@@ -50,6 +51,73 @@ def haversine_formula(x1, y1, x2, y2):
     return distance
 
 
+def compass_heading(bearing):
+    '''
+    compass_heading converts a bearing in degrees to a
+    compass value like North, South, or East.
+    
+    Params:
+    bearing - the bearing value, in degrees, as float.
+    
+    Returns:
+    string representation of compass heading.
+    
+    Notes: 
+    11/18/2024 - There is a more mathematically elegant solution to this, but I'm not bothering
+                 with it right now.
+    '''
+    
+    # set up a list of possible compass directions
+    possible_dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"]
+    
+    # get the index of the 45 quadrants the angle bearing is in
+    bearing_index = int(np.round(bearing/45))
+    
+    # make sure the index isn't negative
+    if bearing_index < 0:
+        bearing_index=bearing_index+8
+        
+    # return the corresponding compass direction
+    return possible_dirs[bearing_index]
+    
+
+def point_bearing(x1, y1, x2, y2, bearing_type = "Angle"):
+    '''
+    point_bearing takex in the latitude and longitude of two separate ponts,
+    and calculates the bearing when travelling from point 1 and point 2.
+    
+    Params:
+    x1 - latitude pt 1 in degrees
+    y1 - longitude pt 1 in degrees
+    x2 - latitude pt 2 in degrees
+    y2 - longitude pt 2 in degrees
+    bearing_type - determine the bearing output.
+                    Options: Angle - return the angle in degrees
+                             Compass - return the angle as a directional bearing (eg: N, E, S, W)
+    
+    Returns:
+    bearing of the vector between the two points. 
+    
+    '''
+    # convert to radians
+    lat1=np.radians(x1)
+    lon1=np.radians(y1)
+    lat2=np.radians(x2)
+    lon2=np.radians(y2)
+    
+    # run the bearing calculation
+    x = np.cos(lat2) * np.sin(lon2-lon1)
+    y = np.cos(lat1) * np.sin(lat2) - np.sin(lat1) * np.cos(lat2) * np.cos(lon2-lon1)
+    bearing = np.arctan2(x, y)
+    bearing = np.degrees(bearing)+180
+    
+    # check the return type
+    if (bearing_type == "Angle"):
+        return bearing
+    elif (bearing_type == "Compass"):
+        return compass_heading(bearing)
+
+
 def get_bounding_box(shape):
     '''
     get_bounding_box() takes in a shapely shape,
@@ -72,6 +140,54 @@ def get_bounding_box(shape):
     
     # return a shapely polygon of those coordinates
     return shapely.Polygon(boundary_coords)
+
+
+def interpolate_points(point_1, point_2, max_dist=1):
+    '''
+    interpolate_points takes two shapely points and a maximum distance,
+    and then interpolates between the points if the maximum distance is exceeded.
+    
+    Params:
+    point_1 - starting point as a shapely point of lat, lon
+    point_2 - final point as a shapely point of lat, lon
+    max_dist - maximum distance the points can be without interpolation. Default int of 1.
+    
+    Returns:
+    an iterable of lon,lat shapely points. 
+    '''
+    
+    # get distance in meters
+    distance = haversine_formula(point_1.y, point_1.x, point_2.y, point_2.x)*1000
+    if distance < max_dist:
+        return [point_1]
+    else:
+        # calculate the number of points between to be interpolated
+        num_interp = int(np.ceil(distance/max_dist)) - 1
+        
+        # calculate the distance between each interpolated point
+        dx = distance/num_interp
+        
+        # generate a linestring
+        line = shapely.LineString([point_1, point_2])
+        
+        # create the points list with the initial point
+        points = [point_1]
+        
+        # loop through each distance from the origin 
+        for dis in np.arange(dx/distance, 1, dx/distance):
+            
+            # interpolate a point
+            i_point = line.interpolate(dis, normalized=True).coords[:][0]
+            
+            # convert it to a shapely point
+            i_point = shapely.Point(i_point[0], i_point[1])
+            
+            # append the point
+            points.append(i_point)
+            
+        # return the points
+        return points[::-1]
+            
 
 ### ---- SERIES QUERY METHODS ---- ###
 
@@ -290,6 +406,7 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
     11/13/2024 - This can be adjusted such that instead of the first value, it's the true closest.
                  Also can probably be combined with the other queries in such a way that it reduces individual
                  methods. 
+    11/18/2024 - Currently Broken.
     '''
     # DEPENDING ON THE FILE, THIS CAN TAKE A WHILE.
     
@@ -298,7 +415,7 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
 
     # get the speed limit data from the shapefile
     if verbose: verbose_line_updater("Loading shapefile & setting EPSG: {}".format(limit_data_path))
-    limits = gpd.read_file(limit_data_path).to_crs(epsg=epsg)
+    limits = gpd.read_file(limit_data_path)#.to_crs(epsg=epsg)
     if verbose: verbose_line_updater("Shapefile loaded with EPSG:{}.".format(epsg))
     
     # get the streets that are within the bounding box
@@ -315,13 +432,15 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
         for point in list(geometry):
 
             # get the speed limit at the point through checking that the distance is within the margin. Use first value that appears.
-            limit = bound_streets[bound_streets.geometry.apply(lambda x: x.distance(point)*1000 < margin) == True].reset_index().iloc[0][key]
-
+            bound_streets['dist'] = bound_streets.geometry.apply(lambda x: x.distance(point)*1000)
+            sorted_streets = bound_streets.sort_values(by=['dist'])
+            limit = bound_streets[bound_streets.apply(lambda x: x.dist < margin) == True].reset_index()
             # append the limit to the list.
             limit_list.append(limit)
             bar()
     
-    # while there is a speed limit of zero, swap them out for the next nearest speed limit that isn't zero.
+    # while there is a speed limit of zero, swap them out for the next nearest speed limit that isn't zero
+    '''
     while (0 in limit_list):
         for i in range(len(limit_list)):
             print(i, end='\r')
@@ -332,10 +451,55 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
                     limit_list[i] = limit_list[i-1]
                     
     if verbose: verbose_line_updater("Speed limits processed. Returning values.")
+    '''
 
     # return the limit list.
     return limit_list
 
+
+def query_bearings(geometry, bearing_type = "Angle", verbose=False):
+    '''
+    query_bearings takes a geometric iterable of shapely points,
+    and returns the corresponding bearing when travelling form one point to the next.
+    
+    Params:
+    geometry - a series of shapely points of lat and lon
+    bearing_type - determine the bearing output.
+                    Options: Angle - return the angle in degrees
+                             Compass - return the angle as a directional bearing (eg: N, E, S, W)
+    verbose - boolean to enable verbosity. Default False.
+    
+    Returns:
+    list of bearings when travelling to subsequent point. 
+    '''
+    
+    # get the current geometry series
+    if verbose: verbose_line_updater("Loading geometry.")
+    currents = geometry
+    
+    # shift the geometry series up by one, which will be the next ponts.
+    if verbose: verbose_line_updater("Shifting geometry.")
+    nexts = geometry.shift(1)
+
+    # combine the two into a dataframe.
+    if verbose: verbose_line_updater("Combining geometry.")
+    data = pd.concat([currents, nexts], axis=1, keys=['current', 'next']).reset_index(drop=True)
+
+    # get the initial point and make sure it's the first value.
+    initial_point = list(data['current'])[0]
+
+    # set the nan value in the beginning of the 'nexts' to the initial, representing no distance traveled.
+    data.loc[0, 'next'] = initial_point
+
+    # apply the haversine formula to the data, which will yeild a series of changes in distance.
+    if verbose: verbose_line_updater("Calculating bearings.")
+    bearings = data.apply(lambda x: point_bearing(x.current.y, x.current.x, x.next.y, x.next.x, bearing_type), axis=1)
+    if verbose: verbose_line_updater("Bearings processed. Returning values.")
+    
+    return bearings
+
+    
+    
 
 ### ---- ELEVATION TOOLS ---- ###
 
@@ -355,7 +519,7 @@ def get_rasterfiles(dir_path):
     rasterfiles_raw = pd.Series(os.listdir(dir_path))
     
     # filter the list to only be those that contain tif. 
-    rasterfiles = rasterfiles_raw[rasterfiles_raw.apply(lambda x: ('tif' in (x.split("."))[-1]))].reset_index(drop='true')
+    rasterfiles_raw = rasterfiles_raw[rasterfiles_raw.apply(lambda x: ('tif' in (x.split("."))[-1]))].reset_index(drop='true')
     rasterfiles = rasterfiles_raw[rasterfiles_raw.apply(lambda x: ('.tif_' not in x))].reset_index(drop='true')
     # convert the paths to have the full path rather than just the filenames.
     rasterfiles = rasterfiles.apply(lambda x: "{}{}".format(dir_path, x))
@@ -482,13 +646,25 @@ def query_elevation_series(geometry, gtiff_dir_ser, verbose=False):
 
                     # add the filtered value to the data dictionary at the index corresponding to
                     # its respective point.
-                    data_dict[index] = filtered[index]
+                    data_dict[index] = filtered[index][0]
                 bar()
                 
     if verbose: verbose_line_updater("Elevation succesfully queried. Returning values.")
                 
     # convert to series and return.
-    return pd.Series(data_dict).apply(lambda x: x[0])/1000
+    return pd.Series(data_dict).apply(float).values/1000
+
+
+
+def smooth_elevation(elev_series, lg:int = 43, deg:int = 3):
+
+        # Apply the savgol filter to the points
+        y_new = scipy.signal.savgol_filter(elev_series,
+                   lg,
+                   deg,
+                   axis = 0)
+
+        return y_new
 
 
 ### ---- Processing Tools ---- ###
@@ -525,7 +701,6 @@ def combine_lidar_data(dsm, dx, max_grade=7.5):
     return filtered.values
 
 
-
 def calculate_grades(dx, elevations, max_grade=7.5):
     '''
     calculate_grades takes the distance between points,
@@ -546,4 +721,57 @@ def calculate_grades(dx, elevations, max_grade=7.5):
     
     # return the grade.
     return grades
+
+
+def interpolate_geometry_series(geometry, max_distance=1):
+    '''
+    interpolate_geometry_series takes an iterable of geospatial shapely points,
+    and then generates an interpolated series in the event that
+    the maximum distance (in meters) is exceeded.
+    
+    Params:
+    geometry - a series of shapely points of lat and lon
+    max_distance - int representing maximum distance the points can be
+                   without interpolation
+                   
+    Returns:
+    iterable of lists of shapely points that have been interpolated.
+    '''
+    
+    currents = pd.Series(geometry)
+    
+    # shift the geometry series up by one, which will be the next ponts.
+    nexts = geometry.shift(1)
+
+    # combine the two into a dataframe.
+    data = pd.concat([currents, nexts], axis=1, keys=['current', 'next']).reset_index(drop=True)
+    
+    # get the initial point and make sure it's the first value.
+    initial_point = list(data['current'])[0]
+
+    # set the nan value in the beginning of the 'nexts' to the initial, representing no distance traveled.
+    data.loc[0, 'next'] = initial_point
+    # interpolate the points
+    
+    grace = data.apply(lambda x: interpolate_points(x.current, x.next, max_dist=max_distance), axis=1)
+    
+    # explode the data so that its a cohesive series
+    sploded = grace.explode().reset_index(drop=True)
+    
+    # return an iterable of the interpolated points at each index
+    return grace
+
+
+def interpolate_distance_traveled(dx, interpolated_iterable):
+    
+    data = pd.concat([pd.Series(dx), interpolated_iterable.apply(len)], axis=1, keys=['dx', 'i_i']).reset_index(drop=True)
+    
+    interp = data.apply(lambda x: [x.dx/x.i_i]*int(x.i_i), axis=1)
+    
+    return interp
+
+
+        
+        
+    
     
