@@ -95,9 +95,58 @@ def query_shape(shape_num, shape_table_dir, fwd_flag = True):
     
     # add the sequence indexer
     gdf['sequence'] = trip_shape['shape_pt_sequence']
+    gdf = gdf.reset_index(drop=True)
     
     # Check if the series should be reversed or not before returning
     if fwd_flag:
         return gdf
     else:
         return gdf.iloc[::-1]
+    
+    
+def check_valid_stops_by_shape(stop_sequence, shape_id, trip_table_dir, stop_times_dir):
+    '''
+    check_valid_stops_by_shape() takes an iterable of stop IDs,
+    a shape id, and the directories for trip table and stop time data,
+    and validates all stops in that sequence that belong to the passed shape.
+    
+    Params:
+    stop_sequence - an iterable of stop ID ints.
+    shape_id - an int representing a route shape.
+    trip_table_dir - str representing path to the trip table.
+    stop_times_dir - str representing path to stop times data.
+    
+    Returns:
+    list of booleans corresponding to valid or invalid stops.
+    '''
+    
+    # empty list to generate
+    stop_bools = []
+    
+    # read the data
+    trips = pd.read_csv(trip_table_dir)
+    stop_times = pd.read_csv(stop_times_dir)
+    
+    # loop through each id in the passed list
+    for stop_id in stop_sequence:   
+        
+        # filter the stop times to the ones with the current id
+        s_stop_times = stop_times[stop_times['stop_id'] == stop_id]
+        
+        # empty list for possible shapes that use that stop
+        shape_id_list = []
+        
+        # loop through the unique trip ids
+        for trip_id in s_stop_times['trip_id'].unique():
+            
+            # add all unique shapes corresponding to that trip to the shape list
+            shape_id_list.extend(trips[trips['trip_id'] == trip_id]['shape_id'].unique())
+            
+        # gives true if the shape ID is within the uniqe values pulled from the trips with that stop.
+        is_valid_stop = shape_id in pd.Series(shape_id_list).unique()
+        
+        # append the stop boolean
+        stop_bools.append(is_valid_stop)
+        
+    # return the list.
+    return stop_bools

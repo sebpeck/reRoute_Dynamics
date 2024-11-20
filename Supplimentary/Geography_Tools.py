@@ -109,7 +109,7 @@ def point_bearing(x1, y1, x2, y2, bearing_type = "Angle"):
     x = np.cos(lat2) * np.sin(lon2-lon1)
     y = np.cos(lat1) * np.sin(lat2) - np.sin(lat1) * np.cos(lat2) * np.cos(lon2-lon1)
     bearing = np.arctan2(x, y)
-    bearing = np.degrees(bearing)+180
+    bearing = np.degrees(bearing)
     
     # check the return type
     if (bearing_type == "Angle"):
@@ -186,8 +186,44 @@ def interpolate_points(point_1, point_2, max_dist=1):
             points.append(i_point)
             
         # return the points
-        return points[::-1]
+        return points
+    
+    
+def repeat_id_remover(sequence):
+    '''
+    repeat_id_remover takes an iterable of IDs where -1 is invalid,
+    and swaps out any repeat index with an invalid.
+    
+    Params:
+    sequence - a sequence of id values in an iterable.
+    
+    Returns:
+    sequence with repeated values swapped for a -1.
+    '''
+    
+    # start the sequence with invalid
+    sequence_value = -1
+    
+    # build a list for the new sequence
+    new_sequence = []
+    
+    # loop through the old
+    for item in sequence:
+        
+        # check if the item is the same as the saved val
+        if (item == sequence_value):
             
+            # if so, append invalid
+            new_sequence.append(-1)
+        else:
+            
+            # otherwise, append the item and swap the saved val for the item
+            new_sequence.append(item)
+            sequence_value=item
+            
+    # return the new sequence
+    return new_sequence
+
 
 ### ---- SERIES QUERY METHODS ---- ###
 
@@ -286,8 +322,8 @@ def query_stops(geometry, stop_table_path, key='stop_id', epsg_from = 4326, epsg
     if verbose: verbose_line_updater("Stops processed. Returning values.")
     
         
-    # return the stop id list.
-    return stop_id_list
+    # return the stop id list with repeats removed.
+    return repeat_id_remover(stop_id_list)
 
 
 def query_distance_traveled(geometry_series, verbose=False):
@@ -309,17 +345,17 @@ def query_distance_traveled(geometry_series, verbose=False):
     
     # shift the geometry series up by one, which will be the next ponts.
     if verbose: verbose_line_updater("Shifting geometry.")
-    nexts = geometry_series.shift(1)
+    nexts = geometry_series.shift(-1)
 
     # combine the two into a dataframe.
     if verbose: verbose_line_updater("Combining geometry.")
     data = pd.concat([currents, nexts], axis=1, keys=['current', 'next']).reset_index(drop=True)
 
-    # get the initial point and make sure it's the first value.
-    initial_point = list(data['current'])[0]
+    # get the initial point and make sure it's the last value.
+    final_point = list(data['current'])[-1]
 
     # set the nan value in the beginning of the 'nexts' to the initial, representing no distance traveled.
-    data.loc[0, 'next'] = initial_point
+    data.iloc[-1, data.columns.get_loc("next")] = final_point
 
     # apply the haversine formula to the data, which will yeild a series of changes in distance.
     if verbose: verbose_line_updater("Calculating distances.")
@@ -382,7 +418,7 @@ def query_signals(geometry, signal_data_path, key="SIGNAL_ID", epsg = 4326, marg
     if verbose: verbose_line_updater("Signals processed. Returning values.")
         
     # return the list.
-    return signal_id_list
+    return repeat_id_remover(signal_id_list)
 
 
 
@@ -405,8 +441,8 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
     Notes:
     11/13/2024 - This can be adjusted such that instead of the first value, it's the true closest.
                  Also can probably be combined with the other queries in such a way that it reduces individual
-                 methods. 
-    11/18/2024 - Currently Broken.
+                 methods. FIXED -- 11/19/2024
+    11/18/2024 - Currently Broken. - FIXED -- 11/19/2024
     '''
     # DEPENDING ON THE FILE, THIS CAN TAKE A WHILE.
     
@@ -425,33 +461,37 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
 
     # set up list.
     limit_list = []
-    
+    bound_streets['dist'] = 0
     # loop through the geometry:
     if verbose: verbose_line_updater("Processing speed limits...")
     with alive_bar(len(geometry)) as bar:
         for point in list(geometry):
-
             # get the speed limit at the point through checking that the distance is within the margin. Use first value that appears.
             bound_streets['dist'] = bound_streets.geometry.apply(lambda x: x.distance(point)*1000)
             sorted_streets = bound_streets.sort_values(by=['dist'])
-            limit = bound_streets[bound_streets.apply(lambda x: x.dist < margin) == True].reset_index()
+            limit = bound_streets[bound_streets.apply(lambda x: x.dist < margin, axis=1) == True].reset_index()
+
+            try:
+                limit = limit.sort_values('dist')[key][0]
+            except:
+                limit=0
             # append the limit to the list.
             limit_list.append(limit)
             bar()
     
     # while there is a speed limit of zero, swap them out for the next nearest speed limit that isn't zero
-    '''
+    
     while (0 in limit_list):
         for i in range(len(limit_list)):
-            print(i, end='\r')
+            if verbose: verbose_line_updater("Filling gaps: {}".format(i), reset=True)
+            
             if limit_list[i] == 0:
                 try:
                     limit_list[i] = limit_list[i+1]
                 except:
                     limit_list[i] = limit_list[i-1]
-                    
     if verbose: verbose_line_updater("Speed limits processed. Returning values.")
-    '''
+
 
     # return the limit list.
     return limit_list
@@ -479,17 +519,17 @@ def query_bearings(geometry, bearing_type = "Angle", verbose=False):
     
     # shift the geometry series up by one, which will be the next ponts.
     if verbose: verbose_line_updater("Shifting geometry.")
-    nexts = geometry.shift(1)
+    nexts = geometry.shift(-1)
 
     # combine the two into a dataframe.
     if verbose: verbose_line_updater("Combining geometry.")
     data = pd.concat([currents, nexts], axis=1, keys=['current', 'next']).reset_index(drop=True)
 
     # get the initial point and make sure it's the first value.
-    initial_point = list(data['current'])[0]
+    final_point = list(data['current'])[-1]
 
     # set the nan value in the beginning of the 'nexts' to the initial, representing no distance traveled.
-    data.loc[0, 'next'] = initial_point
+    data.iloc[-1, data.columns.get_loc("next")] = final_point
 
     # apply the haversine formula to the data, which will yeild a series of changes in distance.
     if verbose: verbose_line_updater("Calculating bearings.")
@@ -640,7 +680,7 @@ def query_elevation_series(geometry, gtiff_dir_ser, verbose=False):
 
                 # remove any masked values
                 filtered = route[route.apply(lambda x: str(type(x[0]))) != "<class 'numpy.ma.core.MaskedConstant'>"]
-
+                
                 # loop through the index of the filtered values
                 for index in filtered.index:
 
@@ -651,8 +691,18 @@ def query_elevation_series(geometry, gtiff_dir_ser, verbose=False):
                 
     if verbose: verbose_line_updater("Elevation succesfully queried. Returning values.")
                 
-    # convert to series and return.
-    return pd.Series(data_dict).apply(float).values/1000
+    # convert to series
+    data_series = pd.Series(list(data_dict.values()), index=list(data_dict.keys()))
+    
+    # sort the data by index
+    data_sorted = data_series.sort_index()
+    
+    # convert to km
+    data_valued = data_sorted.apply(float).values/1000
+    
+    # return
+    return data_valued
+
 
 
 
@@ -701,7 +751,7 @@ def combine_lidar_data(dsm, dx, max_grade=7.5):
     return filtered.values
 
 
-def calculate_grades(dx, elevations, max_grade=7.5):
+def calculate_grades(dx, elevations, clip = False , max_grade=7.5):
     '''
     calculate_grades takes the distance between points,
     as well as the elevations at each point, and returns the grade at each point.
@@ -709,6 +759,7 @@ def calculate_grades(dx, elevations, max_grade=7.5):
     Params:
     dx - an iterable of distances between each point
     elevations - an iterable of elevations corresponding to each point.
+    clip - boolean to determine to clip the grades or not. Default False.
     max_grade - an int representing the maximum grade a point can be without being clipped to.
     
     Returns:
@@ -716,8 +767,16 @@ def calculate_grades(dx, elevations, max_grade=7.5):
     '''
     
     # calculate the grade percentage using the elevation difference and distance difference,
-    # and clip it to the max grade.
-    grades = (pd.Series(elevations).diff()/pd.Series(dx)*100).clip(max_grade, -max_grade)
+    grades = (pd.Series(elevations).diff()/pd.Series(dx)*100)
+    
+    # ensure only finite values
+    grades = grades[np.isfinite(grades)]
+    
+    # check to clip the values
+    if clip:
+        grades = grades.clip(max_grade, -max_grade)
+    else:
+        grades=grades
     
     # return the grade.
     return grades
@@ -741,16 +800,16 @@ def interpolate_geometry_series(geometry, max_distance=1):
     currents = pd.Series(geometry)
     
     # shift the geometry series up by one, which will be the next ponts.
-    nexts = geometry.shift(1)
+    nexts = geometry.shift(-1)
 
     # combine the two into a dataframe.
     data = pd.concat([currents, nexts], axis=1, keys=['current', 'next']).reset_index(drop=True)
     
-    # get the initial point and make sure it's the first value.
-    initial_point = list(data['current'])[0]
+    # get the initial point and make sure it's the final value.
+    final_point = list(data['current'])[-1]
 
     # set the nan value in the beginning of the 'nexts' to the initial, representing no distance traveled.
-    data.loc[0, 'next'] = initial_point
+    data.iloc[-1, data.columns.get_loc("next")] = final_point
     # interpolate the points
     
     grace = data.apply(lambda x: interpolate_points(x.current, x.next, max_dist=max_distance), axis=1)
@@ -759,7 +818,7 @@ def interpolate_geometry_series(geometry, max_distance=1):
     sploded = grace.explode().reset_index(drop=True)
     
     # return an iterable of the interpolated points at each index
-    return grace
+    return gpd.GeoSeries(sploded)
 
 
 def interpolate_distance_traveled(dx, interpolated_iterable):
