@@ -7,6 +7,8 @@ import pandas as pd
 import geopandas as gpd
 import shapely
 import numpy as np
+import pyogrio as pio
+
 
 def query_route_id(shortname, route_data_path, shortname_key = 'route_short_name', idnum_key = 'route_id'):
     '''
@@ -150,3 +152,4 @@ def check_valid_stops_by_shape(stop_sequence, shape_id, trip_table_dir, stop_tim
         
     # return the list.
     return stop_bools
+

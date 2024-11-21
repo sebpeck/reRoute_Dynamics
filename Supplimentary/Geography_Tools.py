@@ -11,6 +11,8 @@ import inspect
 import rasterio
 import os
 import scipy
+import pyogrio as pio
+
 
 def haversine_formula(x1, y1, x2, y2):
     '''
@@ -25,6 +27,9 @@ def haversine_formula(x1, y1, x2, y2):
     
     Returns:
     distance between the points in kilometers.
+    
+    Notes:
+    11/20/2024 - Efficiency can be improved by having radian conversion be done externally.
     '''
     
     # convert the degree coordinates to radians
@@ -48,6 +53,8 @@ def haversine_formula(x1, y1, x2, y2):
     
     
     # return the distance in km.
+    if distance < .0001:
+        distance=.0001
     return distance
 
 
@@ -360,9 +367,10 @@ def query_distance_traveled(geometry_series, verbose=False):
     # apply the haversine formula to the data, which will yeild a series of changes in distance.
     if verbose: verbose_line_updater("Calculating distances.")
     dXs = data.apply(lambda x: haversine_formula(x.current.y, x.current.x, x.next.y, x.next.x), axis=1)
+    
     if verbose: verbose_line_updater("Point distances processed. Returning values.")
 
-    # return the series of the changes in distance, in km
+    # return the series of the changes in distance, in km, make sure it never doesn't travel.
     return dXs.values
 
 
@@ -390,7 +398,7 @@ def query_signals(geometry, signal_data_path, key="SIGNAL_ID", epsg = 4326, marg
     
     # Get the signal data.
     if verbose: verbose_line_updater("Loading shapefile & setting EPSG: {}".format(signal_data_path))
-    signals = gpd.read_file(signal_data_path).to_crs(epsg = epsg)
+    signals = pio.read_dataframe(signal_data_path).to_crs(epsg = epsg)
     if verbose: verbose_line_updater("Shapefile laded with EPSG:{}.".format(epsg))
     
     # get the signals that are within the bounds of the data.
@@ -422,7 +430,7 @@ def query_signals(geometry, signal_data_path, key="SIGNAL_ID", epsg = 4326, marg
 
 
 
-def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, margin = 1, verbose=False):
+def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, margin = 1, last_known_limit= 20*0.00044704, verbose=False):
     '''
     query_speed_limits takes a geometric iterable of shapely points,
     a path to speed limit geodata, and returns the corresponding speed limits at
@@ -431,8 +439,9 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
     Params:
     geometry - a series of shapely points of lat and lon
     limit_data_path - path to shapefile of speed limit data as str
-    key - column identifier of a speed limit id or other value as str
+    key - column identifier of a speed limit or other value as str, assumed to be an int in units of mph
     margin - distance a point can be from the street to qualify in meters as int
+    last_known_limit - the speed limit int value that the bus will assumedly start at or above. default 20 mph
     verbose - boolean to enable verbosity. Default False.
     
     Returns:
@@ -451,7 +460,7 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
 
     # get the speed limit data from the shapefile
     if verbose: verbose_line_updater("Loading shapefile & setting EPSG: {}".format(limit_data_path))
-    limits = gpd.read_file(limit_data_path)#.to_crs(epsg=epsg)
+    limits = pio.read_dataframe(limit_data_path).to_crs(epsg=epsg)
     if verbose: verbose_line_updater("Shapefile loaded with EPSG:{}.".format(epsg))
     
     # get the streets that are within the bounding box
@@ -468,32 +477,34 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
         for point in list(geometry):
             # get the speed limit at the point through checking that the distance is within the margin. Use first value that appears.
             bound_streets['dist'] = bound_streets.geometry.apply(lambda x: x.distance(point)*1000)
-            sorted_streets = bound_streets.sort_values(by=['dist'])
-            limit = bound_streets[bound_streets.apply(lambda x: x.dist < margin, axis=1) == True].reset_index()
 
-            try:
-                limit = limit.sort_values('dist')[key][0]
-            except:
-                limit=0
+            # get the closest street
+            closest = bound_streets[bound_streets['dist'] == bound_streets['dist'].min()].reset_index(drop=True)
+            
+            limit=0
+            
+            # if the distance is less than the margin, get the key value
+            if closest['dist'][0] < margin:
+                limit=closest[key][0]
             # append the limit to the list.
-            limit_list.append(limit)
+            limit_list.append(limit*0.00044704)
             bar()
     
     # while there is a speed limit of zero, swap them out for the next nearest speed limit that isn't zero
     
     while (0 in limit_list):
+        remaining = limit_list.count(0)
         for i in range(len(limit_list)):
-            if verbose: verbose_line_updater("Filling gaps: {}".format(i), reset=True)
+            if verbose: verbose_line_updater("Filling gaps: {}".format(remaining), reset=True)
             
-            if limit_list[i] == 0:
-                try:
-                    limit_list[i] = limit_list[i+1]
-                except:
-                    limit_list[i] = limit_list[i-1]
+            if limit_list[i] <= 0:
+                limit_list[i] = last_known_limit
+            else:
+                last_known_limit = limit_list[i]
     if verbose: verbose_line_updater("Speed limits processed. Returning values.")
 
 
-    # return the limit list.
+    # return the limit list, converted to km/s
     return limit_list
 
 

@@ -376,6 +376,10 @@ class RouteMap:
         self._route_df = pd.read_csv(gdf)
         return self
     
+    def load_from_dataframe(self, dataframe):
+        self._route_df = dataframe
+        return self
+    
     
     def remove_stops(self):
         self._route_df['is_stop'] = False
@@ -449,13 +453,17 @@ class RouteMap:
     
     
     def get_grade(self):
+        import Geography_Tools as gt
         elevation = self.get_elevation().diff()
         distance = self.get_distances()['point_distances[km]']
         # convert true distance back to flat pointwise distances
         dist_flat = (distance**2 - elevation**2)**(1/2)
-        grade = elevation / dist_flat
-        grade = grade.clip(upper=.10, lower=-.10)
-        return grade*100
+        #grade = elevation / dist_flat
+        
+        grade = gt.calculate_grades(self.get_distances()['point_distances[km]'], self.get_elevation())
+        grade = grade.clip(upper=10, lower=-10)
+        return grade
+    
     
     def erica_grade(self):
         grade_SG = [0]

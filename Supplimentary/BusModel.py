@@ -455,7 +455,6 @@ class BusModel:
         Returns:
         a touple containing the power [W] used and the elapsed time [s]. 
         '''
-        
         # Generate the acceleration profile for this set of conditions and the current state of the bus
         power_frame = self.generate_power_frame(dist, ext_a)
         

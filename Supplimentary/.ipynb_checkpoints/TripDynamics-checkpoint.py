@@ -64,7 +64,9 @@ class TripDynamics:
         stop_indexes = list(df[df['is_stop']==True].index)
         
         # At the stops, add the change in riders
+        df.iloc[stop_indexes, df.columns.get_loc('d_riders')] = None
         df.iloc[stop_indexes, df.columns.get_loc('d_riders')] = d_riders
+        
         
         # make the cumulative riders and return it
         df['riders'] = df['d_riders'].cumsum()
@@ -169,13 +171,13 @@ class TripDynamics:
         
         # define new columns for velocity, stop distance, state, and stopping distance,
         # Power needed, and time change.
-        route['vel.[m/s]'] = 0
-        route['acc.[m/s^2]'] = 0
-        route['stop_dist[m]'] = 0
-        route['stppn_dist'] = 0
-        route['power_needed[W]'] = 0
-        route['st'] = 0
-        route['time_change[s]'] = 0
+        route['vel.[m/s]'] = pd.Series()
+        route['acc.[m/s^2]'] = pd.Series()
+        route['stop_dist[m]'] = pd.Series()
+        route['stppn_dist'] = pd.Series()
+        route['power_needed[W]'] = pd.Series()
+        route['st'] = pd.Series()
+        route['time_change[s]'] = pd.Series()
         route['r_change'] = abs(self._ridership_change) > 0
         
         # Generate empty lists to hold the same values as above.
@@ -223,7 +225,8 @@ class TripDynamics:
             next_stop_index = 0
             
             # Set up a boolean for checking if the bus will stop. range based on closest integer to the inverse fraction provided
-            is_stopping = (random.randrange(int(round(1/self._stoplight_chance,0))) == 0)
+
+            is_stopping = (random.randrange(int(round(1/self._stoplight_chance, 0))) == 0)
             
             # get the list of stops as defined by the distance between each stop on the route,
             #including signals, in meters
