@@ -967,10 +967,7 @@ class Route:
                      'li':encode_series(self.limits),
                      'st':encode_series(self.stops),
                      'si':encode_series(self.signals),
-                     'sn':encode_series(self.signs),
-                     'gr':self.grades,
-                     'be':encode_series(self.bearings),
-                     'dx':self.dx}
+                     'sn':encode_series(self.signs)}
         
         # Open and save to the json. encode in utf-8 for funsies.
         with open('{}'.format(path), 'w', encoding='utf-8') as f:
