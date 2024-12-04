@@ -88,6 +88,22 @@ def compass_heading(bearing):
         
     # return the corresponding compass direction
     return possible_dirs[bearing_index]
+
+
+def heading_to_angle(heading):
+    '''
+    heading_to_angle() takes a compass heading of 8 directions,
+    and converts it to an angle in degrees. 
+    
+    Params:
+    heading - a string representing heading.
+    
+    Returns: a compass bearing angle as float.
+    '''
+    options = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+    idx = options.index(heading)
+    return (idx/len(options)*360)
+    
     
 
 def point_bearing(x1, y1, x2, y2, bearing_type = "Angle"):
@@ -262,6 +278,35 @@ def verbose_line_updater(message, reset=False):
         
     # return the carrage.
     return data_string
+
+
+def query_elevation_changes(elev):
+    '''
+    query_elevation_change takes an iterable of elevation,
+    and returns the elevation change between the point at the
+    current index, and the next poinnt. 
+    
+    Params:
+    elev - iterable of elevation data
+    
+    Returns:
+    list of elevation changes to reach the next point.
+    '''
+    
+    # convert to series
+    elev_ser = pd.Series(elev)
+    
+    # shift the series by one
+    shifted = elev_ser.shift(-1)
+    
+    # get the original final point
+    final_point = elev[-1]
+    
+    # set the final point to replace the nan
+    shifted.iloc[-1] = final_point
+    
+    # calculate the shift between the elevations and return.
+    return list(elev_ser-shifted)
     
     
 def query_stops(geometry, stop_table_path, key='stop_id', epsg_from = 4326, epsg_to=4326, margin=10, verbose=False):
@@ -331,7 +376,7 @@ def query_stops(geometry, stop_table_path, key='stop_id', epsg_from = 4326, epsg
     if verbose: verbose_line_updater("Stops processed. Returning values.")
     
         
-    # return the stop id list with repeats removed.
+    # return the stop id list with repeats removed, and the last index guaranteed to be a stop.
     return repeat_id_remover(stop_id_list)
 
 
@@ -360,7 +405,7 @@ def query_distance_traveled(geometry_series, verbose=False):
     if verbose: verbose_line_updater("Combining geometry.")
     data = pd.concat([currents, nexts], axis=1, keys=['current', 'next']).reset_index(drop=True)
 
-    # get the initial point and make sure it's the last value.
+    # get the final point and make sure it's the last value.
     final_point = list(data['current'])[-1]
 
     # set the nan value in the beginning of the 'nexts' to the initial, representing no distance traveled.
@@ -791,6 +836,8 @@ def calculate_grades(dx, elevations, clip = False , max_grade=7.5):
     else:
         grades=grades
     
+    grades = list(grades)
+    grades.append(grades[-1])
     # return the grade.
     return grades
 
@@ -900,13 +947,16 @@ class Route:
         else: self.signals = list(signals)
         
          # if signs is empty, intersperse with 3 signs.
-        if signs == None: self.signs = self._intersperse_list(-1, geolen, 1, 3)
+        if signs == None: self.signs = self._intersperse_list(-1, geolen, 0, 3)
         else: self.signs = list(signs)
         
         # calculate the bearings, distance changes, and grades.
         self.bearings = query_bearings(pd.Series(self.geometry), bearing_type="Compass")
         self.dx = list(query_distance_traveled(pd.Series(self.geometry)))
-        self.grades = list(calculate_grades(self.dx, elevation, max_grade=7.5))
+        self.dz = query_elevation_changes(self.elevation)
+        self.d_X = list(np.sqrt(np.asarray(self.dz)**2 + np.asarray(self.dx)**2))
+        self.cum_d_X = list(pd.Series(self.d_X).cumsum())
+        self.grades = calculate_grades(self.dx, elevation, max_grade=7.5)
         
         
         # return None
@@ -977,6 +1027,7 @@ class Route:
         
         # return the path.
         return path
+    
     
     def save_as_routemap(self, path):
         '''
@@ -1061,6 +1112,7 @@ class Route:
         
         return path
     
+    
     def convert_to_RouteMap(self, path):
         '''
         convert_to_RouteMap() takes in a path for a saved RouteMap CSV (existing or not). If it
@@ -1085,6 +1137,56 @@ class Route:
             route_map = rm.RouteMap(stand_in_map['geometry'], stand_in_map['elevation[km]'])
             route_map = route_map.load_from_dataframe(stand_in_map)
         return route_map
+    
+    
+    def query_point(self, index):
+        '''
+        query_point() takes an index of a point and returns the data for the corresponding point.
+        
+        Params:
+        index - index of the route which data you would like to query.
+        '''
+        
+        data = {'elevation':self.elevation[index],
+                'limit':self.limits[index],
+                'stop':self.stops[index],
+                'signal':self.signals[index],
+                'sign':self.signs[index],
+                'bearing':self.bearings[index],
+                'grade':self.grades[index],
+                'dx_to_next':self.dx[index], # geodesic distance
+                'dz_to_next':self.dz[index],
+                'travel_dx':self.d_X[index],
+                'sum_travel_dx':self.cum_d_X[index]}
+        
+        return data
+    
+    
+    def to_gdf(self):
+        '''
+        to_gdf() takes the constituent information in geography_tools and converts it to a geodataframe.
+        
+        Params:
+        N/A
+        
+        Returns:
+        geodataframe of all information contained by a Route object.
+        '''
+        data = {'geometry':self.geometry,
+                'elevation':self.elevation,
+                'limit':self.limits,
+                'stop':self.stops,
+                'signal':self.signals,
+                'sign':self.signs,
+                'bearing':self.bearings,
+                'grade':self.grades,
+                'dx_to_next':self.dx, # geodesic distance
+                'dz_to_next':self.dz,
+                'travel_dx':self.d_X,
+                'sum_travel_dx':self.cum_d_X}
+        
+        return gpd.GeoDataFrame(data)
+        
             
 
 def encode_series(iterable):
