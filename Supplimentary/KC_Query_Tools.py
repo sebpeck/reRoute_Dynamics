@@ -148,7 +148,7 @@ def check_valid_stops_by_shape(stop_sequence, shape_id, trip_table_dir, stop_tim
         is_valid_stop = shape_id in pd.Series(shape_id_list).unique()
         
         # append the stop boolean
-        stop_bools.append(is_valid_stop)
+        stop_bools.append(int(is_valid_stop)-1)
         
     # return the list.
     return stop_bools

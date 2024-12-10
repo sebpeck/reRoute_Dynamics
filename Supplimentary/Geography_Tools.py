@@ -12,7 +12,9 @@ import rasterio
 import os
 import scipy
 import pyogrio as pio
-
+import json
+import RouteMap as rm
+import random
 
 def haversine_formula(x1, y1, x2, y2):
     '''
@@ -86,6 +88,22 @@ def compass_heading(bearing):
         
     # return the corresponding compass direction
     return possible_dirs[bearing_index]
+
+
+def heading_to_angle(heading):
+    '''
+    heading_to_angle() takes a compass heading of 8 directions,
+    and converts it to an angle in degrees. 
+    
+    Params:
+    heading - a string representing heading.
+    
+    Returns: a compass bearing angle as float.
+    '''
+    options = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+    idx = options.index(heading)
+    return (idx/len(options)*360)
+    
     
 
 def point_bearing(x1, y1, x2, y2, bearing_type = "Angle"):
@@ -260,6 +278,35 @@ def verbose_line_updater(message, reset=False):
         
     # return the carrage.
     return data_string
+
+
+def query_elevation_changes(elev):
+    '''
+    query_elevation_change takes an iterable of elevation,
+    and returns the elevation change between the point at the
+    current index, and the next poinnt. 
+    
+    Params:
+    elev - iterable of elevation data
+    
+    Returns:
+    list of elevation changes to reach the next point.
+    '''
+    
+    # convert to series
+    elev_ser = pd.Series(elev)
+    
+    # shift the series by one
+    shifted = elev_ser.shift(-1)
+    
+    # get the original final point
+    final_point = elev[-1]
+    
+    # set the final point to replace the nan
+    shifted.iloc[-1] = final_point
+    
+    # calculate the shift between the elevations and return.
+    return list(elev_ser-shifted)
     
     
 def query_stops(geometry, stop_table_path, key='stop_id', epsg_from = 4326, epsg_to=4326, margin=10, verbose=False):
@@ -329,7 +376,7 @@ def query_stops(geometry, stop_table_path, key='stop_id', epsg_from = 4326, epsg
     if verbose: verbose_line_updater("Stops processed. Returning values.")
     
         
-    # return the stop id list with repeats removed.
+    # return the stop id list with repeats removed, and the last index guaranteed to be a stop.
     return repeat_id_remover(stop_id_list)
 
 
@@ -358,7 +405,7 @@ def query_distance_traveled(geometry_series, verbose=False):
     if verbose: verbose_line_updater("Combining geometry.")
     data = pd.concat([currents, nexts], axis=1, keys=['current', 'next']).reset_index(drop=True)
 
-    # get the initial point and make sure it's the last value.
+    # get the final point and make sure it's the last value.
     final_point = list(data['current'])[-1]
 
     # set the nan value in the beginning of the 'nexts' to the initial, representing no distance traveled.
@@ -789,6 +836,8 @@ def calculate_grades(dx, elevations, clip = False , max_grade=7.5):
     else:
         grades=grades
     
+    grades = list(grades)
+    grades.append(grades[-1])
     # return the grade.
     return grades
 
@@ -843,5 +892,486 @@ def interpolate_distance_traveled(dx, interpolated_iterable):
 
         
         
+    
+### ---- Class, Saving, and Inter-operability tools ---- ###
+class Route:
+    '''
+    Route class is is used to store route information. 
+    
+    Params:
+    geometry - iterable of shapely geometry points
+    elevation - iterable of elevation data
+    limits - iterable of speed limit at each point. (optional, defaults to 25mph in km/s)
+    stops - iterable of stop flags at each point. (optional, defaults to 10 evenly spaced stops.)
+    signals - iterable of signal flags at each point. (optional, defaults to 8 evenly spaced signals.)
+    signs - iterable of sign flags at each point. (optional, defaults to 3 evenly spaced stop signs.)
+    
+    Methods: 
+    save_to_json() - saves the stored data to a json file. can be loaded again with Geography Tools' load_from_json.
+    
+    '''
+    def __init__(self,
+                 geometry,
+                 elevation,
+                 limits = None,
+                 stops = None,
+                 signals = None,
+                 signs = None):
+        
+        # set up the params list
+        self._params = [len(geometry),
+                        not (limits is None),
+                        not (stops is None),
+                        not (signals is None),
+                        not (signs is None)]
+        
+        # initialize geometry and elevation
+        self.geometry = list(geometry)
+        self.elevation = list(elevation)
+        
+        # get length of passed geometry
+        geolen = len(geometry)
+        
+        # if limits is empty, use 25mph (in km/s) as default.
+        if limits == None: self.limits = self._intersperse_list(25/2236.936, geolen)
+        else: self.limits = list(limits)
+        
+        # if stops is empty, populate with -1, then intersperse with 10 stops (number of timepoints per route)
+        if stops == None: 
+            self.stops = self._intersperse_list(-1, geolen, True, 10)
+            self.stops[-1] = 0
+        else: self.stops = list(stops)
+        
+        # if signals is empty, intersperse with 10 signals.
+        if signals == None: self.signals = self._intersperse_list(-1, geolen, 0, 8)
+        else: self.signals = list(signals)
+        
+         # if signs is empty, intersperse with 3 signs.
+        if signs == None: self.signs = self._intersperse_list(-1, geolen, 0, 3)
+        else: self.signs = list(signs)
+        
+        # calculate the bearings, distance changes, and grades.
+        self.bearings = query_bearings(pd.Series(self.geometry), bearing_type="Compass")
+        self.dx = list(query_distance_traveled(pd.Series(self.geometry)))
+        self.dz = query_elevation_changes(self.elevation)
+        self.d_X = list(np.sqrt(np.asarray(self.dz)**2 + np.asarray(self.dx)**2))
+        self.cum_d_X = list(pd.Series(self.d_X).cumsum())
+        self.grades = calculate_grades(self.dx, elevation, max_grade=7.5)
+        
+        
+        # return None
+        return None
+    
+    
+    def __str__(self):
+        '''
+        String method.
+        '''
+        return "Route(l:{},{},{},{},{})".format(self._params[0],
+                                                self._params[1],
+                                                self._params[2],
+                                                self._params[3],
+                                                self._params[4])
+    
+    
+    def _intersperse_list(self, default_value, list_size, intersperse_val=-1, intersperse_num=0):
+        '''
+        intersperse_list() is used to generate a list of point-based flags of a given value,
+        with the option to evenly intersperse those values with an alternate flag. 
+        
+        Params:
+        default_value - the value that the list will be populated with initially.
+        list_size - size of the list to be made, as an int.
+        intersperse_val - value to be interspersed, default of -1.
+        intersperse_num - number of ocurrences of the interspersed value, as int. Default 0.
+        
+        Returns:
+        the new list.
+        '''
+        
+        # Generate a new list of target size filled with target value.
+        new_list = [default_value]*list_size
+        
+        # loop through and intersperse the desired value.
+        for i in range(intersperse_num):
+            new_list[int(i*(list_size/intersperse_num))] = intersperse_val
+        
+        # return the new list. 
+        return new_list
+    
+    
+    def save_to_json(self, path):
+        '''
+        save_to_json() is used to encode and save the Route data to a json file.
+        
+        Params:
+        path - path and filename to be saved to, as str. Should end with '.json'.
+        
+        Returns:
+        path to the saved json file.
+        '''
+        
+        # generate data dictionary and compress the data where possible.
+        data_dict = {'ge':encode_geometry(self.geometry),
+                     'el':self.elevation,
+                     'li':encode_series(self.limits),
+                     'st':encode_series(self.stops),
+                     'si':encode_series(self.signals),
+                     'sn':encode_series(self.signs)}
+        
+        # Open and save to the json. encode in utf-8 for funsies.
+        with open('{}'.format(path), 'w', encoding='utf-8') as f:
+            
+            # save the data.
+            json.dump(data_dict, f, ensure_ascii=False, indent=4)
+        
+        # return the path.
+        return path
+    
+    
+    def save_as_routemap(self, path):
+        '''
+        save_as_routemap save the data as a classic routemap object's typical output.
+        
+        Params:
+        path - path as str to save location. ends with .csv.
+        
+        Returns:
+        path to CSV of saved routemap.
+        
+        Note:
+        12/2/2024 - This is currently using a stand-in for ridership and ultimately should be PHASED OUT.
+                    It is currently here so that it allows for backwards compatability with existing code.
+        '''
+        def ridership_generator(stops, mean_riders_per_trip=3.5, seed = 42):
+            '''
+            ridership generator takes a sequence of stop booleans,
+            and the mean ridership for that trip, 
+            and generates a sequence of the current riders at any given point.
+
+            Params:
+            stops - iterable of stop booleans
+            mean_riders_per_trip - an int representing the mean riders per bus trip. default 3.5.
+            seed - random seed for generation. Default is 42.
+
+            Returns:
+            list of ongoing ridership for a given point in the stop sequence.
+
+            Notes:
+            11/20/2024 - code breaks when mean riders requires more than 1 boarder per stop.
+                         This should be remedied through the random generation system.
+            '''
+            random.seed(seed)
+            # set up a list where the initial current riders is always 0
+            current_riders = [0]
+
+            print(stops.count(True))
+
+            # calculate the maximum number of boarders
+            range_max = int(mean_riders_per_trip/stops.count(True)*100)+1
+
+            # loop through each stop
+            for i in range(len(stops)):
+
+                # if the stop is valid, generate the riders on and the riders off.
+                if stops[i] == True:
+                    riders_on = int(random.randrange(0, range_max+1) == range_max)
+                    riders_off = random.randrange(0, current_riders[i]+1)
+
+                    # update the rider list.
+                    current_riders.append(current_riders[i] + riders_on - riders_off)
+                else:
+                    # update the riders list with the ongoing number of riders.
+                    current_riders.append(current_riders[i])
+
+            # remove the initial value.
+            current_riders = current_riders[1:]
+
+            # return the list.
+            return current_riders
+
+        
+        stand_in_map = pd.concat([pd.Series(self.geometry),
+                                  pd.Series(self.elevation),
+                                  pd.Series(self.limits), # Convert to km/s
+                                  pd.Series(self.stops).apply(lambda x: (x != -1)),
+                                  pd.Series(self.signals).apply(lambda x: (x != -1)),
+                                  pd.Series(self.dx)],
+                                  axis=1, 
+                                  keys=['geometry',
+                                        'elevation[km]',
+                                        'speed_limit[km/s]',
+                                        'is_stop',
+                                        'is_signal',
+                                        'point_distances[km]']).reset_index(drop=True)
+        stand_in_map['cumulative_distance[km]'] = stand_in_map['point_distances[km]'].cumsum()
+        stand_in_map['latitude'] = stand_in_map['geometry'].apply(lambda x: x.x)
+        stand_in_map['longitude'] = stand_in_map['geometry'].apply(lambda x: x.y)
+        stand_in_map['ridership changes'] = pd.Series(ridership_generator(list(pd.Series(self.stops).apply(lambda x: bool(x+1))))).diff()
+        stand_in_map.to_csv('{}'.format(path))
+        
+        return path
+    
+    
+    def convert_to_RouteMap(self, path):
+        '''
+        convert_to_RouteMap() takes in a path for a saved RouteMap CSV (existing or not). If it
+        exists, it loads it to a RouteMap object. If it doesn't, it converts the current Route
+        object to a RouteMap object and saves at the given path. Used for Inter-operability with
+        old code.
+        
+        Params:
+        path - path to saved RouteMap csv file.
+        
+        Returns:
+        RouteMap object.
+        '''
+        route_map = None
+        if os.path.isfile(path):
+            stand_in_map = pd.read_csv(path)
+            route_map = rm.RouteMap(stand_in_map['geometry'], stand_in_map['elevation[km]'])
+            route_map = route_map.load_from_dataframe(stand_in_map)
+        else:
+            self.save_as_routemap(path)
+            stand_in_map = pd.read_csv(path)
+            route_map = rm.RouteMap(stand_in_map['geometry'], stand_in_map['elevation[km]'])
+            route_map = route_map.load_from_dataframe(stand_in_map)
+        return route_map
+    
+    
+    def query_point(self, index):
+        '''
+        query_point() takes an index of a point and returns the data for the corresponding point.
+        
+        Params:
+        index - index of the route which data you would like to query.
+        '''
+        
+        data = {'elevation':self.elevation[index],
+                'limit':self.limits[index],
+                'stop':self.stops[index],
+                'signal':self.signals[index],
+                'sign':self.signs[index],
+                'bearing':self.bearings[index],
+                'grade':self.grades[index],
+                'dx_to_next':self.dx[index], # geodesic distance
+                'dz_to_next':self.dz[index],
+                'travel_dx':self.d_X[index],
+                'sum_travel_dx':self.cum_d_X[index]}
+        
+        return data
+    
+    
+    def to_gdf(self):
+        '''
+        to_gdf() takes the constituent information in geography_tools and converts it to a geodataframe.
+        
+        Params:
+        N/A
+        
+        Returns:
+        geodataframe of all information contained by a Route object.
+        '''
+        data = {'geometry':self.geometry,
+                'elevation':self.elevation,
+                'limit':self.limits,
+                'stop':self.stops,
+                'signal':self.signals,
+                'sign':self.signs,
+                'bearing':self.bearings,
+                'grade':self.grades,
+                'dx_to_next':self.dx, # geodesic distance
+                'dz_to_next':self.dz,
+                'travel_dx':self.d_X,
+                'sum_travel_dx':self.cum_d_X}
+        
+        return gpd.GeoDataFrame(data)
+        
+            
+
+def encode_series(iterable):
+    '''
+    encode_series() takes an iterable and compresses it down so that 
+    repeating values are stored as the value and number of occurrences.
+    Warning: Value typings will be lost.
+    
+    Params:
+    iterable - an iterable list of values.
+    
+    Returns: 
+    a string representation of the compressed information. 
+    '''
+    
+    # get the first item of the iterable
+    current_item = iterable[0]
+    
+    # set the current item count to negative to avoid indexing errors.
+    current_item_count = -1
+    
+    # create an empty string.
+    data_stream = ""
+    
+    # loop through each position in the iterable
+    for i in range(len(iterable)+1):
+        
+        # if the index is at the end of the iterable,
+        if i > len(iterable)-1:
+            
+            # add by 1 and subsequently add the current item and count to the string.
+            current_item_count += 1
+            data_stream += ('{},{}'.format(current_item_count, current_item))
+        
+        # otherwise,
+        else:
+            
+            # the selected item is the current position in the iterable
+            item = iterable[i]
+            
+            # and if the items are the same,
+            if item == current_item:
+                
+                # increment the count by 1.
+                current_item_count += 1
+                
+            # otherwise,
+            else:
+                
+                # increment the count and add it to the stream.
+                current_item_count += 1
+                data_stream += ('{},{},'.format(current_item_count, current_item))
+                
+                # reset the count and set the new item.
+                current_item_count = 0
+                current_item = item
+
+    # return the encoded representation.
+    return data_stream
+
+
+def decode_series(encoded_string):
+    '''
+    decode_series() takes in a string that was encoded using encode_series(), 
+    and returns it to a decoded iterable. 
+    
+    Params:
+    encoded_string - string that was encoded using encode_series()
+    
+    Returns:
+    an iterable of the decompressed information. 
+    '''
+    
+    # split the string by comma.
+    spliterable = encoded_string.split(",")
+    
+    # create an empty list to contain the data.
+    joint_iterable = []
+    
+    # for every two items, join them into a tuple and append it to the list.
+    for item1, item2 in zip(spliterable[::2], spliterable[1::2]):
+        joint_iterable.append((item1, item2))
+        
+    # create an empty list for the decoded information.
+    decoded_iterable = []
+    
+    # loop through each item in the joint iterable
+    for item in joint_iterable:
+        
+        # repeatedly add the encoded item for the number of occurences it has.
+        for i in range(int(item[0])):
+            decoded_iterable.append(item[1])
+            
+    # return the list. 
+    return decoded_iterable
+
+
+def encode_geometry(geo):
+    '''
+    encode_geometry() takes in an iterable of shapely points,
+    and then converts it to a list of alternating x and y values.
+    
+    Params:
+    geo - iterable of shapely points.
+    
+    Returns:
+    list of alternating X and Y values in the same order as geo.
+    '''
+    
+    # create an empty list
+    clist = []
+    
+    # loop through the geometry and get the X and Y values,
+    # and extend the list with them.
+    for item in pd.Series(geo).apply(lambda x: [x.x, x.y]):
+        clist.extend(item)
+        
+    # return the list.
+    return clist
+
+
+def decode_geometry(enc_geo):
+    '''
+    decode_geometry() takes in compressed geometry from encode_geometry(),
+    and converts it to an iterable of shapely points.
+    
+    Params:
+    enc_geo - encoded geometry list.
+    
+    Returns:
+    list of shapely geometry.
+    '''
+    
+    # empty list to store data
+    point_list = []
+    
+    # loop through every 2
+    for i in range(0, len(enc_geo), 2):
+        # if even index, it's x, odd is y.
+        # append the point.
+        point_list.append(shapely.Point([enc_geo[i], enc_geo[i+1]]))
+    
+    # return the list.
+    return point_list
+            
+
+def load_from_json(path):
+    '''
+    load_from_json() takes in a path to a json file from an exported Route object,
+    and returns a path object as close as possible to what was saved.
+    Waring: Some data types may be altered or adjusted. Speed
+            limits are expected to be floats, stops, signals,
+            signs, are expected to be ints.
+    
+    Params:
+    path - path to json file.
+    
+    Returns: a Route object.
+    '''
+    
+    # create empty data dictionary.
+    data = {}
+    
+    # open the file.
+    with open('{}'.format(path), 'r') as file:
+        
+        # load the data.
+        data = json.load(file)
+    
+    # read the geometry data
+    geo = decode_geometry(data['ge'])
+    
+    # read the elevation data
+    el = data['el']
+    
+    # read the limit, stop, signal, and sign data
+    lim = list(pd.Series(decode_series(data['li'])).apply(float))
+    stp = list(pd.Series(decode_series(data['st'])).apply(int))
+    signals = list(pd.Series(decode_series(data['si'])).apply(int))
+    signs = list(pd.Series(decode_series(data['sn'])).apply(int))
+    
+    # generate a new Route object from the provided data. 
+    loaded_route = Route(geo, el, lim, stp, signals, signs)
+
+    return loaded_route
+    
     
     
