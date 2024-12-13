@@ -289,7 +289,7 @@ def maintain(velocity,
     if P_max >= P_current > 0:
         #print("Enough motor power")
         v_f = v_i
-        dt = v_f*dx
+        dt = dx/v_f
         P = P_current
     
     # Check if there isn't enough motor power to overcome.
@@ -304,7 +304,7 @@ def maintain(velocity,
     elif 0 >= P_current > P_brake_max:
         #print("Enough braking power")
         v_f = v_i
-        dt = v_f*dx
+        dt = dx/v_f
         P=P_current
     
     # Check if there's not enough braking power to overcome.
