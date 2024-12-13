@@ -193,28 +193,38 @@ def brake(velocity,
     Returns:
     a dict containing final velocity v_f, time change dt, power P, and braking factor bf.
     '''
+    vf = 0
+    t = 99999
+    P = 99999
+    bf = braking_factor
     
-    # initial rate of deceleration
-    rate_decell = (braking_acceleration * inertial_factor * braking_factor) + (grade_force + wind_force)/mass
-    print(rate_decell, travel_distance, velocity)
-    # first pass for vf
-    vf = np.sqrt(-rate_decell*2*travel_distance+(velocity**2))
+    if velocity != 0:
 
-    # If the vf is nan, make it zero.
-    if vf != vf:
+        # initial rate of deceleration
+        rate_decell = (braking_acceleration * inertial_factor * braking_factor) + (grade_force + wind_force)/mass
+        # first pass for vf
+        pre_root = -2*rate_decell*travel_distance + velocity**2
+
+        if pre_root >0:
+            vf = np.sqrt(-rate_decell*2*travel_distance+(velocity**2))
+        else:
+            vf = 0
+
+        # calculate time
+        t = (velocity-vf)/rate_decell
+
+        # use the bus's acceleration without externalities to calculate power needed
+        P = mass*-(braking_acceleration * inertial_factor * braking_factor)*travel_distance/t
+
+        # Check if velocity is 0 to re-do the power
+        if vf == 0:
+            P = 0
+    else:
         vf = 0
-        
-    # calculate time
-    t = (velocity-vf)/rate_decell
-    
-    # use the bus's acceleration without externalities to calculate power needed
-    P = mass*-(braking_acceleration * inertial_factor * braking_factor)*travel_distance/t
-    
-    # Check if velocity is 0 to re-do the power
-    if vf == 0:
+        t = 1
         P = 0
-    
-    # create a dict of results
+
+        # create a dict of results
     results = {'v_f':vf,
                'dt':t,
                'P':P,
@@ -277,14 +287,14 @@ def maintain(velocity,
     # Check if there is enough motor power
     #print(P_max, P_current, P_brake_max)
     if P_max >= P_current > 0:
-        print("Enough motor power")
+        #print("Enough motor power")
         v_f = v_i
         dt = v_f*dx
         P = P_current
     
     # Check if there isn't enough motor power to overcome.
     elif P_current > P_max:
-        print("Not enough motor power")
+        #print("Not enough motor power")
         da = (P_current - P_max)/(m*v_i)
         v_f = np.sqrt(v_i**2 - 2*dx*da)
         P = P_max
@@ -292,14 +302,14 @@ def maintain(velocity,
     
     # Check if there's enough braking power to overcome.
     elif 0 >= P_current > P_brake_max:
-        print("Enough braking power")
+        #print("Enough braking power")
         v_f = v_i
         dt = v_f*dx
         P=P_current
     
     # Check if there's not enough braking power to overcome.
     elif P_brake_max >= P_current:
-        print("Not enough braking power")
+        #print("Not enough braking power")
         da = -abs(P_current-P_brake_max) / (m*v_i)
         v_f = np.sqrt(v_i**2 + 2*dx*da)
         P = P_brake_max
@@ -495,9 +505,3 @@ def accelerate(velocity,
                'P':P}
     # return the results
     return results
-
-
-
-    
-    
-    

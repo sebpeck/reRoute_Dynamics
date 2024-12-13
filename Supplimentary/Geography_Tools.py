@@ -809,7 +809,7 @@ def combine_lidar_data(dsm, dx, max_grade=7.5):
     return filtered.values
 
 
-def calculate_grades(dx, elevations, clip = False , max_grade=7.5):
+def calculate_grades(dx, elevations, clip = True , max_grade=7.5):
     '''
     calculate_grades takes the distance between points,
     as well as the elevations at each point, and returns the grade at each point.
@@ -817,8 +817,8 @@ def calculate_grades(dx, elevations, clip = False , max_grade=7.5):
     Params:
     dx - an iterable of distances between each point
     elevations - an iterable of elevations corresponding to each point.
-    clip - boolean to determine to clip the grades or not. Default False.
-    max_grade - an int representing the maximum grade a point can be without being clipped to.
+    clip - boolean to determine to clip the grades or not. Default True.
+    max_grade - an int representing the maximum grade a point can be without being clipped to. Default 7.5
     
     Returns:
     iterable of the slope grade at each point. 
