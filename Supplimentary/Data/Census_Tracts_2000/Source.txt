@@ -1,1 +1,0 @@
-"Census Tracts 2000", Seattle Geodata, 2000, Updated Oct 2, 2023, https://data-seattlecitygis.opendata.arcgis.com/datasets/SeattleCityGIS::census-tracts-2000/explore?location=47.610707%2C-122.336670%2C11.92
