@@ -44,4 +44,3 @@ def calc_instance_power(value,
 
     # Return the battery power.
     return bat_pow
-
