@@ -27,6 +27,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
 
     # convert the ridership data to a list.
     rider_changes = list(rider_series)
+    print(trip.seed)
+    print(rider_changes.count(0))
 
     # take the signal data and convert invalid points to 0
     signal_series = pd.Series(route.signals)
@@ -35,9 +37,10 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
     # multiply the signal values by a boolean of if the stoplight has been hit or not.
     signal_series.apply(lambda x: x*it.check_hit_signal(stoplight_chance = trip.chance_sig, seed=trip.seed))
 
+
     # convert the data to a list.
     signals_hit = list(signal_series)
-
+    print(signals_hit.count(0))
 
     # get the stop type arrays for each point
     stop_types = it.determine_stop_type(rider_changes, signals_hit, pd.Series(route.signs)+1)
@@ -128,8 +131,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
             adjusted_braking_factor = braking_distance_data['bf']
 
             # Conditional booleans
-            above_limit = (v > (limit + trip.MOE))
-            below_limit = (v < (limit - trip.MOE))
+            above_limit = (v > (limit + trip.MOE*limit))
+            below_limit = (v < (limit - trip.MOE*limit))
             stopped = (v < trip.stop_margin)
             stop_upcoming = (braking_distance >= dx_to_next_stop)
 
@@ -302,9 +305,9 @@ if __name__ == '__main__':
     # load the arguments
     parser = argparse.ArgumentParser(description='Simulate a bus trip.')
     parser.add_argument('-r',"--route", help="Path to a Route export json from Geography_Tools.")
-    parser.add_argument('-t',"--trip", help="Path to a trip parameter export json from Object_Params.")
-    parser.add_argument('-b',"--bus", help="Path to a bus parameter export json from Object_Params.")
-    parser.add_argument('-e',"--ESS", help="Path to a ESS parameter export json from Object_Params.")
+    parser.add_argument('-t',"--trip", help="Path to a trip parameter export txt from Object_Params.")
+    parser.add_argument('-b',"--bus", help="Path to a bus parameter export txt from Object_Params.")
+    parser.add_argument('-e',"--ESS", help="Path to a ESS parameter export txt from Object_Params.")
     parser.add_argument('-o', "-output", help="Output filepath.")
     parser.add_argument('-n', "-name", help='Output filename.')
     
@@ -313,13 +316,13 @@ if __name__ == '__main__':
     
     #  Check for the optional params
     if type(args.trip) == type(None): trip_obj = OP.Trip()
-    else: trip_obj = op.load_trip_json(args.trip)
+    else: trip_obj = op.load_trip_params(args.trip)
     
     if type(args.bus) == type(None): bus_obj = OP.Bus()
-    else: bus_obj = op.load_bus_json(args.bus)
+    else: bus_obj = op.load_bus_params(args.bus)
     
     if type(args.ESS) == type(None): ESS_obj = OP.ESS()
-    else: ESS_obj = op.load_ESS_json(args.ESS)
+    else: ESS_obj = op.load_ESS_params(args.ESS)
 
     # get the path params
     output_path = args.output

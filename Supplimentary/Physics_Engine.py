@@ -21,7 +21,7 @@ DEFAULT_MAX_DIST = 304.8 # meters, approx based on offramp length for I-5
 
 DEFAULT_MAX_POWER = 160000 # Watts
 
-DEFAULT_A_PROF = pd.read_csv("./Data/Accel_Prof/acceleration.csv", header=None) # Default acceleration profile.
+DEFAULT_A_PROF = pd.read_csv("/media/sebastian/Slepnir/Route_Data/Accel_Prof/acceleration.csv", header=None) # Default acceleration profile.
 DEFAULT_A_PROF[1] = DEFAULT_A_PROF[1].apply(lambda x: x*9.81)
 DEFAULT_MAX_ACC = .4 #m/s^2 the asymptotic acceleration a profile will achieve.
 DEFAULT_MAX_DT = 1 #second, the timestep in the profile corresponding to the max acceleration.

@@ -17,7 +17,7 @@ class Bus:
                  br_factor = .5, # Not tied to any true value.
                  i_factor = 1.1, # intertial factor, Asamer Et. Al
                  max_dist = 304.8, # m, Assembled from google measurements of offramps from I5
-                 a_prof_path = './Data/Accel_Prof/acceleration.csv', #TODO: NEEDS SOURCE
+                 a_prof_path = '/media/sebastian/Slepnir/Route_Data/Accel_Prof/acceleration.csv', #TODO: NEEDS SOURCE
                  max_acc = .4, # m/s^2, the default accel after profile finishes.
                  max_dt = 1, # s, timestep for the default acceleration betond the profile.
                 ):
@@ -39,8 +39,47 @@ class Bus:
         
     def copy(self):
         return Bus(self.mass, self._w, self._h, self.Cd, self.Cf, self.a_br, self.f_br, self.f_i, self.dmax, self._a_prof_path, self.a_max, self.dt_max)
-        
     
+    def save(self, filepath):
+        data = "{},{},{},{},{},{},{},{},{},{},{},{}".format(self.mass,
+                                                            self._w,
+                                                            self._h,
+                                                            self.Cd,
+                                                            self.Cf,
+                                                            self.a_br,
+                                                            self.f_br,
+                                                            self.f_i,
+                                                            self.dmax,
+                                                            self._a_prof_path,
+                                                            self.a_max,
+                                                            self.dt_max)
+        
+
+
+        # Clear the file
+        open(filepath, 'w').close()
+        
+        # Write the params
+        with open(filepath, 'w') as f:
+            f.write(data)
+        return filepath
+    
+
+def load_bus_params(filepath):
+    data = ''
+    with open(filepath, 'r') as f:
+        data = f.read()
+    data_list = data.split(',')
+    
+    numerical_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11]
+    
+    for index in numerical_indexes:
+        data_list[index] = float(data_list[index])
+    args = tuple(data_list)
+    
+    return Bus(*args)
+    
+
 class ESS: 
     def __init__(self,
                  # ESS instance
@@ -62,7 +101,34 @@ class ESS:
         
     def copy(self):
         return ESS(self.Em, self.Ei, self.Ea, self.Er, self.P_aux, self.P_regen, self.P_max)
+    
+    
+    def save(self, filepath):
+        data = "{},{},{},{},{},{},{}".format(self.Em, self.Ei, self.Ea, self.Er, self.P_aux, self.P_regen, self.P_max)
         
+        # Clear the file
+        open(filepath, 'w').close()
+        
+        # Write the params
+        with open(filepath, 'w') as f:
+            f.write(data)
+        return filepath
+    
+
+def load_ESS_params(filepath):
+    data = ''
+    with open(filepath, 'r') as f:
+        data = f.read()
+    data_list = data.split(',')
+    
+    numerical_indexes = [0, 1, 2, 3, 4, 5, 6]
+    
+    for index in numerical_indexes:
+        data_list[index] = float(data_list[index])
+    args = tuple(data_list)
+    
+    return ESS(*args)
+          
         
 class Trip:
     def __init__(self,
@@ -104,3 +170,46 @@ class Trip:
         
     def copy(self):
         return Trip(self.m_pass, self.MOE, self.chance_sig, self.t_sig, self.t_stop, self.t_sign, self.t_end, self.p_air, self.T_air, self.wind_bearing, self.v_wind, self.d_interp, self.m_riders, self.seed, self.lg, self.deg, self.stop_margin)
+    
+    def save(self, filepath):
+        data = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}".format(self.m_pass,
+                                                                             self.MOE,
+                                                                             self.chance_sig,
+                                                                             self.t_sig,
+                                                                             self.t_stop,
+                                                                             self.t_sign,
+                                                                             self.t_end,
+                                                                             self.p_air,
+                                                                             self.T_air,
+                                                                             self.wind_bearing,
+                                                                             self.v_wind,
+                                                                             self.d_interp,
+                                                                             self.m_riders,
+                                                                             self.seed,
+                                                                             self.lg,
+                                                                             self.deg,
+                                                                             self.stop_margin)
+        
+        # Clear the file
+        open(filepath, 'w').close()
+        
+        # Write the params
+        with open(filepath, 'w') as f:
+            f.write(data)
+        return filepath
+    
+
+def load_trip_params(filepath):
+    data = '' 
+    with open(filepath, 'r') as f:
+        data = f.read()
+    data_list = data.split(',')
+    
+    numerical_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16]
+    
+    for index in numerical_indexes:
+        data_list[index] = float(data_list[index])
+    args = tuple(data_list)
+    
+    return Trip(*args)
+    
