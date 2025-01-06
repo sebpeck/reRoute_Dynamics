@@ -27,8 +27,6 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
 
     # convert the ridership data to a list.
     rider_changes = list(rider_series)
-    print(trip.seed)
-    print(rider_changes.count(0))
 
     # take the signal data and convert invalid points to 0
     signal_series = pd.Series(route.signals)
@@ -40,7 +38,6 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
 
     # convert the data to a list.
     signals_hit = list(signal_series)
-    print(signals_hit.count(0))
 
     # get the stop type arrays for each point
     stop_types = it.determine_stop_type(rider_changes, signals_hit, pd.Series(route.signs)+1)
