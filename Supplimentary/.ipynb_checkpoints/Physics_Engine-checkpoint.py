@@ -410,7 +410,7 @@ def accelerate(velocity,
     
 
     # get the regulator velocities
-    reg_vel = a_prof[0]*a_prof[1].cumsum()
+    reg_vel = (a_prof[0]*a_prof[1]).cumsum()
     
     # using the regulator velocities, get the starting index:
     starting_index=(reg_vel.apply(lambda x: abs(x-velocity)).sort_values().index)[0]
@@ -438,6 +438,8 @@ def accelerate(velocity,
     a_prof['cum_dx'] = a_prof['cum_dx'] - a_prof['cum_dx'].iloc[starting_index] - travel_distance
     
     # Get the closest index to the end of the acceleration profile.
+    #this is wrong!!
+    
     closest_end_index = list(abs(a_prof['cum_dx']).sort_values().index)[0]
     
     #Check if the starting and ending indexes are the same 
@@ -487,13 +489,16 @@ def accelerate(velocity,
         # iterate through the range and adjust the
         # velocity, time, and energy accordingly
         for col, row in ea_prof.iterrows():
-            v_f = v_f+row['dv']
-            i_dt = row['dt']
-            dt += i_dt
-            en += row['power']*i_dt
-            dx += .5*(v_f + v_f-row['dv'])*dt
-            #print(dx)
-            
+            if dx < travel_distance:
+                v_f = v_f+row['dv']
+                i_dt = row['dt']
+                dt += i_dt
+                en += row['power']*i_dt
+                dx += .5*(v_f + v_f-row['dv'])*dt
+            else:
+                break
+                #print(dx)
+        #print(dt, starting_index, closest_end_index)
         #print(dx)
         # calculate the power.
         P = en/dt
@@ -503,5 +508,6 @@ def accelerate(velocity,
     results = {'v_f':v_f,
                'dt':dt,
                'P':P}
+
     # return the results
     return results
