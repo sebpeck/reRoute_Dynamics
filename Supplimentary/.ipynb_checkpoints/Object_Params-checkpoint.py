@@ -213,3 +213,55 @@ def load_trip_params(filepath):
     
     return Trip(*args)
     
+    
+
+def a_eqn(t, m=-4.9661, b=2.9465):
+    '''
+    a_eqn is used to calculate the acceleration at a given time during the acceleration process from zero.
+    the default values are based on a fit of the Braunschweig drive cycle.
+    
+    Params:
+    t: time, in seconds, since the bus began accelerating, as a float
+    m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from 
+        Braunschweig https://www.nrel.gov/transportation/drive-cycle-tool/ 
+        Default of -4.9661.
+    b: intercept value of aformentioned fit as float. Default of 2.9465.
+    
+    Returns:
+    acceleration in m/s^2.
+    '''
+    if t == 0:
+        return 0
+    else:
+        return -m/(t**2) * np.exp((m/t) + b)
+
+def generate_a_profile(filepath, m=-4.9661, b=2.9465, start=0, stop=34, step=.5):
+    '''
+    generate_a_profile() takes the fit parameters for an acceleration profile, and
+    generates one for a given range and step and saves at a filepath.
+    
+    Params:
+    filepath: savefile path and filename.
+    m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from 
+    Braunschweig https://www.nrel.gov/transportation/drive-cycle-tool/ 
+    Default of -4.9661.
+    b: intercept value of aformentioned fit as float. Default of 2.9465.
+    start: starting value for range. Default value of 0
+    stop: stop value for range. Default value of 34
+    step: step size for range. Default of .5.
+    
+    Returns:
+    filepath to generated acceleration profile
+    '''
+    
+    # Get the range of times as a series
+    total_times = pd.Series(np.arange(start, stop, step))
+    
+    # Apply the acceleration fit and then combine into a single dataframe
+    a_prof = pd.concat([total_times, total_times.apply(lambda x: a_eqn(x, m, b))], axis=1)
+    
+    # fix to fit the proper acceleration profile formatting and return
+    a_prof[1] = a_prof[1].shift(-1)/9.81
+    a_prof = a_prof[:-1]
+    a_prof.to_csv(filepath, index=False, header=False)
+    return filepath
