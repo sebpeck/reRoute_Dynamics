@@ -82,7 +82,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                        'stop_clf':[True, True, True, True],
                         'gdx':0,
                         'elevation':0,
-                        'dx_to_next':0}
+                        'dx_to_next':0,
+                        'b_dx':0}
 
     # Initialize the running data with the initialize dict.
     running_data = [initialize_result]
@@ -131,7 +132,7 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
             above_limit = (v > (limit + trip.MOE*limit))
             below_limit = (v < (limit - trip.MOE*limit))
             stopped = (v < trip.stop_margin)
-            stop_upcoming = (braking_distance >= dx_to_next_stop)
+            stop_upcoming = (braking_distance+limit*bus.dt_max >= dx_to_next_stop )
 
             # check if the distance to the next stop is not 0
             if dx_to_next_stop != 0:
@@ -159,7 +160,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                            'stop_clf':stop_classes,
                            'gdx':geodes_dist,
                            'elevation':elevation,
-                           'dx_to_next':dx_to_next_stop}
+                           'dx_to_next':dx_to_next_stop,
+                           'b_dx':(braking_distance, adjusted_braking_factor)}
 
             # Check if there's a stop upcoming and if the bus is still moving
             if stop_upcoming and not stopped:
@@ -174,9 +176,7 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                                   bus.f_i,
                                   bus.dmax)
 
-                # if the speed is within the stop margin, stop the bus.
-                if result['v_f']<trip.stop_margin:
-                    result['v_f'] = 0
+
 
                 # insert the results.
                 true_result['type'] = 'stp_brk'
@@ -185,21 +185,24 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                 true_result['P'] = result['P']
                 running_data.append(true_result.copy()) #<-- This has to use the copy, otherwise it will change prev. values
 
-                # Calculate the stop time based on the class.
-                stop_time = stop_classes[0]*trip.t_stop + stop_classes[1]*trip.t_sig + stop_classes[2]*trip.t_sign + stop_classes[3]*trip.t_end  # ridership, signal, sign, end
+                # if the speed is within the stop margin, stop the bus.
+                if (result['v_f'] < trip.stop_margin):
+                    result['v_f'] = 0
+                    # Calculate the stop time based on the class.
+                    stop_time = stop_classes[0]*trip.t_stop + stop_classes[1]*trip.t_sig + stop_classes[2]*trip.t_sign + stop_classes[3]*trip.t_end  # ridership, signal, sign, end
 
-                # Adjust the mass of the bus
-                bus.mass += rider_change*trip.m_pass
+                    # Adjust the mass of the bus
+                    bus.mass += rider_change*trip.m_pass
 
-                # Add the results.
-                true_result['type'] = 'rest'
-                true_result['v_f'] = 0
-                true_result['dt'] = stop_time
-                true_result['P'] =0
-                tmp_storage = true_result['stop_clf']
-                true_result['stop_clf'] = [0, 0, 0, 0]
+                    # Add the results.
+                    true_result['type'] = 'rest'
+                    true_result['v_f'] = 0
+                    true_result['dt'] = stop_time
+                    true_result['P'] =0
+                    tmp_storage = true_result['stop_clf']
+                    true_result['stop_clf'] = [0, 0, 0, 0]
 
-                running_data.append(true_result.copy())
+                    running_data.append(true_result.copy())
 
             # otherwise, if the bus is not coming up to a stop:
             else:

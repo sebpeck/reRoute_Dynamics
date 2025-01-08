@@ -230,7 +230,7 @@ def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_pat
             route = gt.Route(i_geo, smellev, limits=limits, stops=stops, signals=signals, signs = [-1]*len(i_geo))
             route.save_to_json(fname)
             print("Succesfully Rendered {}".format(fname))
-        return fname + " -- 0"
+        return fname + ""
     except:
         print("Failed Rendering {}".format(fname))
         return fname + " -- 1"

@@ -394,7 +394,7 @@ def accelerate(velocity,
     a_prof = pd.concat([raw_a_prof]).reset_index(drop=True)
     
     # Set the last index of the acceleration profile as the max timestep and accel.
-    for i in range(40):
+    for i in range(2):
         
         # Also, extend the profile with the timestep and acceleration.
         a_prof.at[-1, 0] = max_timestep + list(a_prof[0])[-1]
@@ -417,7 +417,8 @@ def accelerate(velocity,
     
     # P = m*a_engine*(v+dt*a_engine)
     powers = mass*needed_a*(velocity + a_prof[0]*needed_a)
-    powers = powers.clip(0, P_max)
+    #powers = powers.clip(0, P_max)
+    powers = powers.apply(lambda x: (P_max>x>0)*x + P_max*(x>P_max))
     
     # Quadratic formula to solve for possible a from power equation
     possible_a = (-velocity+np.sqrt(velocity**2 + 4*a_prof[0]*powers/mass))/(2*a_prof[0])
