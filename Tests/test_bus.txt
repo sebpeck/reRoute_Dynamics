@@ -1,0 +1,1 @@
+999999,2.59,3.38,0.6,0.01,1.5,0.5,1.1,304.8,/media/sebastian/Slepnir/Route_Data/Accel_Prof/acceleration.csv,0.4,1

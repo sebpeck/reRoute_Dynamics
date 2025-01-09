@@ -13,7 +13,6 @@ import os
 import scipy
 import pyogrio as pio
 import json
-import RouteMap as rm
 import random
 
 def haversine_formula(x1, y1, x2, y2):
@@ -1027,116 +1026,6 @@ class Route:
         
         # return the path.
         return path
-    
-    
-    def save_as_routemap(self, path):
-        '''
-        save_as_routemap save the data as a classic routemap object's typical output.
-        
-        Params:
-        path - path as str to save location. ends with .csv.
-        
-        Returns:
-        path to CSV of saved routemap.
-        
-        Note:
-        12/2/2024 - This is currently using a stand-in for ridership and ultimately should be PHASED OUT.
-                    It is currently here so that it allows for backwards compatability with existing code.
-        '''
-        def ridership_generator(stops, mean_riders_per_trip=3.5, seed = 42):
-            '''
-            ridership generator takes a sequence of stop booleans,
-            and the mean ridership for that trip, 
-            and generates a sequence of the current riders at any given point.
-
-            Params:
-            stops - iterable of stop booleans
-            mean_riders_per_trip - an int representing the mean riders per bus trip. default 3.5.
-            seed - random seed for generation. Default is 42.
-
-            Returns:
-            list of ongoing ridership for a given point in the stop sequence.
-
-            Notes:
-            11/20/2024 - code breaks when mean riders requires more than 1 boarder per stop.
-                         This should be remedied through the random generation system.
-            '''
-            random.seed(seed)
-            # set up a list where the initial current riders is always 0
-            current_riders = [0]
-
-            print(stops.count(True))
-
-            # calculate the maximum number of boarders
-            range_max = int(mean_riders_per_trip/stops.count(True)*100)+1
-
-            # loop through each stop
-            for i in range(len(stops)):
-
-                # if the stop is valid, generate the riders on and the riders off.
-                if stops[i] == True:
-                    riders_on = int(random.randrange(0, range_max+1) == range_max)
-                    riders_off = random.randrange(0, current_riders[i]+1)
-
-                    # update the rider list.
-                    current_riders.append(current_riders[i] + riders_on - riders_off)
-                else:
-                    # update the riders list with the ongoing number of riders.
-                    current_riders.append(current_riders[i])
-
-            # remove the initial value.
-            current_riders = current_riders[1:]
-
-            # return the list.
-            return current_riders
-
-        
-        stand_in_map = pd.concat([pd.Series(self.geometry),
-                                  pd.Series(self.elevation),
-                                  pd.Series(self.limits), # Convert to km/s
-                                  pd.Series(self.stops).apply(lambda x: (x != -1)),
-                                  pd.Series(self.signals).apply(lambda x: (x != -1)),
-                                  pd.Series(self.dx)],
-                                  axis=1, 
-                                  keys=['geometry',
-                                        'elevation[km]',
-                                        'speed_limit[km/s]',
-                                        'is_stop',
-                                        'is_signal',
-                                        'point_distances[km]']).reset_index(drop=True)
-        stand_in_map['cumulative_distance[km]'] = stand_in_map['point_distances[km]'].cumsum()
-        stand_in_map['latitude'] = stand_in_map['geometry'].apply(lambda x: x.x)
-        stand_in_map['longitude'] = stand_in_map['geometry'].apply(lambda x: x.y)
-        stand_in_map['ridership changes'] = pd.Series(ridership_generator(list(pd.Series(self.stops).apply(lambda x: bool(x+1))))).diff()
-        stand_in_map.to_csv('{}'.format(path))
-        
-        return path
-    
-    
-    def convert_to_RouteMap(self, path):
-        '''
-        convert_to_RouteMap() takes in a path for a saved RouteMap CSV (existing or not). If it
-        exists, it loads it to a RouteMap object. If it doesn't, it converts the current Route
-        object to a RouteMap object and saves at the given path. Used for Inter-operability with
-        old code.
-        
-        Params:
-        path - path to saved RouteMap csv file.
-        
-        Returns:
-        RouteMap object.
-        '''
-        route_map = None
-        if os.path.isfile(path):
-            stand_in_map = pd.read_csv(path)
-            route_map = rm.RouteMap(stand_in_map['geometry'], stand_in_map['elevation[km]'])
-            route_map = route_map.load_from_dataframe(stand_in_map)
-        else:
-            self.save_as_routemap(path)
-            stand_in_map = pd.read_csv(path)
-            route_map = rm.RouteMap(stand_in_map['geometry'], stand_in_map['elevation[km]'])
-            route_map = route_map.load_from_dataframe(stand_in_map)
-        return route_map
     
     
     def query_point(self, index):

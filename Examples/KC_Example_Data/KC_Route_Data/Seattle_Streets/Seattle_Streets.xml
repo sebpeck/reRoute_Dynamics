@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+    <idinfo>
+        <citation>
+            <citeinfo>
+                <title>Seattle Streets</title>
+            </citeinfo>
+        </citation>
+        <descript>
+            <abstract>Streets data includes: Arterial Classification, Street Names, Block Number, Direction, One-way, Surface Width, Surface Type, Pavement Condition, Speed Limit, Percent Slope.   From the Hansen Asset Management System:The linework is from the SND(Street Network Database) which can be found at our open data site - https://data-seattlecitygis.opendata.arcgis.com/datasets/street-network-database-snd.  | Attribute Information: https://www.seattle.gov/Documents/Departments/SDOT/GIS/Seattle_Streets_OD.pdf | Update Cycle: Weekly| Contact Email: DOT_IT_GIS@seattle.gov---  Common SDOT queries and data downloads   | Arterial Classification: of Seattle StreetsARTCLASS IN(1,2,3,4)| Transit Classification: of Seattle StreetsTRANCLASS IN(1,2,3,4,5,6)</abstract>
+            <purpose>SDOT maintained data about streets in Seattle.
+</purpose>
+        </descript>
+        <keywords>
+            <theme>
+                <themekt>None</themekt>
+                <themekey>SDOT</themekey>
+                <themekey>GIS</themekey>
+                <themekey>Seattle</themekey>
+                <themekey>One Way Streets</themekey>
+                <themekey>Arterial Classification</themekey>
+                <themekey>Street Names</themekey>
+                <themekey>Block Number</themekey>
+                <themekey>Direction</themekey>
+                <themekey>One-Way</themekey>
+                <themekey>Surface Width</themekey>
+                <themekey>Surface Type</themekey>
+                <themekey>Pavement Condition</themekey>
+                <themekey>Speed Limit</themekey>
+                <themekey>Transit</themekey>
+                <themekey>Transit Classification</themekey>
+                <themekey>Percent Slope</themekey>
+                <themekey>Arterial</themekey>
+            </theme>
+        </keywords>
+        <accconst>None</accconst>
+        <useconst/>
+        <datacred>SDOT, City of Seattle</datacred>
+    </idinfo>
+    <metainfo>
+        <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+        <metstdv>FGDC-STD-001-1998</metstdv>
+        <mettc>local time</mettc>
+    </metainfo>
+</metadata>

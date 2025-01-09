@@ -2,13 +2,46 @@
 KC_Query_Tools.py
 KC_Query_Tools is used for providing route information from King County Metro's dataset.
 '''
-
+import sys
+sys.path.append('../src/reRoute_Dynamics_Core/')
 import pandas as pd
 import geopandas as gpd
 import shapely
 import numpy as np
 import pyogrio as pio
 import Geography_Tools as gt
+import os
+import multiprocessing
+import datetime as dt
+import inspect
+
+
+def verbose_line_updater(message, reset=False):
+    '''
+    verbose_line_updater generates a verbose message with timestamps and
+    method calls based on a passed message. Can reset printline if specified.
+    
+    Params:
+    message - message, as str, to be printed with the line.
+    reset - boolean to reset carrige or not. Default false.
+    
+    Returns:
+    The string to be printed.
+    '''
+    
+    # generate the string.
+    data_string = "[{} -- {}.{}()] {}                  ".format(dt.datetime.now().time(),
+                                                                "KC_Query_Tools",
+                                                                str(inspect.stack()[1][3]),
+                                                                message)
+    # check if the carrage should be reset.
+    if reset:
+        print(data_string, end='\r')
+    else:
+        print(data_string)
+        
+    # return the carrage.
+    return data_string
 
 
 def query_route_id(shortname, route_data_path, shortname_key = 'route_short_name', idnum_key = 'route_id'):
@@ -156,7 +189,7 @@ def check_valid_stops_by_shape(stop_sequence, shape_id, trip_table_dir, stop_tim
 
 
 
-def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_path, trip_obj):
+def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_path, render_params):
     '''
     render_kc_route_file is the pipeline for rendering king county specific routes.
     
@@ -172,7 +205,7 @@ def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_pat
                      'stop_times.txt' -- a file containing the stop time KCM data
                      'Signals/KCM_signals.shp' -- a shapefile containing the signals for KCM area
     dtm_raster_path: path to raster elevation data, should be in same projection as all other data (EPSG:4326)
-    trip_obj - the trip parameters object to help define interpolation and smoothness degree
+    render_params - the parameters as a touple to help define interpolation and smoothness degree
     
     Returns:
     filename of object with a ' -- 0' or ' -- 1' appended, depending on if the render succeeded or not.
@@ -198,7 +231,7 @@ def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_pat
             dx = gt.query_distance_traveled(geo, verbose=verb)
 
             # use the geometry to interpolate points
-            i_geo = gt.interpolate_geometry_series(geo, trip_obj.d_interp)
+            i_geo = gt.interpolate_geometry_series(geo, render_params[0])
 
             # Use the interpolated geometry to get interpolated distances
             i_dx = gt.query_distance_traveled(i_geo, verbose=verb)
@@ -208,7 +241,7 @@ def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_pat
 
             # get the DTM elevation and smoth it.
             idtm_elevation = gt.query_elevation_series(i_geo, reprojected_DTMs, verbose=verb)
-            smellev = gt.smooth_elevation(idtm_elevation,smoothness, trip_obj.deg)
+            smellev = gt.smooth_elevation(idtm_elevation,smoothness, render_params[1])
 
             # get the speed limits for the data
             limits = gt.query_speed_limits(i_geo, route_data_dir + "Seattle_Streets/KCM_Streets.shp", verbose=verb)
@@ -230,9 +263,166 @@ def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_pat
             route = gt.Route(i_geo, smellev, limits=limits, stops=stops, signals=signals, signs = [-1]*len(i_geo))
             route.save_to_json(fname)
             print("Succesfully Rendered {}".format(fname))
-        return fname + " -- 0"
+        return fname + ""
     except:
         print("Failed Rendering {}".format(fname))
         return fname + " -- 1"
+    
+    
+def batch_render_kc_routes(route_options, route_data_dir, elevation_raster_path, route_savepath, skip_unrendered=False, render_params=(10, 3),batch_size = 5, verbose=False):
+    '''
+    batch_rended_kc_routes takes in a list of route shortnames, path to king county route data,
+    a path to an elevation raster, and a path to write the saved .json files to, and then
+    renders all the given route options, both inbound and outbound, for each possible shape of
+    that shortname.
+    
+    Params:
+    route_options: list of route shortnames, all as ints
+    route_data_dir: path to directory, as str, that holds route data from king county (a la, routes.txt, trips,txt.)
+    elevation_raster_path: path to directory containing all elevation rasters for the area being examined. 
+    route_savepath: path to directory the json files will be saved to.
+    skip_unrendered: boolean (default False) to skip rendering and just return the pre-existing valid json files.
+    render_params: tuple containing the parameters for (interpolation distance, savgol degree) as ints. Default (10, 3)
+    batch_size: (default 5) - int representing how many batches/cpu cores to use while rendering.
+    verbose: boolean to enable verbosity.
+    
+    Returns:
+    a list to hold the paths of all files that have been processed. 
+    If the render failed, the path will have ' -- 1' added to the end.
+    
+    '''
+
+    # generate the route list of saved routes that exist
+    saved_route_list = os.listdir(route_savepath)
+    for i in range(len(saved_route_list)):
+        saved_route_list[i] = (route_savepath+saved_route_list[i])
 
 
+    # empty list to hold the json filenames that need to be generated
+    fname_list = []
+
+    # empty list to hold valid files that have been generated
+    data_list = [[]]
+
+    # loop through each route option, and iterate through the shapes and directions
+    # to hold the json filenames
+    for selected_route in route_options:
+        # try to load the selected route by shortname
+        try:
+            # Query the possible shapes of that route.
+            route_id = query_route_id(selected_route, route_data_dir + "routes.txt")
+            possible_shapes = query_possible_shapes(route_id, route_data_dir + "trips.txt")
+
+            # loop through each possible shape
+            for shape_id in possible_shapes:
+
+                # loop through inbound and outbound
+                for in_out in [0, 1]:
+
+                    # generate the json filename based on shortname, shape, and direction
+                    filename = route_savepath + 'rt{}_sh{}_d{}.json'.format(selected_route, shape_id, in_out)
+
+                    # Check if the filename doesn't exist in the route list
+                    if filename not in saved_route_list:
+
+                        # if not, add the name to the list of json files that need to be generated
+                        fname_list.append(filename)
+
+                    else:
+                        # if it does exist, add it to the first list of valid files in the data list.
+                        data_list[0].append(filename)
+                        if verbose: verbose_line_updater('Filename {} exists already. Skipping...'.format(filename))
+        except:
+            if verbose: verbose_line_updater("Route {} Unavailable in shortname index. Skipping...".format(selected_route))
+
+    
+    if not skip_unrendered:
+
+        # batch the filenames based on the batch size
+        batched_filenames = [fname_list[i:i + batch_size] for i in range(0, len(fname_list), batch_size)]
+
+
+        # loop through each batch of filepaths
+        for fname_batch in batched_filenames:
+
+            # Get the batch file and associate it with its parameters by zipping to touples
+            batch = list(zip(fname_batch,
+                     [saved_route_list]*len(fname_batch),
+                     [route_data_dir]*len(fname_batch),
+                     [elevation_raster_path]*len(fname_batch),
+                     [render_params]*len(fname_batch)))
+
+            # use multiprocessing with a batch size for the pool
+            with multiprocessing.Pool(batch_size) as pool:
+                # use starmap to process each file's route map.
+                data_list.append(pool.starmap(render_kc_route_file, batch))
+    
+    return data_list
+
+
+def calculate_expected_ridership(ridership_data_path):
+    '''
+    calculate_expected_ridership takes a path to king county ridership data by route, 
+    and then calculates the typical total number of unique riders for a given route,
+    period, and direction. 
+    
+    Params:
+    ridership_data_path: Path, as str, to ridership data csv
+    
+    Returns:
+    dataframe containing the total unique riders for that given combination of route, period, and direction.
+    '''
+    
+    # Load the CSV
+    ridership_frame = pd.read_csv(ridership_data_path)
+
+    # Group the data by route, period, and direction
+    grouped = ridership_frame.groupby(['Route', 'Period', 'InOut'])
+    formatted_rider_data = []
+    
+    # iterate through the grouped data
+    for combo_group_name, combo_group in grouped:
+        
+        # group each combined group by the stop sequence
+        sid_groups = combo_group.groupby('STOP_SEQ')
+        
+        # create a list to store the data
+        data_list = []
+        
+        # Loop through eaach sequence:
+        for stop_id in sid_groups.groups:
+            
+            # Get the group of sequences
+            stop_group = sid_groups.get_group(stop_id)
+            
+            # get the mean of the average on, off, and load
+            ave_on = stop_group['AveOn'].mean()
+            #ave_off = stop_group['AveOff'].mean()
+            #ave_Ld = stop_group['AveLd'].mean()
+            
+            # convert the information to a data dict
+            data = {'STOP_SEQ':stop_id, 'diff':ave_on}
+            
+            # append the dict to the data list
+            data_list.append(data)
+            
+        # generate a dataframe from the data list
+        g_in = pd.DataFrame(data_list)
+        
+        # get the cumulative value of riders
+        expected_unique_riders = g_in['diff'].cumsum().max()
+        
+        # Get the data to be exportde
+        group_data = {'rt':combo_group_name[0],
+                      'per':combo_group_name[1],
+                      'io':combo_group_name[2],
+                      'riders':expected_unique_riders}
+        
+        # append it to the formatted list
+        formatted_rider_data.append(group_data)
+        
+    # generate a datagrame of the ridership data
+    formatted_rider_data = pd.DataFrame(formatted_rider_data)
+    
+    #return said dataframe
+    return formatted_rider_data

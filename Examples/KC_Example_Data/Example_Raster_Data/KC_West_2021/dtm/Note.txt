@@ -1,0 +1,10 @@
+For the sake of Microsoft not coming to my doorstep with a 15th century Cannon for
+singlehandedly melting a server rack with this data, I have not included any of the
+actual .tif files here. They can be found as King County West 2021 at the following URL:
+https://lidarportal.dnr.wa.gov/#47.56263:-122.73926:10
+
+Please use at your hard drive's own rist. the DTM files just for the west side of king county are 87.5 GB, and to
+reproject them with Geography_Tools, it saves reprojected versions. So, make sure to have double the space of whatever rasters you're looking at.
+
+Good Luck!
+-S
