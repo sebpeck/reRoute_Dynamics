@@ -30,7 +30,6 @@ def calc_instance_power(value,
 
     # set the battery power to zero.
     bat_pow = 0
-
     # Including Auxilliary load, though not strictly important at the moment. 
     if (value >= 0):
         # Discharging, converting the needed power into power battery must exert

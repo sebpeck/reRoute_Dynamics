@@ -12,6 +12,7 @@ import KC_Query_Tools as kqt
 import Object_Params as op
 import Geography_Tools as gt
 import ESS
+import matplotlib.pyplot as plt
 
 
 def prepare_trips(data_list,
@@ -232,7 +233,7 @@ def run_trip(path, trip, bus, bus_ESS, export_figures = False, seed_list=np.aran
             
     # if exporting figures, export the tuple
     if export_figures:
-        return results, plt_list
+        return (route_results, plt_list)
 
     # otherwise, export just the results.
     else:
@@ -324,15 +325,6 @@ def run_tests(ridership_data_path,
     route_options = list(pd.Series(formatted_rider_data['rt'].unique()).apply(str))
 
     # render out the files. 
-    
-    print(route_options,
-           route_data_dir,
-           elevation_raster_path,
-           route_savepath,
-           True,
-           (trip.d_interp, trip.deg),
-           batch_size,
-           True)
     data_list = kqt.batch_render_kc_routes(route_options,
                                            route_data_dir,
                                            elevation_raster_path,

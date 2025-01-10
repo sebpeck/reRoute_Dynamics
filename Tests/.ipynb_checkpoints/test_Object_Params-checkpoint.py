@@ -6,6 +6,7 @@ contains testing classes and cases for Object_Params.py
 Notes:
 1/8/2025 - This could do with some additional tests, but as it stands OP is simple enough that 
            very little can actually go wrong with it. 
+1/9/2025 - I have since discovered something that can go wrong with this. There need to be tests that can validate that parameters do NOT get switched around when saving and loading, as that can be a bit of an issue. 
 '''
 
 import unittest

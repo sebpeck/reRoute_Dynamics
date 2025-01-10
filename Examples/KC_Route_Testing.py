@@ -12,6 +12,7 @@ import KC_Query_Tools as kqt
 import Object_Params as op
 import Geography_Tools as gt
 import ESS
+import matplotlib.pyplot as plt
 
 
 def prepare_trips(data_list,
@@ -232,7 +233,7 @@ def run_trip(path, trip, bus, bus_ESS, export_figures = False, seed_list=np.aran
             
     # if exporting figures, export the tuple
     if export_figures:
-        return results, plt_list
+        return (route_results, plt_list)
 
     # otherwise, export just the results.
     else:

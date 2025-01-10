@@ -100,11 +100,11 @@ class ESS:
         self.P_max = max_power
         
     def copy(self):
-        return ESS(self.Em, self.Ei, self.Ea, self.Er, self.P_aux, self.P_regen, self.P_max)
+        return ESS(self.Em, self.Ei, self.Ea, self.P_aux, self.Er, self.P_regen, self.P_max)
     
     
     def save(self, filepath):
-        data = "{},{},{},{},{},{},{}".format(self.Em, self.Ei, self.Ea, self.Er, self.P_aux, self.P_regen, self.P_max)
+        data = "{},{},{},{},{},{},{}".format(self.Em, self.Ei, self.Ea, self.P_aux, self.Er, self.P_regen, self.P_max)
         
         # Clear the file
         open(filepath, 'w').close()

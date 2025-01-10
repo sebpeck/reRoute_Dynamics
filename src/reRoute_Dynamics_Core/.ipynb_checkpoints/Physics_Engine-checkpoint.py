@@ -110,7 +110,7 @@ def get_braking_distance(velocity,
                          wind_force,
                          braking_acceleration = DEFAULT_BR_ACCEL,
                          braking_factor = DEFAULT_BR_FACTOR,
-                         intertial_factor = DEFAULT_I_FACTOR,
+                         inertial_factor = DEFAULT_I_FACTOR,
                          max_distance = DEFAULT_MAX_DIST
                          ):
     
@@ -136,32 +136,35 @@ def get_braking_distance(velocity,
     net_external_force = grade_force + wind_force # positive means decellerating the bus.
     
     # calculate an initial pass of decelleration
-    rate_decell = (braking_acceleration*braking_factor*intertial_factor) + net_external_force/mass
-
+    rate_decell = (braking_acceleration*braking_factor*inertial_factor) + net_external_force/mass
+    
     # check if the current deceleration rate is higher than the 'maximum that's expected'
-    while (rate_decell > braking_acceleration*intertial_factor) and braking_factor > 0.01:
-
+    while (rate_decell > braking_acceleration*inertial_factor) and braking_factor > 0.01:
         # reduce braking factor
         braking_factor -= .0001
         
         # recalculate the decelleration
-        rate_decell = (braking_acceleration*braking_factor*intertial_factor) + net_external_force/mass
+        rate_decell = (braking_acceleration*braking_factor*inertial_factor) + net_external_force/mass
     
     
     # Check to make sure the object is actually decelerating to be able to stop over the max distance.
+
     while (braking_factor<1.001) and rate_decell < velocity**2/(2*max_distance):
         
         # if it isn't, up the braking factor.
         braking_factor += .0001
         
         # update the rate of deceleration.
-        rate_decell = (braking_acceleration*braking_factor*intertial_factor) + net_external_force/mass
+        rate_decell = (braking_acceleration*braking_factor*inertial_factor) + net_external_force/mass
 
             
     # calculate the braking distance.
     braking_dist = velocity**2 / (2*rate_decell)
-    
+    #if braking_dist<0:
+        #print(velocity, mass, grade_force, wind_force, braking_acceleration, braking_factor, inertial_factor, max_distance)
     # return the braking distance.
+    
+    #print('test')
     return {'dx':braking_dist, 'bf':braking_factor, 'ad':rate_decell}
 
 
@@ -188,7 +191,7 @@ def brake(velocity,
     braking_factor - float between 0 and 1 representing how much of the max braking acceleration
                      is used. Default .5.
     inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1
-    max_distance - float representing the ideal maximum distance the bust takes to stop. Default 304.8 m.
+    max_distance - float representing the ideal maximum distance the bust takes to stop. Default 304.8 m. **UNUSED**
     
     Returns:
     a dict containing final velocity v_f, time change dt, power P, and braking factor bf.
@@ -217,7 +220,7 @@ def brake(velocity,
         P = mass*-(braking_acceleration * inertial_factor * braking_factor)*travel_distance/t
 
         # Check if velocity is 0 to re-do the power
-        if vf == 0:
+        if t == 0:
             P = 0
     else:
         vf = 0

@@ -30,17 +30,19 @@ def calc_instance_power(value,
 
     # set the battery power to zero.
     bat_pow = 0
-
     # Including Auxilliary load, though not strictly important at the moment. 
     if (value >= 0):
         # Discharging, converting the needed power into power battery must exert
         bat_pow = value/(motor_eff*invert_eff) + (aux_load/aux_eff)
+        print(0)
     elif(value*regen_eff*motor_eff > max_regen):
+        print(1)
 
         #charging, the regenerative braking ALL the time, max regen is 100
         bat_pow = (value*regen_eff*motor_eff) + (aux_load/aux_eff)
         
     else:
+        print(2)
         bat_pow = max_regen + (aux_load/aux_eff)
 
 
