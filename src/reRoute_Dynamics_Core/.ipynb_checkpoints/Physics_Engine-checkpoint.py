@@ -309,14 +309,18 @@ def maintain(velocity,
         v_f = v_i
         dt = dx/v_f
         P=P_current
-    
+        
+        
     # Check if there's not enough braking power to overcome.
     elif P_brake_max >= P_current:
         #print("Not enough braking power")
-        da = -abs(P_current-P_brake_max) / (m*v_i)
+        # this is somehow either giving netative time or the acceleration is wrong - 1/10/2025
+        da = abs(P_current-P_brake_max) / (m*v_i)
         v_f = np.sqrt(v_i**2 + 2*dx*da)
         P = P_brake_max
-        dt = (v_i - v_f) / da
+        dt = (v_f - v_i) / da
+
+        
     
     # Otherwise, error time!
     else:

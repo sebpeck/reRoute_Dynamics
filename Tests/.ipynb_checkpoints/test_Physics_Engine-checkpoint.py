@@ -2,6 +2,9 @@
 test_Physics_Engine.py
 
 contains the tests for Physics_Engine.py
+
+Notes:
+1/10/2025 - Maintain needs to get checked for why it could possibly return a v_f of nan. 
 '''
 import unittest
 import sys
@@ -262,7 +265,7 @@ class TestBrake(unittest.TestCase):
         self.assertEqual(result['v_f'], expected)
         
     def test_no_stop(self):
-        # tapping the brake for a distance of zero should mean no velocity change
+        # tapping the brake for a distance of zero should mean no velocity change.
         dist = pe.get_braking_distance(self.vi,
                                 self.mass,
                                 self.fg,
@@ -282,8 +285,8 @@ class TestBrake(unittest.TestCase):
                           self.dx_max)
         
         expected = 0
-        print(result)
         self.assertEqual(result['v_f'], self.vi)
+        
         
     
 '''

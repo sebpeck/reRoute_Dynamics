@@ -2,6 +2,9 @@
 test_Physics_Engine.py
 
 contains the tests for Physics_Engine.py
+
+Notes:
+1/10/2025 - Maintain needs to get checked for why it could possibly return a v_f of nan. 
 '''
 import unittest
 import sys
