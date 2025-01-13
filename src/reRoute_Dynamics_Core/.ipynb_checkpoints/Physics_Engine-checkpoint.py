@@ -380,6 +380,7 @@ def accelerate(velocity,
     v_f = 0
     P = 0
     a_max=0
+    dx = 0
     
     # Assume the bus can always start up. If the velocity is 0,
     if velocity ==0:
@@ -448,10 +449,11 @@ def accelerate(velocity,
     # Get the closest index to the end of the acceleration profile.
     #this is wrong!!
     
-    closest_end_index = list(abs(a_prof['cum_dx']).sort_values().index)[0]
+    closest_end_index = list(abs(a_prof['cum_dx']).sort_values().index)[0]+1
     
     #Check if the starting and ending indexes are the same 
     if (starting_index == closest_end_index):
+        print(1)
         #print('same')
         # get the data from the index
         ea_prof = a_prof.iloc[starting_index]
@@ -468,6 +470,7 @@ def accelerate(velocity,
     # if the forces are too hard to overcome, the starting index will
     # be greater than the end index
     elif(starting_index > closest_end_index):
+        print(2)
         #print('overforce')
         # get the acceleration from the true net accels.
         a=true_a.iloc[starting_index]
@@ -483,6 +486,7 @@ def accelerate(velocity,
     
     # otherwise, 
     else:
+        print(3)
         #print('range')
         #print("multi")
         # get the selection range of data
@@ -493,29 +497,46 @@ def accelerate(velocity,
         
         # intialize the total energy
         en=0
-        dx = 0
         # iterate through the range and adjust the
         # velocity, time, and energy accordingly
         for col, row in ea_prof.iterrows():
-            if dx < travel_distance:
-                v_f = v_f+row['dv']
+            # Calculate an initial pass of distance and velocity change
+            v_f_i = v_f+row['dv']
+            i_dx = .5*(v_f_i + v_f_i-row['dv'])*row['dt']# <--- Should this be dt or i_dt? 
+
+            # if the travel distance is less than using the whole next step of the profile,
+            # and if the travel distance is the same as the cumulative distance,
+            if i_dx+dx > travel_distance and ((travel_distance-dx) != 0):
+                
+                # back-calculate the time, velocity, distance, and energy change
+                # starting with the quadratic formula from the kinematic eqn
+                # for time without final velocity.
+                i_dx = travel_distance-dx
+                i_dt = (-v_f + np.sqrt(v_f**2 + 2*i_dx*row['net_a']))/row['net_a']
+
+                # Calculate the cumulative values
+                v_f = i_dx/i_dt
+                en += row['power']*i_dt
+                dx += i_dx
+                dt += i_dt
+
+            # Otherwise, use the existing chane calues.
+            else:
+                v_f = v_f_i
                 i_dt = row['dt']
                 dt += i_dt
                 en += row['power']*i_dt
-                dx += .5*(v_f + v_f-row['dv'])*dt
-            else:
-                break
-                #print(dx)
-        #print(dt, starting_index, closest_end_index)
-        #print(dx)
+                dx+=i_dx
+                
         # calculate the power.
+        print(en/dt, dx)
         P = en/dt
         
-    
     # Get the results.
     results = {'v_f':v_f,
                'dt':dt,
                'P':P}
+    #print("ding!")
 
     # return the results
     return results
