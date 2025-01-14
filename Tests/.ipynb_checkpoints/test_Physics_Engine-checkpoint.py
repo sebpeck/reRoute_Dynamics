@@ -8,11 +8,57 @@ Notes:
 '''
 import unittest
 import sys
+import os
 sys.path.append('../src/reRoute_Dynamics_Core')
+import pandas as pd
+import numpy as np
+import itertools
+
 import Physics_Engine as pe
 
-class TestCalculateWindForce(unittest.TestCase):
+# set up the min, max of each parameter
+bearings = (0, 360) # deg 0
+velocitys = (0, 40) #m/s 1
+wind_bearings = bearings # deg 2
+wind_speeds = (0, 22) # m/s 3
+air_densities = (.9, 1.5) # kg/m^3 4
+drag_coefs = (.2, 2) # 5
+a_frontals = (.09, 1.5) #m^2, smart car and semi truck 6
+grades = (-17, 17) # %, based on seattle 7
+masses = (700, 37000) # kg, smart car and loaded semi 8
+fric_coefs = (.02, .5) # engineering toolbox 9
+a_brakings = (.098, 9.81) # m/s^2, grav 10
+br_factors = (0, 1)  # 11
+inert_factors = (0.001, 0.0730) # wikipedia 12
+max_dist = (300, 1000) #m, estimates 13
+dx_travel = (1, 300) #m, estimates 14
+max_power = (3000, 60000) # watts, est based on ev smart car, ev semi 15
+max_acc = (0.098, 9.81) # m/s^2, grav 16
+max_timestep = (.01, 60) # seconds 17
+a_prof_path = '../Examples/KC_Example_Data/Acceleration_Profiles/Braunschweig_Acceleration.csv'
+a_prof = pd.read_csv(a_prof_path, header=None)
+a_prof[1] = a_prof[1]*9.81
+a_prof = (a_prof,)
+
+
+range_list = [bearings, velocitys, wind_bearings, wind_speeds, air_densities, drag_coefs, a_frontals, grades, masses, fric_coefs, a_brakings, br_factors, inert_factors, max_dist, dx_travel, max_power, max_acc, max_timestep, a_prof]
+
+print("Prepping samples...")
+param_samples = []
+for param_options in list(itertools.product(*range_list)):
+    wind_params = param_options[0:7]
+    grade_params = param_options[7:10]
+    wind_force = pe.calculate_wind_force(*wind_params)
+    grade_force = pe.calculate_grade_force(*grade_params)
+    bdist_params = (param_options[1], param_options[8], grade_force, wind_force) + param_options[10:14]
+    brake_params = (param_options[1], param_options[8], param_options[14], grade_force, wind_force) + param_options[10:14]
+    main_params = (param_options[1], param_options[8], param_options[14], grade_force, wind_force) + param_options[10:13] + (param_options[15],)
+    acc_params = (param_options[1], param_options[8], param_options[14], grade_force, wind_force,param_options[18]) + param_options[10:13] + param_options[15:18]
+    param_samples.append([wind_params, grade_params, bdist_params, brake_params, main_params, acc_params])
+print('Samples prepped.')
     
+class TestCalculateWindForce(unittest.TestCase):
+    print('windforcetests')
     # Legitemately I don't know how to properly test-case this one. 
     # Reasonably, there should be errors resulting for things like:
     # - Negative Frontal area
@@ -76,6 +122,7 @@ class TestCalculateWindForce(unittest.TestCase):
     
     
 class TestSign(unittest.TestCase):
+    print('signtests')
     
     def test_negative(self):
         called = pe.sign(-500)
@@ -96,6 +143,7 @@ class TestSign(unittest.TestCase):
         
 
 class TestCalculateGradeForce(unittest.TestCase):
+    print('gradeforcetests')
     
     # Like above, this should have checks in place to make sure there arent:
     # - Negative or zero mass
@@ -133,6 +181,7 @@ class TestCalculateGradeForce(unittest.TestCase):
     
 
 class TestGetBrakingDistance(unittest.TestCase):
+    print('brakingdistests')
     
     # This should probably have checks in the method
     # to verify that:
@@ -226,9 +275,26 @@ class TestGetBrakingDistance(unittest.TestCase):
         self.assertEqual(ad, expected)
         
         
-        
+# ---------------------------------------------- General test methods for braking, maintaining, and accelerating
+def test_vf_valid(self, vf, params):
+    against_min = int(vf<velocitys[0])
+    is_valid = int(np.isnan(vf))
+    self.assertEqual(is_valid, 0, "vf: {}, ".format(vf)+str(params))
+    self.assertEqual(against_min, 0, "vf: {}, ".format(vf)+str(params))
+    
+def test_t_valid(self, t, params):
+    is_possible = int(t<0)
+    is_valid = int(np.isnan(t))
+    self.assertEqual(is_possible, 0, "t: {}, ".format(t)+str(params))
+    self.assertEqual(is_valid, 0, "t: {}, ".format(t)+str(params))
+    
+def test_P_valid(self, P, params):
+    is_valid = int(np.isnan(P))
+    self.assertEqual(is_valid, 0, "P: {}, ".format(P)+str(params))
+    
 
 class TestBrake(unittest.TestCase):
+    print('braketest')
     vi = 10
     mass = 100
     dx = 100
@@ -286,14 +352,39 @@ class TestBrake(unittest.TestCase):
         
         expected = 0
         self.assertEqual(result['v_f'], self.vi)
-        
-        
     
-'''
+    
+    def test_all_valid(self):
+        # This iterates through the combos of min and max possible values for each param and
+        # checks if the output are valid responses. 
+        for params in param_samples:
+            result = pe.brake(*params[3])
+            test_vf_valid(self, result['v_f'], params[3])
+            test_t_valid(self, result['dt'], params[3])
+            test_P_valid(self, result['P'], params[3])
 
+            
 class TestMaintain(unittest.TestCase):
+    print('maintest')
+    def test_all_valid(self):
+        # Check if any of the responses are invalid, a la negative time, negative velocity, or nan
+        for params in param_samples:
+            result = pe.maintain(*params[4])
+            test_vf_valid(self, result['v_f'], params[4])
+            test_t_valid(self, result['dt'], params[4])
+            test_P_valid(self, result['P'], params[4])
+
     
+
 class TestAccelerate(unittest.TestCase):
-'''
+    print('acceltest')
+    def test_all_valid(self):
+        # Check if any of the responses are invalid, a la negative time, negative velocity, or nan
+        for params in param_samples:
+            result = pe.accelerate(*params[5])
+            test_vf_valid(self, result['v_f'], params[5])
+            test_t_valid(self, result['dt'], params[5])
+            test_P_valid(self, result['P'], params[5])
+            
 if __name__ == '__main__':
     unittest.main()

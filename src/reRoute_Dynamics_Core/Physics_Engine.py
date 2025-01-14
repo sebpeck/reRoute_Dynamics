@@ -286,52 +286,60 @@ def maintain(velocity,
     P = None
     m = mass
     dx = travel_distance
-    
-    # Check if there is enough motor power
-    #print(P_max, P_current, P_brake_max)
-    if P_max >= P_current > 0:
-        #print("Enough motor power")
-        v_f = v_i
-        dt = dx/v_f
-        P = P_current
-    
-    # Check if there isn't enough motor power to overcome.
-    elif P_current > P_max:
-        #print("Not enough motor power")
-        da = (P_current - P_max)/(m*v_i)
-        v_f = np.sqrt(v_i**2 - 2*dx*da)
-        P = P_max
-        dt = (v_i - v_f) / da
-    
-    # Check if there's enough braking power to overcome.
-    elif 0 >= P_current > P_brake_max:
-        #print("Enough braking power")
-        v_f = v_i
-        dt = dx/v_f
-        P=P_current
-        
-        
-    # Check if there's not enough braking power to overcome.
-    elif P_brake_max >= P_current:
-        #print("Not enough braking power")
-        # this is somehow either giving netative time or the acceleration is wrong - 1/10/2025
-        da = abs(P_current-P_brake_max) / (m*v_i)
-        v_f = np.sqrt(v_i**2 + 2*dx*da)
-        P = P_brake_max
-        dt = (v_f - v_i) / da
+    if v_i != 0:
+        # Check if there is enough motor power
+        #print(P_max, P_current, P_brake_max)
+        if P_max >= P_current > 0:
+            #print("Enough motor power")
+            v_f = v_i
+            dt = dx/v_f
+            P = P_current
 
-        
-    
-    # Otherwise, error time!
+        # Check if there isn't enough motor power to overcome.
+        elif P_current > P_max:
+            #print("Not enough motor power")
+            da = (P_current - P_max)/(m*v_i)
+            if (v_i**2 - 2*dx*da) < 0:
+                v_f = 0
+            else:
+                v_f = np.sqrt(v_i**2 - 2*dx*da)
+            P = P_max
+            dt = (v_i - v_f) / da
+
+        # Check if there's enough braking power to overcome.
+        elif 0 >= P_current > P_brake_max:
+            #print("Enough braking power")
+            v_f = v_i
+            dt = dx/v_f
+            P=P_current
+
+
+        # Check if there's not enough braking power to overcome.
+        elif P_brake_max >= P_current:
+            #print("Not enough braking power")
+            # this is somehow either giving netative time or the acceleration is wrong - 1/10/2025
+            da = abs(P_current-P_brake_max) / (m*v_i)
+            v_f = np.sqrt(v_i**2 + 2*dx*da)
+            P = P_brake_max
+            dt = (v_f - v_i) / da
+
+
+
+        # Otherwise, error time!
+        else:
+            print("You shouldn't be here")
+            print('mass {}, a_counter {}, velocity {}, braking_Factor {}, braking_accel {}, i_factor {}'.format(mass, a_counter, velocity, braking_factor, braking_acceleration, inertial_factor))
+            print("Pmax {}, pcurrent {}, pmin {}".format(P_max, P_current, P_brake_max))
+
+        # turn the results into a dict
     else:
-        print("You shouldn't be here")
-        print('mass {}, a_counter {}, velocity {}, braking_Factor {}, braking_accel {}, i_factor {}'.format(mass, a_counter, velocity, braking_factor, braking_acceleration, inertial_factor))
-        print("Pmax {}, pcurrent {}, pmin {}".format(P_max, P_current, P_brake_max))
-        
-    # turn the results into a dict
+        v_f = 0
+        P = 0
+        dt = 0
     results = {'v_f':v_f,
                'dt':dt,
                'P':P}
+
     
     # return the results
     return results
@@ -447,13 +455,11 @@ def accelerate(velocity,
     a_prof['cum_dx'] = a_prof['cum_dx'] - a_prof['cum_dx'].iloc[starting_index] - travel_distance
     
     # Get the closest index to the end of the acceleration profile.
-    #this is wrong!!
     
     closest_end_index = list(abs(a_prof['cum_dx']).sort_values().index)[0]+1
     
     #Check if the starting and ending indexes are the same 
     if (starting_index == closest_end_index):
-        print(1)
         #print('same')
         # get the data from the index
         ea_prof = a_prof.iloc[starting_index]
@@ -470,7 +476,6 @@ def accelerate(velocity,
     # if the forces are too hard to overcome, the starting index will
     # be greater than the end index
     elif(starting_index > closest_end_index):
-        print(2)
         #print('overforce')
         # get the acceleration from the true net accels.
         a=true_a.iloc[starting_index]
@@ -486,23 +491,31 @@ def accelerate(velocity,
     
     # otherwise, 
     else:
-        print(3)
-        #print('range')
-        #print("multi")
         # get the selection range of data
-        ea_prof = a_prof.iloc[starting_index:closest_end_index]
-        
+        ea_prof = a_prof.iloc[starting_index:closest_end_index].reset_index(drop=True)
+        #print(ea_prof)
         # initialize the final velocity
         v_f = velocity
         
         # intialize the total energy
         en=0
+            
         # iterate through the range and adjust the
         # velocity, time, and energy accordingly
         for col, row in ea_prof.iterrows():
             # Calculate an initial pass of distance and velocity change
-            v_f_i = v_f+row['dv']
-            i_dx = .5*(v_f_i + v_f_i-row['dv'])*row['dt']# <--- Should this be dt or i_dt? 
+            step_dv = row['dv']
+            step_a = row['net_a']
+            
+            # Adjust the initial dv 
+            i_dv = 0
+            if col==0:
+                i_dv = row['dv'] - (velocity-reg_vel[starting_index])
+            else:
+                 i_dv = row['dv']
+            
+            v_f_i = v_f + i_dv
+            i_dx = .5*(v_f_i + v_f_i-i_dv)*row['dt']# <--- Should this be dt or i_dt? 
 
             # if the travel distance is less than using the whole next step of the profile,
             # and if the travel distance is the same as the cumulative distance,
@@ -529,14 +542,14 @@ def accelerate(velocity,
                 dx+=i_dx
                 
         # calculate the power.
-        print(en/dt, dx)
+        #print(en/dt, dx)
         P = en/dt
         
     # Get the results.
     results = {'v_f':v_f,
                'dt':dt,
                'P':P}
-    #print("ding!")
+    #print("ding!\n")
 
     # return the results
     return results

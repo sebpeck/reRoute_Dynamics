@@ -84,6 +84,9 @@ def compass_heading(bearing):
     # make sure the index isn't negative
     if bearing_index < 0:
         bearing_index=bearing_index+8
+    elif bearing_index > 8:
+        while bearing_index > 8:
+            bearing_index -= 8
         
     # return the corresponding compass direction
     return possible_dirs[bearing_index]
