@@ -184,7 +184,7 @@ def interpolate_points(point_1, point_2, max_dist=1):
     '''
     
     # get distance in meters
-    distance = haversine_formula(point_1.y, point_1.x, point_2.y, point_2.x)*1000
+    distance = haversine_formula(point_1.x, point_1.y, point_2.x, point_2.y)*1000
     if distance < max_dist:
         return [point_1]
     else:
@@ -199,6 +199,7 @@ def interpolate_points(point_1, point_2, max_dist=1):
         
         # create the points list with the initial point
         points = [point_1]
+        #print(dx,distance,num_interp)
         
         # loop through each distance from the origin 
         for dis in np.arange(dx/distance, 1, dx/distance):
@@ -232,22 +233,23 @@ def repeat_id_remover(sequence):
     sequence_value = -1
     
     # build a list for the new sequence
-    new_sequence = []
+    new_sequence = sequence
     
-    # loop through the old
-    for item in sequence:
+    # creaate a history
+    his = set([])
+    
+    # loop through each element in the sequence
+    for idx, ele in enumerate(new_sequence):
         
-        # check if the item is the same as the saved val
-        if (item == sequence_value):
-            
-            # if so, append invalid
-            new_sequence.append(-1)
-        else:
-            
-            # otherwise, append the item and swap the saved val for the item
-            new_sequence.append(item)
-            sequence_value=item
-            
+        # if the element is in the history, 
+        if ele in his:
+            # swap the index with the sequence value
+            new_sequence[idx] = sequence_value
+        
+        # then, add the element to the history. 
+        his.add(ele)
+        
+    
     # return the new sequence
     return new_sequence
 
@@ -340,20 +342,23 @@ def query_stops(geometry, stop_table_path, key='stop_id', epsg_from = 4326, epsg
     
     # convert the data to a shapely geometry pandas series
     if verbose: verbose_line_updater("Loading stop geometry...")
-    stop_table['geometry'] = stop_table.apply(lambda x: shapely.Point(x.stop_lon, x.stop_lat), axis=1)
+    stop_table['geometry'] = stop_table.apply(lambda x: shapely.Point(x.stop_lat, x.stop_lon), axis=1)
     if verbose: verbose_line_updater("Loaded stop geometry.")
     
+    #print(stop_table['geometry'])
     # convert the data to a geodataframe, and re-set the crs to the specified
-    if verbose: verbose_line_updater("Setting geodata: epsg{}-->epsg:{}".format(epsg_from, epsg_to))
-    stop_table = gpd.GeoDataFrame(stop_table).set_crs(epsg = epsg_from).to_crs(epsg = epsg_to)
+    if epsg_from != epsg_to:
+        if verbose: verbose_line_updater("Setting geodata: epsg{}-->epsg:{}".format(epsg_from, epsg_to))
+        stop_table = gpd.GeoDataFrame(stop_table).set_crs(epsg = epsg_from).to_crs(epsg = epsg_to)
+    else:
+        stop_table = gpd.GeoDataFrame(stop_table).set_crs(epsg = epsg_from)
     if verbose: verbose_line_updater("Geodata Set.")
     
     # filter the stop table to only be the stops within the boundary
     if verbose: verbose_line_updater("Filtering stops...")
-    stop_table = stop_table[stop_table['geometry'].apply(lambda x: shape_bounds.contains(x)) == True]
+    stop_table = stop_table[stop_table['geometry'].apply(lambda x: shape_bounds.buffer(1e-10).contains(x)) == True]
     if verbose: verbose_line_updater("Stops filtered.")
-    
-    
+
     # check for stops within a set distance of each geometry point
     stop_id_list = []
     
@@ -367,8 +372,7 @@ def query_stops(geometry, stop_table_path, key='stop_id', epsg_from = 4326, epsg
             route_pt = point
 
             # get the distances using the haversine formula, converted to meters
-            stop_table['dist'] = stop_table.geometry.apply(lambda x: haversine_formula(x.y, x.x, route_pt.y, route_pt.x)*1000)
-
+            stop_table['dist'] = stop_table.geometry.apply(lambda x: haversine_formula(x.x, x.y, route_pt.x, route_pt.y)*1000)
             # filter the data to yeild the closest stop
             closest_stop = stop_table[stop_table['dist'] == stop_table['dist'].min()].reset_index().iloc[0]
 

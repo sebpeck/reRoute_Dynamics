@@ -552,4 +552,4 @@ def accelerate(velocity,
     #print("ding!\n")
 
     # return the results
-    return results
+    return resultss
