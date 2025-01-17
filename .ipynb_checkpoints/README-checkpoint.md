@@ -6,10 +6,10 @@ reRoute_Dynamics is a software package that is a more thourouglhly refined versi
 
 ## Sebastian's To Do List: 
 1/8/2025: 
-- Write Tests for Physics_Engine.py, this is a top priority to show this works adequately
-- Write tests for Geography_Tools.py
-- Write tests for instance_tools.py
-- Write tests for trip_simulator? may not be possible
+- Write Tests for Physics_Engine.py, this is a top priority to show this works adequately - Done! 1/16/2025
+- Write tests for Geography_Tools.py - Done! 1/16/2025
+- Write tests for instance_tools.py - Done! 1/16/2025
+- ~~Write tests for trip_simulator? may not be possible~~ Noooope. 1/16/2025
 - Get an example notebook set up to run a whole bunch of runs and export relevant data. Adapt the existing KC tools.
 - Write a better ESS method so as to be able to predict voltage. This will involve a literature review. Remember the eventual goal is disaggregation of route vs decay. Voltage is just one metric. 
 - Create more Trips, busses, and ESS options beyond the XDE35.
