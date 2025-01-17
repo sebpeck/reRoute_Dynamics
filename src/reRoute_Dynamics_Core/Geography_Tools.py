@@ -8,6 +8,7 @@ import numpy as np
 import datetime as dt
 from alive_progress import alive_bar
 import inspect
+from rasterio.warp import calculate_default_transform, reproject, Resampling
 import rasterio
 import os
 import scipy
@@ -665,9 +666,8 @@ def reproject_rasterfiles(filepath_sequence, target_crs='EPSG:4326', verbose=Fal
 
                 # open the current rasterfile.
                 with rasterio.open(path) as src:
-
                     # use rasterIO to calculate the transform of the file to the desired crs
-                    transform, width, height = rasterio.warp.calculate_default_transform(src.crs,
+                    transform, width, height = calculate_default_transform(src.crs,
                                                                                          target_crs,
                                                                                          src.width,
                                                                                          src.height,
@@ -690,13 +690,13 @@ def reproject_rasterfiles(filepath_sequence, target_crs='EPSG:4326', verbose=Fal
                         for i in range(1, src.count + 1):
 
                             # reproject the values in the src.
-                            rasterio.warp.reproject(source=rasterio.band(src, i),
+                            reproject(source=rasterio.band(src, i),
                                                     destination=rasterio.band(dst, i),
                                                     src_transform=src.transform,
                                                     src_crs=src.crs,
                                                     dst_transform=transform,
                                                     dst_crs=target_crs,
-                                                    resampling=rasterio.warp.Resampling.nearest)
+                                                    resampling=Resampling.nearest)
             bar()
     if verbose: verbose_line_updater("Raster files succesfully reprojected.")
     
@@ -708,6 +708,8 @@ def query_elevation_series(geometry, gtiff_dir_ser, verbose=False):
     query_elevation_series takes a series of geometric shapely points, and an iterable of
     geotiff filepaths, and generates a pandas series of elevations from each point in
     the geometry.
+    Also for some reason tifs store lat and long in (lon, lat), so i swap em.
+    
     
     Params: 
     geometry - a series of shapely points of lat and lon
@@ -716,7 +718,7 @@ def query_elevation_series(geometry, gtiff_dir_ser, verbose=False):
     verbose - boolean parameter to specify verbosity. Defualt False.
     
     Returns:
-    pandas series of elevations corresponding to the geometry iterable.
+    pandas series of elevations corresponding to the geometry iterable, in km.
     '''
     
     # Generate the empty dictionary
@@ -727,7 +729,7 @@ def query_elevation_series(geometry, gtiff_dir_ser, verbose=False):
     
     if verbose: verbose_line_updater("Converting geometry...")
     # Convert the geometry to individual lat/lon tuples
-    route_ll = (geometry.apply(lambda x: (x.x, x.y))).reset_index(drop=True)
+    route_ll = (geometry.apply(lambda x: (x.y, x.x))).reset_index(drop=True)
     if verbose: verbose_line_updater("Geometry converted.")
     
     if verbose: verbose_line_updater("Querying elevation data...")
@@ -741,6 +743,7 @@ def query_elevation_series(geometry, gtiff_dir_ser, verbose=False):
 
                 # sample the elevations using rasterio and the list of lats and lons.
                 route = pd.Series(list(rasterio.sample.sample_gen(img, list(route_ll), masked=True)))
+                
 
                 # remove any masked values
                 filtered = route[route.apply(lambda x: str(type(x[0]))) != "<class 'numpy.ma.core.MaskedConstant'>"]
@@ -784,7 +787,7 @@ def smooth_elevation(elev_series, lg:int = 43, deg:int = 3):
 ### ---- Processing Tools ---- ###
 
 
-def combine_lidar_data(dsm, dx, max_grade=7.5):
+def _combine_lidar_data(dsm, dx, max_grade=7.5):
     '''
     combine_lidar_data takes dsm elevation series, as well as the change in distance
     between the points, and generates a filtered elevation that provides cleaner road elevation.
@@ -797,6 +800,10 @@ def combine_lidar_data(dsm, dx, max_grade=7.5):
     
     Returns:
     iterable of filtered elevations, in km.
+    
+    Note: 
+    1/16/2025 - Made private, as it is not strictly nessecary for functionality right now. 
+                Also, writing a test for this sounds like a headache.
     '''
     
     # combine the dsm and dx into a dataframe
@@ -835,7 +842,7 @@ def calculate_grades(dx, elevations, clip = True , max_grade=7.5):
     
     # ensure only finite values
     grades = grades[np.isfinite(grades)]
-    
+
     # check to clip the values
     if clip:
         grades = grades.clip(max_grade, -max_grade)
@@ -861,6 +868,7 @@ def interpolate_geometry_series(geometry, max_distance=1):
                    
     Returns:
     iterable of lists of shapely points that have been interpolated.
+    
     '''
     
     currents = pd.Series(geometry)
@@ -887,7 +895,11 @@ def interpolate_geometry_series(geometry, max_distance=1):
     return gpd.GeoSeries(sploded)
 
 
-def interpolate_distance_traveled(dx, interpolated_iterable):
+def _interpolate_distance_traveled(dx, interpolated_iterable):
+    '''
+    Notes:
+    1/16/2025 - Not strictly nessecary. Privated. 
+    '''
     
     data = pd.concat([pd.Series(dx), interpolated_iterable.apply(len)], axis=1, keys=['dx', 'i_i']).reset_index(drop=True)
     
@@ -944,7 +956,7 @@ class Route:
         
         # if stops is empty, populate with -1, then intersperse with 10 stops (number of timepoints per route)
         if stops == None: 
-            self.stops = self._intersperse_list(-1, geolen, True, 10)
+            self.stops = self._intersperse_list(-1, geolen, 0, 10)
             self.stops[-1] = 0
         else: self.stops = list(stops)
         
@@ -1018,12 +1030,12 @@ class Route:
         '''
         
         # generate data dictionary and compress the data where possible.
-        data_dict = {'ge':encode_geometry(self.geometry),
+        data_dict = {'ge':_encode_geometry(self.geometry),
                      'el':self.elevation,
-                     'li':encode_series(self.limits),
-                     'st':encode_series(self.stops),
-                     'si':encode_series(self.signals),
-                     'sn':encode_series(self.signs)}
+                     'li':_encode_series(self.limits),
+                     'st':_encode_series(self.stops),
+                     'si':_encode_series(self.signals),
+                     'sn':_encode_series(self.signs)}
         
         # Open and save to the json. encode in utf-8 for funsies.
         with open('{}'.format(path), 'w', encoding='utf-8') as f:
@@ -1085,7 +1097,7 @@ class Route:
         
             
 
-def encode_series(iterable):
+def _encode_series(iterable):
     '''
     encode_series() takes an iterable and compresses it down so that 
     repeating values are stored as the value and number of occurrences.
@@ -1096,6 +1108,9 @@ def encode_series(iterable):
     
     Returns: 
     a string representation of the compressed information. 
+    
+    Notes:
+    1/16/2025 - Privated since it isn't needed externally. 
     '''
     
     # get the first item of the iterable
@@ -1144,7 +1159,7 @@ def encode_series(iterable):
     return data_stream
 
 
-def decode_series(encoded_string):
+def _decode_series(encoded_string):
     '''
     decode_series() takes in a string that was encoded using encode_series(), 
     and returns it to a decoded iterable. 
@@ -1154,6 +1169,9 @@ def decode_series(encoded_string):
     
     Returns:
     an iterable of the decompressed information. 
+    
+    Notes:
+    1/16/2025 - Privated since it isn't needed externally. 
     '''
     
     # split the string by comma.
@@ -1180,7 +1198,7 @@ def decode_series(encoded_string):
     return decoded_iterable
 
 
-def encode_geometry(geo):
+def _encode_geometry(geo):
     '''
     encode_geometry() takes in an iterable of shapely points,
     and then converts it to a list of alternating x and y values.
@@ -1190,6 +1208,8 @@ def encode_geometry(geo):
     
     Returns:
     list of alternating X and Y values in the same order as geo.
+        Notes:
+    1/16/2025 - Privated since it isn't needed externally. 
     '''
     
     # create an empty list
@@ -1204,7 +1224,7 @@ def encode_geometry(geo):
     return clist
 
 
-def decode_geometry(enc_geo):
+def _decode_geometry(enc_geo):
     '''
     decode_geometry() takes in compressed geometry from encode_geometry(),
     and converts it to an iterable of shapely points.
@@ -1214,6 +1234,9 @@ def decode_geometry(enc_geo):
     
     Returns:
     list of shapely geometry.
+    
+    Notes:
+    1/16/2025 - Privated since it isn't needed externally. 
     '''
     
     # empty list to store data
@@ -1253,16 +1276,16 @@ def load_from_json(path):
         data = json.load(file)
     
     # read the geometry data
-    geo = decode_geometry(data['ge'])
+    geo = _decode_geometry(data['ge'])
     
     # read the elevation data
     el = data['el']
-    
+
     # read the limit, stop, signal, and sign data
-    lim = list(pd.Series(decode_series(data['li'])).apply(float))
-    stp = list(pd.Series(decode_series(data['st'])).apply(int))
-    signals = list(pd.Series(decode_series(data['si'])).apply(int))
-    signs = list(pd.Series(decode_series(data['sn'])).apply(int))
+    lim = list(pd.Series(_decode_series(data['li'])).apply(float))
+    stp = list(pd.Series(_decode_series(data['st'])).apply(int))
+    signals = list(pd.Series(_decode_series(data['si'])).apply(int))
+    signs = list(pd.Series(_decode_series(data['sn'])).apply(int))
     
     # generate a new Route object from the provided data. 
     loaded_route = Route(geo, el, lim, stp, signals, signs)

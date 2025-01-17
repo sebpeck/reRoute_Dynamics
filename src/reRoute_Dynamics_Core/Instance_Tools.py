@@ -27,45 +27,49 @@ def generate_riders(n_stops, mean_ridership, seed=None):
         
         # Implement the seed.
         random.seed(seed)
-        
-    # create a list of indexes
-    rider_list_indexes = list(np.arange(0, n_stops, 1))
     
-    # create a list of zeros based on number of stops
-    riders_on = [0]*n_stops
+    if n_stops > 1:
+        # create a list of indexes
+        rider_list_indexes = list(np.arange(0, n_stops, 1))
+
+        # create a list of zeros based on number of stops
+        riders_on = [0]*n_stops
+
+        # for each rider in the mean, randomly select a stop they get on at.
+        for i in range(int(np.ceil(mean_ridership))):
+            riders_on[random.choice(rider_list_indexes[:-1])] += 1
+            
+        # tally for current riders.
+        current_riders = 0
+
+        # list to store ridership changes
+        rider_changes = []
+
+        # loop through each stop in the ridership on changes
+        for stop in riders_on:
+
+            # a number between 0 and the current number of riders disembark.
+            riders_off = random.randrange(0, current_riders+1)
+
+            # The current riders is updated for the net change in ridership.
+            current_riders += stop - riders_off
+
+            # the ridership change is calculated.
+            rider_change = stop - riders_off
+
+            # the change is appended.
+            rider_changes.append(rider_change)
+
+
+        # if not everyone is off by the last stop, shove em off.
+        if current_riders != 0:
+            rider_changes[-1] -= current_riders
+
+        # return the rider changes.
+        return rider_changes
     
-    # for each rider in the mean, randomly select a stop they get on at.
-    for i in range(int(np.ceil(mean_ridership))):
-        riders_on[random.choice(rider_list_indexes)] += 1
-    
-    # tally for current riders.
-    current_riders = 0
-    
-    # list to store ridership changes
-    rider_changes = []
-    
-    # loop through each stop in the ridership on changes
-    for stop in riders_on:
-        
-        # a number between 0 and the current number of riders disembark.
-        riders_off = random.randrange(0, current_riders+1)
-        
-        # The current riders is updated for the net change in ridership.
-        current_riders += stop - riders_off
-        
-        # the ridership change is calculated.
-        rider_change = stop - riders_off
-        
-        # the change is appended.
-        rider_changes.append(rider_change)
-        
-        
-    # if not everyone is off by the last stop, shove em off.
-    if current_riders != 0:
-        rider_changes[-1] -= current_riders
-        
-    # return the rider changes.
-    return rider_changes
+    else:
+        return [0]
 
 
 def check_hit_signal(stoplight_chance=.541666, seed=None):

@@ -10,10 +10,13 @@ Notes:
 
 import unittest
 import sys
+import os
 sys.path.append('../src/reRoute_Dynamics_Core')
 import shapely
 import pandas as pd
 import Geography_Tools as gt
+import numpy as np
+import geopandas as gpd
 
 class TestHaversineFormula(unittest.TestCase):
     
@@ -165,18 +168,6 @@ class TestRepeatIDRemover(unittest.TestCase):
         result = gt.repeat_id_remover(self.uniques)
         expected = self.uniques
         self.assertEqual(expected, result)
-'''
-    Skipping this one for now since it's not critical to the function.
-class TestVerboseLineUpdater(unittest.TestCase):
-
-'''
-
-'''
-# I'm gonna be honest, this does not make a whole lot of sense as an independent function. 
-class TestQueryElevationChanges(unittest.TestCase):
-
-class TestQueryDistanceTraveled(unittest.TestCase):
-''' 
 
 class TestInterpolateGeometrySeries(unittest.TestCase):
     geo_series = pd.read_csv("../Examples/KC_Example_Data/Example_Route_Data/example_route_table.csv")
@@ -213,14 +204,7 @@ class TestQuerySignals(unittest.TestCase):
     def test_works(self):
         result = gt.query_stops(self.geo_series, self.stop_table_path)
         self.assertEqual(18, len(result) - result.count(-1))
-'''
-This one feels insurmountable right now. How do I create fake geospatial speed limit data?
-Do i assemble a bunch of linestrings with different limi... yeah thats the unfortunately tedious solution
-hahah frick
 
-class TestQuerySpeedLimits(unittest.TestCase):
-    
-'''
 
 class TestQueryBearings(unittest.TestCase):
     geo_series = pd.read_csv("../Examples/KC_Example_Data/Example_Route_Data/example_route_table.csv")
@@ -231,40 +215,175 @@ class TestQueryBearings(unittest.TestCase):
         expected = len(self.geo_series)
         self.assertEqual(expected, result)
 
+        
 class TestGetRasterFiles(unittest.TestCase):
     path = "../Examples/KC_Example_Data/Example_Raster_Data/"
-    path_with = "../Examples/KC_Example_Data/Example_Raster_Data/KC_West_2021/dtm/"
+    path_with = "../Examples/KC_Example_Data/Example_Raster_Data/Redmond_2014/dtm/"
     def test_no_tif(self):
         result = gt.get_rasterfiles(self.path)
         self.assertEqual(0, len(result))
-    def test_tif_with_others(self):
-        result = gt.get_rasterfiles(self.path_with) # << need a fake raster or single raster for this
-        self.assertEqual(1, len(result))
         
-'''
-    
+    def test_tif_with_others(self):
+        result = gt.get_rasterfiles(self.path_with) # < There should be 4 raster files here
+        self.assertEqual(4, len(result))
+        
+
 class TestReprojectRasterfiles(unittest.TestCase):
+    redmond_rasters_path = "../Examples/KC_Example_Data/Example_Raster_Data/Redmond_2014/dtm/"
+    redmond_rasters = gt.get_rasterfiles(redmond_rasters_path)
+    
+    
+    def test_4326(self):
+        new_projections = gt.reproject_rasterfiles(self.redmond_rasters)
+        self.assertEqual(len(self.redmond_rasters), len(new_projections))
+        self.assertEqual(8,len(os.listdir(self.redmond_rasters_path)))
+        
 
 class TestQueryElevationSeries(unittest.TestCase):
+    redmond_rasters_path = "../Examples/KC_Example_Data/Example_Raster_Data/Redmond_2014/dtm/"
+    redmond_rasters = gt.get_rasterfiles(redmond_rasters_path)
+    new_projections = gt.reproject_rasterfiles(redmond_rasters)
+    pt1 = shapely.Point(47.6778, -122.1574) # close, tract 1
+    pt2 = shapely.Point(47.678, -122.1575) # close, tract 1
+    pt3 = shapely.Point(47.679, -122.1579) # far, tract 1
+    pt4 = shapely.Point(47.6817, -122.1571) # deep, tract 1
+    pt5 = shapely.Point(47.6687, -122.1083) # far, onramp, tract 2
+    pt6 = shapely.Point(47.6702, -122.1073) # far, bridge of onramp, tract 2
     
-class TestSmoothElevation(unittest.TestCase):
-    
-class TestCombineLidarData(unittest.TestCase):
+    def test_same_tract_close(self):
+        pts = [self.pt1, self.pt2, self.pt3]
+        result = gt.query_elevation_series(pts, self.new_projections)
+        self.assertEqual(3, len(result))
+        self.assertEqual(True, result[0]>result[1])
+        self.assertEqual(True, result[1]>result[2])
         
-class TestCalculateGrades(unittest.TestCase):
+    def test_multiple_tracts(self):
+        pts = [self.pt1, self.pt4, self.pt6]
+        result = gt.query_elevation_series(pts, self.new_projections)
+        self.assertEqual(3, len(result))
+        self.assertEqual(True, result[0]>result[1])
+        self.assertEqual(True, result[0]>result[2])
     
-class TestInterpolateGeometrySeries(unittest.TestCase):
 
-class TestInterpolateDistanceTraveled(unittest.TestCase):
+class TestSmoothElevation(unittest.TestCase):
+    pts = pd.Series([shapely.Point(47.667,-122.1279),
+           shapely.Point(47.6672, -122.1276),
+           shapely.Point(47.6673, -122.1255),
+           shapely.Point(47.6673, -122.1172),
+           shapely.Point(47.6674, -122.111),
+           shapely.Point(47.6687,-122.1084),
+           shapely.Point(47.6676, -122.1075),
+           shapely.Point(47.6702, -122.107)]) # A highway with two bridges at index 1 and index 7
+
+    int_pts = gt.interpolate_geometry_series(pts, 10)
+    redmond_rasters_path = "../Examples/KC_Example_Data/Example_Raster_Data/Redmond_2014/dtm/"
+    redmond_rasters = gt.get_rasterfiles(redmond_rasters_path)
+    new_projections = gt.reproject_rasterfiles(redmond_rasters)
+    elevs = gt.query_elevation_series(int_pts, new_projections)
+    
+    def test_works(self):
+        result = gt.smooth_elevation(self.elevs, 20, 3)
+        # tTHIS DOES NOT TEST IF THE ELEVATION MAKES REASONABLE SENSE!!!! ONLY WORKS!
+        #results = pd.DataFrame([pd.Series(list(self.int_pts)), pd.Series(list(result)), pd.Series(list(self.elevs))]).T
+        self.assertEqual(len(self.elevs), len(result))
+        self.assertEqual(False, np.isnan(result).any())
+
+
+class TestCalculateGrades(unittest.TestCase):
+    # I am assuming no one is passing negative distances
+    dx = [1, 1, 1, 1, 1]
+    elevations = [0, .5, -.5, -.5 + 7.5/100, -.5 + 7.5/100+2.5/100]
+    
+    def test_no_clip(self):
+        result = gt.calculate_grades(self.dx, self.elevations, clip=False)
+        expected = [50.0, -100.0, 7.5, 2.5, 2.5]
+        new = []
+        for item in result:
+            item = round(item, 1)
+            new.append(item)
+        self.assertEqual(expected, new)
+    
+    def test_clip(self):
+        result = gt.calculate_grades(self.dx, self.elevations, clip=True)
+        expected = [7.5, -7.5, 7.5, 2.5, 2.5]
+        new = []
+        for item in result:
+            item = round(item, 1)
+            new.append(item)
+        self.assertEqual(expected, new)
+        
+
+class TestInterpolateGeometrySeries(unittest.TestCase):
+    pts = pd.Series([shapely.Point(47.667,-122.1279),
+       shapely.Point(47.6672, -122.1276),
+       shapely.Point(47.6673, -122.1255),
+       shapely.Point(47.6673, -122.1172),
+       shapely.Point(47.6674, -122.111),
+       shapely.Point(47.6687,-122.1084),
+       shapely.Point(47.6676, -122.1075),
+       shapely.Point(47.6702, -122.107)]) # A highway with two bridges at index 1 and index 7
+
+    def test_works(self):
+        int_pts = gt.interpolate_geometry_series(self.pts, 10)
+        expected = 196
+        result = len(int_pts)
+        self.assertEqual(expected, result) 
 
 #--- Route
 
 class TestRouteClass(unittest.TestCase):
-    # TestToString
-    # TestIntersperseList
-    # TestSaveToJSON - saveload?
-    # TestQueryPoint
-    # TestToGDF
+    pts = pd.Series([shapely.Point(47.667,-122.1279),
+       shapely.Point(47.6672, -122.1276),
+       shapely.Point(47.6673, -122.1255),
+       shapely.Point(47.6673, -122.1172),
+       shapely.Point(47.6674, -122.111),
+       shapely.Point(47.6687,-122.1084),
+       shapely.Point(47.6676, -122.1075),
+       shapely.Point(47.6702, -122.107)]) # A highway with two bridges at index 1 and index 7
+
+    int_pts = gt.interpolate_geometry_series(pts, 10)
+    redmond_rasters_path = "../Examples/KC_Example_Data/Example_Raster_Data/Redmond_2014/dtm/"
+    redmond_rasters = gt.get_rasterfiles(redmond_rasters_path)
+    new_projections = gt.reproject_rasterfiles(redmond_rasters)
+    elevs = gt.query_elevation_series(int_pts, new_projections)
+    
+    def test_make_and_methods(self):
+        route = gt.Route(self.int_pts, self.elevs)
+
+        self.assertEqual(len(self.elevs), len(route.elevation))
+        routesavepath = route.save_to_json('../Examples/KC_Example_Data/Example_Route_Save/redmond_road.json')
+        loaded_route = gt.load_from_json(routesavepath)
+        self.assertEqual(len(self.elevs),len(loaded_route.elevation))
+        pt=route.query_point(0)
+        self.assertEqual(self.elevs[0],pt['elevation'])
+        self.assertEqual(type(gpd.GeoDataFrame()), type(route.to_gdf()))
+        
+
+        
+    
+'''
+
+    Skipping this one for now since it's not critical to the function.
+class TestVerboseLineUpdater(unittest.TestCase):
+
+# I'm gonna be honest, this does not make a whole lot of sense as an independent function. 
+class TestQueryElevationChanges(unittest.TestCase):
+
+class TestQueryDistanceTraveled(unittest.TestCase):
+
+
+This one feels insurmountable right now. How do I create fake geospatial speed limit data?
+Do i assemble a bunch of linestrings with different limi... yeah thats the unfortunately tedious solution
+hahah frick
+
+class TestQuerySpeedLimits(unittest.TestCase):
+    
+Coming soon, to a unit test near you...
+...EXCEPT YOU WON'T BECAUSE IT's SECRET [read, private methods]!
+
+class TestInterpolateDistanceTraveled(unittest.TestCase):
+
+class TestCombineLidarData(unittest.TestCase):
 
 class TestEncodeSeries(unittest.TestCase):
 
@@ -274,7 +393,7 @@ class TestEncodeGeometry(unittest.TestCase):
     
 class TestDecodeGeometry(unittest.TestCase):
     
-class TestLoadFromJson(unittest.TestCase)
+class TestLoadFromJson(unittest.TestCase) < - Already low key tested this one with the Route.
 '''
 if __name__ == '__main__':
     unittest.main()
