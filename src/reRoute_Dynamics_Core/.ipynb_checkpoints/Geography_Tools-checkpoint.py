@@ -139,6 +139,11 @@ def point_bearing(x1, y1, x2, y2, bearing_type = "Angle"):
     bearing = np.arctan2(x, y)
     bearing = np.degrees(bearing)
     
+    while bearing<0:
+        bearing+=360
+    while bearing>360:
+        bearing-=360
+    
     # check the return type
     if (bearing_type == "Angle"):
         return bearing
@@ -190,7 +195,7 @@ def interpolate_points(point_1, point_2, max_dist=1):
         return [point_1]
     else:
         # calculate the number of points between to be interpolated
-        num_interp = int(np.ceil(distance/max_dist)) - 1
+        num_interp = int(np.ceil(distance/max_dist))
         
         # calculate the distance between each interpolated point
         dx = distance/num_interp
@@ -744,7 +749,7 @@ def query_elevation_series(geometry, gtiff_dir_ser, verbose=False):
                 # sample the elevations using rasterio and the list of lats and lons.
                 route = pd.Series(list(rasterio.sample.sample_gen(img, list(route_ll), masked=True)))
                 
-
+     
                 # remove any masked values
                 filtered = route[route.apply(lambda x: str(type(x[0]))) != "<class 'numpy.ma.core.MaskedConstant'>"]
                 

@@ -1,0 +1,230 @@
+ -----------------------------------------------------------------------------
+ -   This listing contains control for which complete digital                -
+ -   data sheets where not provided.  The complete data sheets were          -
+ -   not provided for the reason listed below.  The reason below is          -
+ -   associated with a horizontal control Nonpub code shown under            -
+ -   the heading 'H' and/or a vertical control Nonpub code shown under       -
+ -   the heading 'v'                                                         -
+ -                                                                           -
+ -   The format of the records are as follows:                               -
+ -       Pid  = Station Permanent Identifier)                                -
+ -       Name = Station Designation                                          -
+ -       Lat  = Approx. Latitude (Degrees, Minutes, truncated Seconds)       -
+ -       Lon  = Approx. Longitude (Degrees, Minutes, truncated Seconds)      -
+ -       O    = Horizontal Order                                             -
+ -       o    = Vertical Order                                               -
+ -       H    = Horizontal Nonpub Code                                       -
+ -       v    = Vertical Nonpub Code                                         -
+ -                                                                           -
+ -       H Nonpub HORIZONTAL CONTROL NONPUB REASON                           -
+ -       -------- --------------------------------                           -
+ -       B        Station is a RBN antenna                                   -
+ -       C        Not a publishable datum within the state                   -
+ -       D        No descriptive text available                              -
+ -       I        No NAD83 coordinates available, only IGS08 coordinates     -
+ -       L        CORS L1 Phase Center is not publishable                    -
+ -       N        No geodetic control                                        -
+ -       O        Outside NGS publication area                               -
+ -       P        Purpose of position is not for network control             -
+ -       R        Restricted position                                        -
+ -       T        Station is a temporary point/bench mark                    -
+ -       V        Station is a VOR antenna                                   -
+ -       W        Weakly determined position                                 -
+ -       X        Surface mark reported destroyed                            -
+ -       Y        Surface and underground mark reported destroyed            -
+                                                                             -
+ -       v Nonpub VERTICAL CONTROL NONPUB REASON                             -
+ -       -------- ------------------------------                             -
+ -       C        Not a publishable datum within the state                   -
+ -       D        No descriptive text available                              -
+ -       F        Bench mark not yet adjusted                                -
+ -       N        No geodetic control                                        -
+ -       L        CORS L1 Phase Center is not publishable                    -
+ -       O        Outside NGS publication area                               -
+ -       R        Restricted elevation                                       -
+ -       S        Mark is in a subsidence area                               -
+ -       T        Station is a temporary point/bench mark                    -
+ -       X        Surface mark reported destroyed                            -
+ -       Y        Surface and underground mark reported destroyed            -
+ -       Z        Presumed destroyed                                         -
+ -                                                                           -
+ -                                                                           -
+ -   NOTE - Stations found in this listing may still have a valid            -
+ -          datasheet produced by use of other publishable values.           -
+ -          For example, an ADJUSTED height may be non-publishable           -
+ -          but a good GPS height might be found on the datasheet.           -
+ -                                                                           -
+ -          If a mark/control point is in a subsidence area, you can request -
+ -          to see suspect heights in the SUPERSEDED SURVEY CONTROL section  -
+ -          of its datasheet by checking the 'Include suspect heights in     -
+ -          subsidence area' checkbox on the datasheet retrieval pages.      -
+ -                                                                           -
+ -----------------------------------------------------------------------------
+  Pid    Name                           Lat        Lon        Elev      O o Hv
+  ------ ----------------------------- ---------- ----------- --------- - - --
+ >SY0308 1 AS 1 C OF S                 47 40 13. /122 24 03.                XX
+ >SY0463 12                            47 33 04. /122 19 00.                XX
+ >SX1083 1531 T                        47 12 23. /121 32 19.                DD
+ >SX1090 1614 T                        47 12 29. /121 29 49.                DD
+ >SY0321 2 A 1 S 1 WAGS                47 42 01. /122 21 52.                XX
+ >SY0146 2 A 7                         47 43 10. /122 20 41.                XX
+ >SY0142 2 A 8 S 1 WAGS                47 44 29. /122 20 43.                XX
+ >SY0475 21                            47 30 27. /122 16 51.                XX
+ >SY0296 23 A 2                        47 37 59. /122 22 41.                XX
+ >SX1093 2776 T                        47 15 46. /121 21 55.                DD
+ >SY0363 3 A 1 S 3 C OF S              47 37 24. /122 20 36.                XX
+ >SY0365 3 A 1 S 4 C OF S              47 37 28. /122 20 31.                XX
+ >SY0383 3 A 5 S 2 C OF S              47 38 37. /122 18 15.                XX
+ >SY0452 4                             47 35 00. /122 19 11.                XX
+ >SY0396 4 A 1                         47 39 21. /122 18 08.                XX
+ >SY0628 40                            47 28 48. /122 12 17.                XX
+ >SY0521 565 A                         47 20 50. /122 01 08.                XX
+ >SY0148 8 A 12                        47 30 01. /122 12 07.                XX
+ >SY0149 8 A 13                        47 30 15. /122 11 57.                XX
+ >SY0154 8 A 14                        47 31 02. /122 12 32.                XX
+ >SY0160 8 A 21                        47 32 20. /122 11 42.                XX
+ >SY0426 9 A 4                         47 43 09. /122 18 49.                XX
+ >DN5697 944 7130 G                    47 36 09. /122 20 14.                XX
+ >SY0285 944 7130 TIDAL 15             47 36 13. /122 20 16.                XX
+ >SY0328 944 7130 TIDAL BASIC          47 36 07. /122 19 46.                XX
+ >SY0437 A 352                         47 30 30. /122 27 51.                XX
+ >SY0240 ADD                           47 32 05. /122 18 04.                XX
+ >SY0241 ADD MAGNETIC                  47 32 05. /122 18 04.                XX
+ >SX1521 ASHTON 2                      47 42 57. /121 57 06.     148.     3 XX
+ >SY0412 AVIATION RESET                47 41 07. /122 14 55.                XX
+ >SX1051 B 1                           47 12 21. /121 30 49.                DD
+ >SY0155 B 168                         47 30 56. /122 12 25.                XX
+ >SY0614 B 196                         47 27 32. /122 14 25.                XX
+ >SY0440 B 298                         47 38 08. /122 23 03.                XX
+ >SY0580 B 407                         47 24 43. /122 14 38.                XX
+ >SY0421 B 411                         47 43 07. /122 18 47.                XX
+ >SY5690 BEL 24                        47 37 01. /122 11 27.                XX
+ >SY4152 BM 1                          47 38 51. /122 18 24.      20.     3 DD
+ >SY0242 BOEING MAGNETIC               47 32 22. /122 18 26.                XX
+ >SY3482 BOTHELL                       47 46 21. /122 12 01.     110.     3 XX
+ >SY2357 BRISCOE                       47 25 47. /122 16 24.     108.     3 XX
+ >SX1091 C 1                           47 13 08. /121 26 04.                DD
+ >SX0700 C 248                         47 15 10. /121 22 45.                XX
+ >SY0631 C 352                         47 29 52. /122 28 03.                XX
+ >SY0203 C 385                         47 40 23. /122 06 36.                XX
+ >SY0608 C 408                         47 27 01. /122 14 36.                XX
+ >SX0628 C 59                          47 45 15. /121 27 39.                XX
+ >SX0796 C 67                          47 21 13. /121 53 05.                XX
+ >SY1556 CITY 2                        47 35 44. /122 19 40.                DD
+ >SY1555 CITY 3                        47 34 14. /122 19 24.                DD
+ >SY3823 CLEAR 1902                    47 44 52. /122 16 58.       9.     3 DD
+ >SX1092 D 1                           47 14 13. /121 24 51.                DD
+ >SX0779 D 249                         47 14 54. /121 43 31.                XX
+ >SY0573 D 252                         47 18 12. /122 13 54.                XX
+ >SY0606 D 260                         47 26 38. /122 18 22.                XX
+ >SY0232 D 460                         47 29 21. /122 15 55.                XX
+ >SY2364 DESMOINES                     47 24 10. /122 19 46.       3.     3 XX
+ >SY2516 DOLLOFF                       47 20 35. /122 16 13.     133.     3 XX
+ >SY3747 DREW                          47 38 05. /122 10 25.     132.     3 XX
+ >SY3737 DWYER                         47 40 33. /122 08 11.      24.     3 XX
+ >SY1524 E 260                         47 26 41. /122 18 56.                DZ
+ >SY0194 E 28                          47 37 52. /122 07 59.                XX
+ >SX0797 E 67                          47 22 54. /121 52 03.                XX
+ >SY1532 EE 260 CAA                    47 26 42. /122 18 56.                DZ
+ >SY1558 F                             47 36 12. /122 20 08.                DZ
+ >SY0213 F 385                         47 41 39. /122 02 50.                XX
+ >SY2783 FK 3 D K CO                   47 22 05. /122 29 30.     109.     3 DD
+ >SY1557 G                             47 36 06. /122 20 03.                DD
+ >SY2102 GREEN                         47 26 37. /122 14 48.       8.     3 XX
+ >SY2119 GREENWOOD                     47 29 33. /122 10 29.     117.     3 XX
+ >SY1552 H                             47 28 36. /122 15 10.                DD
+ >SX0694 H 248                         47 12 31. /121 26 22.                XX
+ >SY3939 HALLER                        47 43 37. /122 19 41.     125.     3 XX
+ >SY3743 HOLLYWOOD                     47 43 54. /122 08 08.      82.     3 XX
+ >SY1551 I                             47 28 29. /122 15 04.                DD
+ >SX0722 J 292                         47 08 07. /121 27 20.                XX
+ >SY0626 J 385                         47 29 06. /122 12 45.                XX
+ >SX0854 J 40                          47 43 31. /121 59 28.                XX
+ >SY0605 J 408                         47 26 29. /122 17 57.                XX
+ >SY3551 JACOB                         47 34 26. /122 01 11.     125.     3 XX
+ >SY1550 K                             47 22 51. /122 14 04.                DD
+ >SX0721 K 292                         47 07 50. /121 28 13.                XX
+ >SY0627 K 385                         47 29 34. /122 12 47.                XX
+ >SY0183 K 386                         47 34 41. /122 07 48.                XX
+ >SY3871 KANE                          47 43 19. /122 15 39.       8.     3 XX
+ >SY1530 KS 1                          47 22 58. /122 13 58.                DZ
+ >SY0262 KS 13                         47 33 22. /122 19 22.                XX
+ >SY0577 KS 2                          47 23 32. /122 13 58.                XX
+ >SY0581 KS 4                          47 25 34. /122 14 20.                XX
+ >SY0613 KS 5                          47 27 23. /122 14 25.                XX
+ >SY0231 KS 8                          47 29 32. /122 16 02.                XX
+ >SY1549 L                             47 21 41. /122 13 57.                DD
+ >SX0688 L 248                         47 12 31. /121 29 37.                XX
+ >SY1545 L 252                         47 21 14. /122 06 06.                DZ
+ >SX0720 L 292                         47 07 27. /121 28 32.                XX
+ >SY0629 L 385                         47 29 37. /122 12 50.                XX
+ >SY0184 L 386                         47 34 44. /122 07 45.                XX
+ >SY1540 M                             47 18 40. /122 13 55.                DD
+ >SY0579 M 249                         47 24 43. /122 14 10.                XX
+ >SY0600 M 254                         47 26 42. /122 16 53.                XX
+ >SY0185 M 386                         47 34 45. /122 07 40.                XX
+ >SY0578 MM 249                        47 23 49. /122 13 59.                XX
+ >SY1525 N 252                         47 19 32. /122 07 32.                DD
+ >SY0596 N 254 RESET                   47 26 29. /122 15 33.                XX
+ >SY1553 NP 1                          47 30 23. /122 17 02.                DZ
+ >SY1554 NP 2                          47 32 44. /122 18 44.                DZ
+ >SY1526 O                             47 18 12. /122 13 34.                DD
+ >SY1522 O 7                           47 43 54. /122 22 24.                DD
+ >SY4761 OLYMPIC                       47 41 43. /122 22 50.     105.     3 XX
+ >SY0318 OLYMPIC RM 2                  47 41 42. /122 22 50.                XX
+ >SY0620 P 384                         47 28 34. /122 13 45.                XX
+ >SY0129 P 407                         47 46 38. /122 20 43.                XX
+ >SX0844 P 67                          47 32 52. /121 49 33.                XX
+ >SY4726 PARK                          47 42 40. /122 22 46.       6.     3 XX
+ >SY0333 PH 3                          47 35 34. /122 18 54.                XX
+ >SY0336 PH 5                          47 35 34. /122 18 56.                XX
+ >SY3532 PROGRESS                      47 40 35. /122 06 41.      60.     3 XX
+ >SY0317 Q 408                         47 41 25. /122 22 34.                XX
+ >SX0845 Q 67                          47 33 52. /121 51 18.                XX
+ >SY0189 R 384                         47 37 01. /122 11 07.                XX
+ >SY0471 RAIL                          47 31 58. /122 17 46.                XX
+ >SY0472 RAIL RM 2                     47 31 58. /122 17 45.                XX
+ >SY0195 RD 4                          47 38 32. /122 07 04.                XX
+ >AB6300 ROBINSON POINT 1 CORS L1 PHAS 47 23 15. /122 22 29.                LL
+ >SY0278 RR 252                        47 35 33. /122 20 11.                XX
+ >SY0602 S AND TA                      47 26 42. /122 18 14.                XX
+ >SX0738 S=PTS                         47 21 11. /121 58 49.                XX
+ >AF9675 SEATTLE CORS L1 PHASE CENTER  47 39 14. /122 18 34.                LL
+ >AH7397 SEATTLE WEATHER CORS L1 PHASE 47 41 13. /122 15 22.                LL
+ >SY2127 SNOW                          47 25 58. /122 11 19.     160.     3 XX
+ >SY2172 SPOON C 1937 ECC              47 24 02. /122 09 50.     163.     3 DD
+ >SY4810 SPRING                        47 44 55. /122 22 56.       4.     3 XX
+ >SY0234 T 10                          47 29 52. /122 16 28.                XX
+ >SY3564 TAPPS                         47 34 54. /122 02 00.     136.     3 XX
+ >SY1560 TIDAL 4                       47 36 15. /122 20 14.                DD
+ >SY1559 TIDAL 5                       47 36 20. /122 20 18.                DZ
+ >SX1076 U                             47 20 27. /121 56 53.                DD
+ >SX0759 U 249                         47 18 45. /121 52 21.                XX
+ >SY0357 U 298                         47 38 29. /122 17 55.                XX
+ >SX0849 U 67                          47 38 47. /121 54 25.                XX
+ >SY0389 U W 2                         47 39 04. /122 18 31.                XX
+ >SY0388 UW 1                          47 38 55. /122 18 25.                XX
+ >SY0391 UW 3                          47 39 10. /122 18 37.                XX
+ >SY0392 UW 4                          47 39 15. /122 18 40.                XX
+ >SY0394 UW 5                          47 39 08. /122 18 38.                XX
+ >SX0741 V 253                         47 20 35. /121 56 55.                XX
+ >SX0757 V=PTS                         47 18 57. /121 53 17.                XX
+ >SY0298 W 252                         47 38 25. /122 22 49.                XX
+ >SX1005 W 529                         47 12 36. /121 29 16.                XX
+ >SY0651 WASH 21 OFFSET                47 28 51. /122 12 19.                XX
+ >SY0650 WASH 21 USGS                  47 28 51. /122 12 19.                XX
+ >SY3785 WAYNE                         47 44 59. /122 12 10.     137.     3 XX
+ >SY0445 WEST GARFIELD BRIDGE          47 38 00. /122 23 11.                XX
+ >SY0446 WEST GARFIELD BRIDGE RM 1     47 38 00. /122 23 11.                XX
+ >SY0447 WEST GARFIELD BRIDGE RM 2     47 38 00. /122 23 11.                XX
+ >SX1082 X                             47 18 00. /121 50 43.                DD
+ >SX0735 X 253                         47 21 07. /121 59 00.                XX
+ >SY0622 Z 249                         47 28 32. /122 13 00.                XX
+ >SY0422 Z 297                         47 42 27. /122 19 04.                XX
+ >SY0423 Z 297 RESET                   47 42 27. /122 19 04.                XX
+ >SX0625 Z 58                          47 42 33. /121 21 36.                XX
+ >SY2341 ZENITH 2                      47 23 12. /122 19 37.      13.     3 XX
+
+ *** retrieval complete.
+ Elapsed Time = 00:02:06
+ALL OKAY - No errrors were encountered.
