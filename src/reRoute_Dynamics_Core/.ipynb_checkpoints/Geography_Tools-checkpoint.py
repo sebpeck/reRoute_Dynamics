@@ -15,8 +15,9 @@ import scipy
 import pyogrio as pio
 import json
 import random
+import geopy.distance as gdist
 
-def haversine_formula(x1, y1, x2, y2):
+def _haversine_formula(x1, y1, x2, y2):
     '''
     haversine_formula takex the latitude and longitude of two separate points,
     and calculates the distance in kilometers between those two points as a crow flies.
@@ -32,6 +33,7 @@ def haversine_formula(x1, y1, x2, y2):
     
     Notes:
     11/20/2024 - Efficiency can be improved by having radian conversion be done externally.
+    12/21/2025 - Deprecated. Succeeded by geodesic_formula.
     '''
     
     # convert the degree coordinates to radians
@@ -41,7 +43,7 @@ def haversine_formula(x1, y1, x2, y2):
     lon2=np.radians(y2)
     
     # Get the radius of earth in kilometers - using the average of the radii
-    R = (6356.752 + 6378.137)/2
+    R = 6371.009 #https://en.wikipedia.org/wiki/Great-circle_distance
     
     # calculate the difference in radians
     dlon=lon2-lon1
@@ -52,6 +54,7 @@ def haversine_formula(x1, y1, x2, y2):
     c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
 
     distance = R * c
+    print(distance, geodesic_formula(x1, y1, x2, y2))
     
     
     # return the distance in km.
@@ -59,6 +62,25 @@ def haversine_formula(x1, y1, x2, y2):
         distance=.0001
     return distance
 
+
+def geodesic_formula(x1, y1, x2, y2):
+    '''
+    geodesic_formula takex the latitude and longitude of two separate points,
+    and calculates the distance in kilometers between those two points as a crow flies,
+    according to the geodesic formula as calculated by geopy. 
+    
+    Params:
+    x1 - latitude pt 1 in degrees
+    y1 - longitude pt 1 in degrees
+    x2 - latitude pt 2 in degrees
+    y2 - longitude pt 2 in degrees
+    
+    Returns:
+    distance between the points in kilometers.
+    '''
+    return gdist.geodesic((x1, y1), (x2,y2)).km
+    
+    
 
 def compass_heading(bearing):
     '''
@@ -151,7 +173,7 @@ def point_bearing(x1, y1, x2, y2, bearing_type = "Angle"):
         return compass_heading(bearing)
 
 
-def get_bounding_box(shape):
+def get_bounding_box(shape, how='basic'):
     '''
     get_bounding_box() takes in a shapely shape,
     and then generates a polygon that is a rectangular bounding box.
@@ -162,17 +184,32 @@ def get_bounding_box(shape):
     Returns: 
     shapely.polygon that fits around the provided shape
     '''
-    # get the bound coordinates
-    bbox_cords = shape.bounds
     
-    # create a rectangle of those coordinates
-    boundary_coords = ((bbox_cords[0], bbox_cords[1]),
-                 (bbox_cords[0], bbox_cords[3]),
-                 (bbox_cords[2], bbox_cords[3]),
-                 (bbox_cords[2], bbox_cords[1]))
-    
-    # return a shapely polygon of those coordinates
-    return shapely.Polygon(boundary_coords)
+    if how=='basic':
+        # get the bound coordinates
+        bbox_cords = shape.bounds
+
+        # create a rectangle of those coordinates
+        boundary_coords = ((bbox_cords[0], bbox_cords[1]),
+                     (bbox_cords[0], bbox_cords[3]),
+                     (bbox_cords[2], bbox_cords[3]),
+                     (bbox_cords[2], bbox_cords[1]))
+
+        # return a shapely polygon of those coordinates
+        return shapely.Polygon(boundary_coords)
+    elif how=='swapax':
+        # get the bound coordinates
+        bbox_cords = shape.bounds
+
+        # create a rectangle of those coordinates
+        boundary_coords = ((bbox_cords[1], bbox_cords[0]),
+                     (bbox_cords[3], bbox_cords[0]),
+                     (bbox_cords[3], bbox_cords[2]),
+                     (bbox_cords[1], bbox_cords[2]))
+
+        # return a shapely polygon of those coordinates
+        return shapely.Polygon(boundary_coords)
+        
 
 
 def interpolate_points(point_1, point_2, max_dist=1):
@@ -190,7 +227,7 @@ def interpolate_points(point_1, point_2, max_dist=1):
     '''
     
     # get distance in meters
-    distance = haversine_formula(point_1.x, point_1.y, point_2.x, point_2.y)*1000
+    distance = geodesic_formula(point_1.x, point_1.y, point_2.x, point_2.y)*1000
     if distance < max_dist:
         return [point_1]
     else:
@@ -261,6 +298,10 @@ def repeat_id_remover(sequence):
 
 
 ### ---- SERIES QUERY METHODS ---- ###
+
+def _flip(x, y):
+    """Flips the x and y coordinate values"""
+    return y, x
 
 def verbose_line_updater(message, reset=False):
     '''
@@ -377,8 +418,8 @@ def query_stops(geometry, stop_table_path, key='stop_id', epsg_from = 4326, epsg
             # re-set the pont name because i dont want to re-change them all
             route_pt = point
 
-            # get the distances using the haversine formula, converted to meters
-            stop_table['dist'] = stop_table.geometry.apply(lambda x: haversine_formula(x.x, x.y, route_pt.x, route_pt.y)*1000)
+            # get the distances using the geodesic formula, converted to meters
+            stop_table['dist'] = stop_table.geometry.apply(lambda x: geodesic_formula(x.x, x.y, route_pt.x, route_pt.y)*1000)
             # filter the data to yeild the closest stop
             closest_stop = stop_table[stop_table['dist'] == stop_table['dist'].min()].reset_index().iloc[0]
 
@@ -423,9 +464,9 @@ def query_distance_traveled(geometry_series, verbose=False):
     # set the nan value in the beginning of the 'nexts' to the initial, representing no distance traveled.
     data.iloc[-1, data.columns.get_loc("next")] = final_point
 
-    # apply the haversine formula to the data, which will yeild a series of changes in distance.
+    # apply the geodesic formula to the data, which will yeild a series of changes in distance.
     if verbose: verbose_line_updater("Calculating distances.")
-    dXs = data.apply(lambda x: haversine_formula(x.current.y, x.current.x, x.next.y, x.next.x), axis=1)
+    dXs = data.apply(lambda x: geodesic_formula(x.current.x, x.current.y, x.next.x, x.next.y), axis=1)
     
     if verbose: verbose_line_updater("Point distances processed. Returning values.")
 
@@ -473,8 +514,8 @@ def query_signals(geometry, signal_data_path, key="SIGNAL_ID", epsg = 4326, marg
     with alive_bar(len(geometry)) as bar:
         for point in list(geometry):
 
-            # use the haversine formula to get the distances between the current point and each point in the series, in meters
-            signals['dist'] = signals.geometry.apply(lambda x: haversine_formula(x.y, x.x, point.y, point.x)*1000)
+            # use the geodesic formula to get the distances between the current point and each point in the series, in meters
+            signals['dist'] = signals.geometry.apply(lambda x: geodesic_formula(x.y, x.x, point.y, point.x)*1000)
 
             # get the closest signal through the minimum distance
             closest_signal = signals[signals['dist'] == signals['dist'].min()].reset_index().iloc[0]
@@ -489,7 +530,7 @@ def query_signals(geometry, signal_data_path, key="SIGNAL_ID", epsg = 4326, marg
 
 
 
-def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, margin = 1, last_known_limit= 20*0.00044704, verbose=False):
+def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, margin = 3e-4, last_known_limit= 20*0.00044704, verbose=False):
     '''
     query_speed_limits takes a geometric iterable of shapely points,
     a path to speed limit geodata, and returns the corresponding speed limits at
@@ -499,7 +540,7 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
     geometry - a series of shapely points of lat and lon
     limit_data_path - path to shapefile of speed limit data as str
     key - column identifier of a speed limit or other value as str, assumed to be an int in units of mph
-    margin - distance a point can be from the street to qualify in meters as int
+    margin - distance a point can be from the street to qualify, default 5e-5
     last_known_limit - the speed limit int value that the bus will assumedly start at or above. default 20 mph
     verbose - boolean to enable verbosity. Default False.
     
@@ -514,6 +555,8 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
     '''
     # DEPENDING ON THE FILE, THIS CAN TAKE A WHILE.
     
+    geometry = gpd.GeoSeries(geometry).apply(lambda x: shapely.ops.transform(_flip, x))
+    
     # get the bounding box of the route.
     shape_bounds = get_bounding_box(shapely.LineString(list(geometry)))
 
@@ -524,7 +567,7 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
     
     # get the streets that are within the bounding box
     if verbose: verbose_line_updater("Filtering streets...")
-    bound_streets = limits[limits.apply(lambda x: shape_bounds.contains(x.geometry), axis=1).reset_index(drop=True) == True][['geometry', key]]
+    bound_streets = limits[limits.apply(lambda x: shape_bounds.intersects(x.geometry), axis=1).reset_index(drop=True) == True][['geometry', key]]
     if verbose: verbose_line_updater("Streets filtered.")
 
     # set up list.
@@ -533,18 +576,19 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
     # loop through the geometry:
     if verbose: verbose_line_updater("Processing speed limits...")
     with alive_bar(len(geometry)) as bar:
-        for point in list(geometry):
+        for i in range(len(list(geometry))):
+            point = list(geometry)[i]
             # get the speed limit at the point through checking that the distance is within the margin. Use first value that appears.
-            bound_streets['dist'] = bound_streets.geometry.apply(lambda x: x.distance(point)*1000)
+            bound_streets['range'] = bound_streets.geometry.apply(lambda x: x.buffer(margin))
+            bound_streets['contains_point'] = bound_streets['range'].apply(lambda x: x.contains(point))
+            matches_street = bound_streets[bound_streets['contains_point'] == True]
 
-            # get the closest street
-            closest = bound_streets[bound_streets['dist'] == bound_streets['dist'].min()].reset_index(drop=True)
+            limit = 0
+            if len(matches_street) > 0:
+                limit=matches_street[key].max()
+                
             
-            limit=0
-            
-            # if the distance is less than the margin, get the key value
-            if closest['dist'][0] < margin:
-                limit=closest[key][0]
+                
             # append the limit to the list.
             limit_list.append(limit*0.00044704)
             bar()
@@ -555,11 +599,11 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
         remaining = limit_list.count(0)
         for i in range(len(limit_list)):
             if verbose: verbose_line_updater("Filling gaps: {}".format(remaining), reset=True)
-            
             if limit_list[i] <= 0:
                 limit_list[i] = last_known_limit
             else:
                 last_known_limit = limit_list[i]
+    
     if verbose: verbose_line_updater("Speed limits processed. Returning values.")
 
 
@@ -601,7 +645,7 @@ def query_bearings(geometry, bearing_type = "Angle", verbose=False):
     # set the nan value in the beginning of the 'nexts' to the initial, representing no distance traveled.
     data.iloc[-1, data.columns.get_loc("next")] = final_point
 
-    # apply the haversine formula to the data, which will yeild a series of changes in distance.
+    # apply the geodesic formula to the data, which will yeild a series of changes in distance.
     if verbose: verbose_line_updater("Calculating bearings.")
     bearings = data.apply(lambda x: point_bearing(x.current.y, x.current.x, x.next.y, x.next.x, bearing_type), axis=1)
     if verbose: verbose_line_updater("Bearings processed. Returning values.")
@@ -856,6 +900,7 @@ def calculate_grades(dx, elevations, clip = True , max_grade=7.5):
     
     grades = list(grades)
     grades.append(grades[-1])
+    grades.append(grades[-1])
     # return the grade.
     return grades
 
@@ -928,6 +973,7 @@ class Route:
     stops - iterable of stop flags at each point. (optional, defaults to 10 evenly spaced stops.)
     signals - iterable of signal flags at each point. (optional, defaults to 8 evenly spaced signals.)
     signs - iterable of sign flags at each point. (optional, defaults to 3 evenly spaced stop signs.)
+    intersperse_empty - boolean flag to intersperse any empty parameters. Default False.
     
     Methods: 
     save_to_json() - saves the stored data to a json file. can be loaded again with Geography Tools' load_from_json.
@@ -939,14 +985,16 @@ class Route:
                  limits = None,
                  stops = None,
                  signals = None,
-                 signs = None):
+                 signs = None,
+                 intersperse_empty = False):
         
         # set up the params list
         self._params = [len(geometry),
                         not (limits is None),
                         not (stops is None),
                         not (signals is None),
-                        not (signs is None)]
+                        not (signs is None),
+                        intersperse_empty]
         
         # initialize geometry and elevation
         self.geometry = list(geometry)
@@ -956,21 +1004,35 @@ class Route:
         geolen = len(geometry)
         
         # if limits is empty, use 25mph (in km/s) as default.
-        if limits == None: self.limits = self._intersperse_list(25/2236.936, geolen)
+        if limits == None: 
+            self.limits = self._intersperse_list(25/2236.936, geolen)
         else: self.limits = list(limits)
         
         # if stops is empty, populate with -1, then intersperse with 10 stops (number of timepoints per route)
         if stops == None: 
-            self.stops = self._intersperse_list(-1, geolen, 0, 10)
-            self.stops[-1] = 0
+            if intersperse_empty:
+                self.stops = self._intersperse_list(-1, geolen, 0, 10)
+                self.stops[-1] = 0
+            else:
+                self.stops = self._intersperse_list(-1, geolen, 0, 0)
+                self.stops[-1] = 0
         else: self.stops = list(stops)
         
         # if signals is empty, intersperse with 10 signals.
-        if signals == None: self.signals = self._intersperse_list(-1, geolen, 0, 8)
+        if signals == None: 
+            if intersperse_empty:
+                self.signals = self._intersperse_list(-1, geolen, 0, 8)
+            else:
+                self.signals = self._intersperse_list(-1, geolen, 0, 0)
+                
         else: self.signals = list(signals)
         
          # if signs is empty, intersperse with 3 signs.
-        if signs == None: self.signs = self._intersperse_list(-1, geolen, 0, 3)
+        if signs == None: 
+            if intersperse_empty:
+                self.signs = self._intersperse_list(-1, geolen, 0, 3)
+            else:
+                self.signs = self._intersperse_list(-1, geolen, 0, 0)
         else: self.signs = list(signs)
         
         # calculate the bearings, distance changes, and grades.
