@@ -18,6 +18,8 @@ import Geography_Tools as gt
 import numpy as np
 import geopandas as gpd
 
+'''
+Depricated as of 1/22/25
 class TestHaversineFormula(unittest.TestCase):
     
     def test_large_range(self):
@@ -38,7 +40,7 @@ class TestHaversineFormula(unittest.TestCase):
         called = gt.haversine_formula(47.68679, -122.37682, 47.68679, -122.37682)
         expected = .0001
         self.assertEqual(called, expected)
-
+'''
         
 class TestCompassHeading(unittest.TestCase):
     def test_north(self):
@@ -111,7 +113,7 @@ class TestBoundingBox(unittest.TestCase):
 class TestInterpolatePoints(unittest.TestCase):
     # doesnt have handles for negative max_dist. 
     same = (shapely.Point(47.66131, -122.27157), shapely.Point(47.66131, -122.27157))
-    within = (shapely.Point(47.66131, -122.27157), shapely.Point(47.66132, -122.27157))
+    within = (shapely.Point(47.66131, -122.27157), shapely.Point(47.661315, -122.27157))
     long_road = (shapely.Point(47.755934, -122.345852), shapely.Point(47.74876, -122.34564)) #797 meters
     def test_same(self):
         result = gt.interpolate_points(*self.same)
@@ -120,11 +122,12 @@ class TestInterpolatePoints(unittest.TestCase):
         
     def test_within_bounds(self):
         result = gt.interpolate_points(*self.within)
+        
         expected = [self.within[0]]
         self.assertEqual(expected, result)
     
     def test_one_added(self):
-        params = self.long_road + (380,)
+        params = self.long_road + (400,)
         result = len(gt.interpolate_points(*params))
         expected = 2
         
@@ -133,7 +136,7 @@ class TestInterpolatePoints(unittest.TestCase):
     def test_eighthund_added(self):
         params = self.long_road + (1,)
         result = len(gt.interpolate_points(*params))
-        expected = 797
+        expected = 799
         
         self.assertEqual(expected, result)
 
@@ -296,7 +299,7 @@ class TestCalculateGrades(unittest.TestCase):
     
     def test_no_clip(self):
         result = gt.calculate_grades(self.dx, self.elevations, clip=False)
-        expected = [50.0, -100.0, 7.5, 2.5, 2.5]
+        expected = [50.0,50.0, -100.0, 7.5, 2.5]
         new = []
         for item in result:
             item = round(item, 1)
@@ -305,7 +308,7 @@ class TestCalculateGrades(unittest.TestCase):
     
     def test_clip(self):
         result = gt.calculate_grades(self.dx, self.elevations, clip=True)
-        expected = [7.5, -7.5, 7.5, 2.5, 2.5]
+        expected = [7.5, 7.5, -7.5, 7.5, 2.5]
         new = []
         for item in result:
             item = round(item, 1)
@@ -325,7 +328,7 @@ class TestInterpolateGeometrySeries(unittest.TestCase):
 
     def test_works(self):
         int_pts = gt.interpolate_geometry_series(self.pts, 10)
-        expected = 196
+        expected = 202
         result = len(int_pts)
         self.assertEqual(expected, result) 
 

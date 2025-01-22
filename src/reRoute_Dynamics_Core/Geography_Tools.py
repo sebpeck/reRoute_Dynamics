@@ -885,11 +885,13 @@ def calculate_grades(dx, elevations, clip = True , max_grade=7.5):
     Returns:
     iterable of the slope grade at each point. 
     '''
-    
+
     # calculate the grade percentage using the elevation difference and distance difference,
     grades = (pd.Series(elevations).diff()/pd.Series(dx)*100)
-    
+
     # ensure only finite values
+    gradeindex = np.where(~np.isfinite(grades)==True)
+    grades[gradeindex[0][1:]] = max_grade
     grades = grades[np.isfinite(grades)]
 
     # check to clip the values
@@ -897,10 +899,12 @@ def calculate_grades(dx, elevations, clip = True , max_grade=7.5):
         grades = grades.clip(max_grade, -max_grade)
     else:
         grades=grades
-    
+
+
     grades = list(grades)
-    grades.append(grades[-1])
-    grades.append(grades[-1])
+    grades.insert(0,grades[0])
+
+
     # return the grade.
     return grades
 
