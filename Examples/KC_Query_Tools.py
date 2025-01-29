@@ -139,6 +139,47 @@ def query_shape(shape_num, shape_table_dir, fwd_flag = True):
     else:
         return gdf.iloc[::-1]
     
+
+def _query_shape_geometry(shape_num, shape_table_dir, fwd_flag = True):
+    '''
+    query_shape_geometry takes in a shape number, shape lookup directory, and returns the 
+    corresponding geometry in lat, lon
+    
+    Params:
+    shape_num - number corresponding to a shape
+    shape_table_dir - path to file containing shape geodata csv as str
+    fwd_flag - boolean to report the shape in forward or reverse. Default is True (forward)
+    
+    Returns:
+    geodataframe corresponding to the provided data. Distances in km. 
+    '''
+    
+    # load the data
+    shape_table = pd.read_csv(shape_table_dir)
+    
+    # get the shape corresponding to the shape id through filtering
+    trip_shape = shape_table[shape_table['shape_id'] == shape_num]
+    
+    # convert the lat and lon to shapely points.
+    trip_geom = trip_shape.apply(lambda x: shapely.Point(x.shape_pt_lon, x.shape_pt_lat), axis=1)
+    
+    # convert the baseline distance traveled to kilometers
+    trip_dist = trip_shape['shape_dist_traveled']*0.0003048
+    
+    # convert the data to a geodataframe
+    gdf = gpd.GeoDataFrame(data=trip_dist, geometry=trip_geom)
+    
+    # add the sequence indexer
+    gdf['sequence'] = trip_shape['shape_pt_sequence']
+    gdf = gdf.reset_index(drop=True)
+    
+    # Check if the series should be reversed or not before returning
+    if fwd_flag:
+        return gdf['geometry'].apply(lambda x: shapely.ops.transform(flip, x))
+    else:
+        return gdf.iloc[::-1]['geometry'].apply(lambda x: shapely.ops.transform(flip, x))
+    
+    
     
 def check_valid_stops_by_shape(stop_sequence, shape_id, trip_table_dir, stop_times_dir):
     '''
@@ -188,6 +229,10 @@ def check_valid_stops_by_shape(stop_sequence, shape_id, trip_table_dir, stop_tim
     return stop_bools
 
 
+def _flip(x, y):
+    """Flips the x and y coordinate values"""
+    return y, x
+
 
 def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_path, render_params):
     '''
@@ -228,6 +273,8 @@ def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_pat
 
             # get the geometry and distances
             geo = shape['geometry']
+            geo = geo.apply(lambda x: shapely.ops.transform(_flip, x))
+            
             dx = gt.query_distance_traveled(geo, verbose=verb)
 
             # use the geometry to interpolate points
@@ -238,9 +285,12 @@ def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_pat
 
             # Get the smoothness based on the interpolation ratio
             smoothness=int(np.ceil((len(i_dx)/len(dx))**2))+1
+            
+            if len(render_params) > 2:
+                smoothness=render_params[2]
 
-            # get the DTM elevation and smoth it.
-            idtm_elevation = gt.query_elevation_series(i_geo, reprojected_DTMs, verbose=verb)
+            # get the DTM elevation and sm0oth it.
+            idtm_elevation = gt.query_elevation_series(i_geo, reprojected_DTMs, verbose=verb)*0.3048
             smellev = gt.smooth_elevation(idtm_elevation,smoothness, render_params[1])
 
             # get the speed limits for the data
@@ -260,12 +310,14 @@ def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_pat
             signals = gt.query_signals(i_geo, route_data_dir +"Signals/KCM_signals.shp", verbose=verb)
 
             # Generate a new test route
-            route = gt.Route(i_geo, smellev, limits=limits, stops=stops, signals=signals, signs = [-1]*len(i_geo))
+            route = gt.Route(i_geo, smellev, limits=limits, stops=stops, signals=signals, signs = [-1]*len(i_geo), smooth_grades=True )
             route.save_to_json(fname)
             print("Succesfully Rendered {}".format(fname))
         return fname + ""
-    except:
-        print("Failed Rendering {}".format(fname))
+    except Exception as e:
+        import traceback
+        print("Failed Rendering {}, Error: {}".format(fname, e))
+        traceback.print_exc()
         return fname + " -- 1"
     
     
@@ -427,3 +479,44 @@ def calculate_expected_ridership(ridership_data_path):
     
     #return said dataframe
     return formatted_rider_data
+
+def get_ridership(shortname, period, rider_data):
+    '''
+    get_ridership takes a shortname, period, and ridership dataframe, 
+    and provides a list of dictionaries, with each key being period,
+    and the value being unique ridership for that period. 
+    '''
+    return list(rider_data.groupby(['rt', 'io']).get_group((int(shortname), period))[['per', 'riders']].apply(lambda x: {x['per']: x['riders']}, axis=1))
+
+
+def bus_type_finder(val):
+    '''
+    bus_type_finder takes a king county bus ID number, 
+    and returns the class of bus it belongs to as a string. 
+    '''
+    if 6813<=val<=6865:
+        return 'DE60LF'
+    elif 6000<=val<=6019:
+        return 'DE60LFA'
+    elif 7001<=val<=7199:
+        return 'OBI6'
+    elif 6866<=val<=6999 or val==6800 or 6020<=val<=6035 or 6040<=val<=6073 or 6075<=val<=6117:
+        return 'DE60LFR'
+    elif 3700<=val<=3759:
+        return 'XDE35'
+    elif 7200<=val<=7259:
+        return 'XDE40'
+    elif 4300<=val<=4409:
+        return 'XT40'
+    elif 4500<=val<=4563:
+        return 'XT60'
+    elif 6200<=val<=6269 or 8000<=val<=8084 or 8100<=val<=8299 or 6400<=val<=6412:
+        return 'XDE60'
+    elif 7300<=val<=7484:
+        return 'BRT'
+    elif 4700<=val<=4719:
+        return 'XE40'
+    elif 4800<=val<=4819:
+        return 'XE60'
+    else:
+        return "NA"

@@ -499,7 +499,7 @@ def accelerate(velocity,
         
         # intialize the total energy
         en=0
-            
+
         # iterate through the range and adjust the
         # velocity, time, and energy accordingly
         for col, row in ea_prof.iterrows():
@@ -519,7 +519,7 @@ def accelerate(velocity,
 
             # if the travel distance is less than using the whole next step of the profile,
             # and if the travel distance is the same as the cumulative distance,
-            if i_dx+dx > travel_distance and ((travel_distance-dx) != 0):
+            if i_dx > (travel_distance-dx):
                 
                 # back-calculate the time, velocity, distance, and energy change
                 # starting with the quadratic formula from the kinematic eqn
@@ -532,9 +532,10 @@ def accelerate(velocity,
                 en += row['power']*i_dt
                 dx += i_dx
                 dt += i_dt
-
+                break
             # Otherwise, use the existing chane calues.
             else:
+
                 v_f = v_f_i
                 i_dt = row['dt']
                 dt += i_dt

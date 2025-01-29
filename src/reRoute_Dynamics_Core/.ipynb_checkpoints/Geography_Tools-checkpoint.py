@@ -380,7 +380,7 @@ def query_stops(geometry, stop_table_path, key='stop_id', epsg_from = 4326, epsg
     '''
     
     # Check the shape boundaries for the geometric series
-    shape_bounds = get_bounding_box(shapely.LineString(list(geometry)))
+    shape_bounds = shapely.LineString(list(geometry)).buffer(3e-4)
     
     # read the data.
     if verbose: verbose_line_updater("Loading CSV: {}".format(stop_table_path))
@@ -428,7 +428,6 @@ def query_stops(geometry, stop_table_path, key='stop_id', epsg_from = 4326, epsg
             bar()
     if verbose: verbose_line_updater("Stops processed. Returning values.")
     
-        
     # return the stop id list with repeats removed, and the last index guaranteed to be a stop.
     return repeat_id_remover(stop_id_list)
 
@@ -494,18 +493,18 @@ def query_signals(geometry, signal_data_path, key="SIGNAL_ID", epsg = 4326, marg
     '''
     
     # get the bounding box of the geometry
-    shape_bounds = get_bounding_box(shapely.LineString(list(geometry)))
+    shape_bounds = shapely.LineString(list(geometry)).buffer(3e-3)
     
     # Get the signal data.
     if verbose: verbose_line_updater("Loading shapefile & setting EPSG: {}".format(signal_data_path))
     signals = pio.read_dataframe(signal_data_path).to_crs(epsg = epsg)
+    signals.geometry = signals.geometry.apply(lambda x: shapely.ops.transform(_flip, x))
     if verbose: verbose_line_updater("Shapefile laded with EPSG:{}.".format(epsg))
-    
     # get the signals that are within the bounds of the data.
     if verbose: verbose_line_updater("Filtering sinals...")
     signals = signals[signals.apply(lambda x: shape_bounds.contains(x.geometry), axis=1).reset_index(drop=True) == True]
     if verbose: verbose_line_updater("Signals filtered.")
-    
+
     # Generate empty list for signal ids
     signal_id_list = []
     
@@ -515,7 +514,7 @@ def query_signals(geometry, signal_data_path, key="SIGNAL_ID", epsg = 4326, marg
         for point in list(geometry):
 
             # use the geodesic formula to get the distances between the current point and each point in the series, in meters
-            signals['dist'] = signals.geometry.apply(lambda x: geodesic_formula(x.y, x.x, point.y, point.x)*1000)
+            signals['dist'] = signals.geometry.apply(lambda x: geodesic_formula(x.x, x.y, point.x, point.y)*1000)
 
             # get the closest signal through the minimum distance
             closest_signal = signals[signals['dist'] == signals['dist'].min()].reset_index().iloc[0]
@@ -558,8 +557,11 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
     geometry = gpd.GeoSeries(geometry).apply(lambda x: shapely.ops.transform(_flip, x))
     
     # get the bounding box of the route.
-    shape_bounds = get_bounding_box(shapely.LineString(list(geometry)))
+    #shape_bounds = get_bounding_box(shapely.LineString(list(geometry)))
+    
 
+    shape_bounds = shapely.LineString(list(geometry)).buffer(3e-4)
+        
     # get the speed limit data from the shapefile
     if verbose: verbose_line_updater("Loading shapefile & setting EPSG: {}".format(limit_data_path))
     limits = pio.read_dataframe(limit_data_path).to_crs(epsg=epsg)
@@ -579,8 +581,8 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
         for i in range(len(list(geometry))):
             point = list(geometry)[i]
             # get the speed limit at the point through checking that the distance is within the margin. Use first value that appears.
-            bound_streets['range'] = bound_streets.geometry.apply(lambda x: x.buffer(margin))
-            bound_streets['contains_point'] = bound_streets['range'].apply(lambda x: x.contains(point))
+            #bound_streets['range'] = bound_streets.geometry.apply(lambda x: x.buffer(margin))
+            bound_streets['contains_point'] = bound_streets['geometry'].apply(lambda x: x.buffer(margin).contains(point))
             matches_street = bound_streets[bound_streets['contains_point'] == True]
 
             limit = 0
@@ -990,7 +992,8 @@ class Route:
                  stops = None,
                  signals = None,
                  signs = None,
-                 intersperse_empty = False):
+                 intersperse_empty = False,
+                 smooth_grades = False):
         
         # set up the params list
         self._params = [len(geometry),
@@ -998,7 +1001,8 @@ class Route:
                         not (stops is None),
                         not (signals is None),
                         not (signs is None),
-                        intersperse_empty]
+                        intersperse_empty,
+                        smooth_grades]
         
         # initialize geometry and elevation
         self.geometry = list(geometry)
@@ -1046,6 +1050,8 @@ class Route:
         self.d_X = list(np.sqrt(np.asarray(self.dz)**2 + np.asarray(self.dx)**2))
         self.cum_d_X = list(pd.Series(self.d_X).cumsum())
         self.grades = calculate_grades(self.dx, elevation, max_grade=7.5)
+        if smooth_grades:
+            self.grades = smooth_elevation(self.grades, 43, 3)
         
         
         # return None

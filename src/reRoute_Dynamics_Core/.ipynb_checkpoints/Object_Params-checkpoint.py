@@ -20,6 +20,7 @@ class Bus:
                  a_prof_path = '/media/sebastian/Slepnir/Route_Data/Accel_Prof/acceleration.csv', #TODO: NEEDS SOURCE
                  max_acc = .4, # m/s^2, the default accel after profile finishes.
                  max_dt = 1, # s, timestep for the default acceleration betond the profile.
+                 max_P = 160000 # Watts, max power output by the motors. 
                 ):
         self._a_prof_path=a_prof_path
         self._w = frontal_width
@@ -36,12 +37,13 @@ class Bus:
         self.a_prof[1] = self.a_prof.apply(lambda x: x[1]*9.81, axis=1)
         self.a_max = max_acc
         self.dt_max = max_dt
+        self.P_max = max_P
         
     def copy(self):
-        return Bus(self.mass, self._w, self._h, self.Cd, self.Cf, self.a_br, self.f_br, self.f_i, self.dmax, self._a_prof_path, self.a_max, self.dt_max)
+        return Bus(self.mass, self._w, self._h, self.Cd, self.Cf, self.a_br, self.f_br, self.f_i, self.dmax, self._a_prof_path, self.a_max, self.dt_max, self.P_max)
     
     def save(self, filepath):
-        data = "{},{},{},{},{},{},{},{},{},{},{},{}".format(self.mass,
+        data = "{},{},{},{},{},{},{},{},{},{},{},{},{}".format(self.mass,
                                                             self._w,
                                                             self._h,
                                                             self.Cd,
@@ -52,7 +54,8 @@ class Bus:
                                                             self.dmax,
                                                             self._a_prof_path,
                                                             self.a_max,
-                                                            self.dt_max)
+                                                            self.dt_max,
+                                                            self.P_max)
         
 
 
@@ -71,8 +74,8 @@ def load_bus_params(filepath):
         data = f.read()
     data_list = data.split(',')
     
-    numerical_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11]
-    
+    numerical_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12]
+
     for index in numerical_indexes:
         data_list[index] = float(data_list[index])
     args = tuple(data_list)
@@ -148,7 +151,9 @@ class Trip:
                  seed = 42, # random seed
                  lg=43, #savgol param
                  deg = 3, #savgol param
-                 stop_margin = 1 #m/s, margin for the velocity to be considered 'stopped'
+                 stop_margin = 1, #m/s, margin for the velocity to be considered 'stopped'
+                 traffic = 0 # fraction from zero to 1 representing how slowed the
+                             # bus is due to traffic
                 ):
         self.m_pass = pass_mass
         self.MOE = limit_MOE
@@ -167,12 +172,13 @@ class Trip:
         self.lg = lg
         self.deg = deg
         self.stop_margin = stop_margin
+        self.traffic = traffic
         
     def copy(self):
-        return Trip(self.m_pass, self.MOE, self.chance_sig, self.t_sig, self.t_stop, self.t_sign, self.t_end, self.p_air, self.T_air, self.wind_bearing, self.v_wind, self.d_interp, self.m_riders, self.seed, self.lg, self.deg, self.stop_margin)
+        return Trip(self.m_pass, self.MOE, self.chance_sig, self.t_sig, self.t_stop, self.t_sign, self.t_end, self.p_air, self.T_air, self.wind_bearing, self.v_wind, self.d_interp, self.m_riders, self.seed, self.lg, self.deg, self.stop_margin, self.traffic)
     
     def save(self, filepath):
-        data = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}".format(self.m_pass,
+        data = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}".format(self.m_pass,
                                                                              self.MOE,
                                                                              self.chance_sig,
                                                                              self.t_sig,
@@ -188,7 +194,8 @@ class Trip:
                                                                              self.seed,
                                                                              self.lg,
                                                                              self.deg,
-                                                                             self.stop_margin)
+                                                                             self.stop_margin,
+                                                                             self.traffic)
         
         # Clear the file
         open(filepath, 'w').close()
@@ -205,7 +212,7 @@ def load_trip_params(filepath):
         data = f.read()
     data_list = data.split(',')
     
-    numerical_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16]
+    numerical_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17]
     
     for index in numerical_indexes:
         data_list[index] = float(data_list[index])

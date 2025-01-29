@@ -57,8 +57,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
     # Get the changes in travel distance, in meters
     dxs = list(pd.Series(route.d_X)*1000)
 
-    # get the speed limits, in m/s
-    limits = list(pd.Series(route.limits)*1000)
+    # get the speed limits, in m/s, and affect it by the trip's traffic parameter
+    limits = list(pd.Series(route.limits)*1000*((1-(trip.traffic/2))))
 
     # get the bearing angle from headings/
     bearings = list(pd.Series(route.bearings).apply(lambda x: gt.heading_to_angle(x)))
@@ -89,8 +89,9 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
     running_data = [initialize_result]
 
     # Loop through each point. 
-    with alive_bar(len(stop_distances)) as bar:
-        for i in range(len(stop_distances)):
+    with alive_bar(len(stop_distances)-1) as bar:
+        for i in range(len(stop_distances)-1):
+            #print(running_data[-1])
             v = running_data[-1]['v_f']
 
             # Query point data
@@ -100,7 +101,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
             dx = dxs[i]
             limit = limits[i]
             bearing = bearings[i]
-            stop_classes = stop_types[i]
+            stop_classes = stop_types[i+1]
+
             rider_change = rider_changes[i]
             geodes_dist = geodes_dists[i]
             elevation = elevations[i]
@@ -198,9 +200,9 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                     true_result['type'] = 'rest'
                     true_result['v_f'] = 0
                     true_result['dt'] = stop_time
-                    true_result['P'] =0
+                    true_result['P'] = 0
+                    true_result['dx'] = 0
                     tmp_storage = true_result['stop_clf']
-                    true_result['stop_clf'] = [0, 0, 0, 0]
 
                     running_data.append(true_result.copy())
 
@@ -220,7 +222,7 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                                            bus.a_br,
                                            bus.f_br,
                                            bus.f_i,
-                                           ESS.P_max,
+                                           bus.P_max,
                                            bus.a_max,
                                            bus.dt_max)]
 
@@ -232,6 +234,7 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                         true_result['P'] = result['P']
                         #print('ac_from_0:',result)
                         running_data.append(true_result.copy())
+                    
                     #print("v, dx, grade_force, wind_force = {}, {}, {}, {}".format(v, dx, grade_force, wind_force))
 
                 elif below_limit and not stopped:
@@ -245,7 +248,7 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                                bus.a_br,
                                bus.f_br,
                                bus.f_i,
-                               ESS.P_max,
+                               bus.P_max,
                                bus.a_max,
                                bus.dt_max)]
                     for result in results:
@@ -285,7 +288,7 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                                          bus.a_br,
                                          bus.f_br,
                                          bus.f_i, 
-                                         ESS.P_max)
+                                         bus.P_max)
                     true_result['type'] = 'main'
                     true_result['v_f'] = result['v_f']
                     true_result['dt'] = result['dt']
