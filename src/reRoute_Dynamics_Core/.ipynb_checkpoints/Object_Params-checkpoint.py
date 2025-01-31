@@ -219,7 +219,6 @@ def load_trip_params(filepath):
     data_list = data.split(',')
     
     numerical_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17]
-    
     for index in numerical_indexes:
         data_list[index] = float(data_list[index])
     args = tuple(data_list)

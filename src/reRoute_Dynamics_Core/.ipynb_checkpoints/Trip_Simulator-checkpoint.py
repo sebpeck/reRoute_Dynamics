@@ -69,6 +69,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
     # get the elevations, in km
     elevations = route.elevation
     
+    geometry = route.geometry
+    
     wind_angle = gt.heading_to_angle(trip.wind_bearing)
 
     # create an empty dict to store the result structure
@@ -83,7 +85,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                         'gdx':0,
                         'elevation':0,
                         'dx_to_next':0,
-                        'b_dx':0}
+                        'b_dx':0,
+                        'geometry':0}
 
     # Initialize the running data with the initialize dict.
     running_data = [initialize_result]
@@ -106,6 +109,7 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
             rider_change = rider_changes[i]
             geodes_dist = geodes_dists[i]
             elevation = elevations[i]
+            position = geometry[i]
 
             # Calculate the wind force
             wind_force = pe.calculate_wind_force(bearing,
@@ -163,7 +167,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                            'gdx':geodes_dist,
                            'elevation':elevation,
                            'dx_to_next':dx_to_next_stop,
-                           'b_dx':(braking_distance, adjusted_braking_factor)}
+                           'b_dx':(braking_distance, adjusted_braking_factor),
+                           'geometry':position}
 
             # Check if there's a stop upcoming and if the bus is still moving
             if stop_upcoming and not stopped:

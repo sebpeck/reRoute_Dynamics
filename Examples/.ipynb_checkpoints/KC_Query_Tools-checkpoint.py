@@ -294,7 +294,7 @@ def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_pat
             smellev = gt.smooth_elevation(idtm_elevation,smoothness, render_params[1])
 
             # get the speed limits for the data
-            limits = gt.query_speed_limits(i_geo, route_data_dir + "Seattle_Streets/KCM_Streets.shp", verbose=verb)
+            limits = gt.query_speed_limits(i_geo, route_data_dir + "Seattle_Streets/bound_KCM_Streets.shp", verbose=verb)
 
             # Get the stops for the data
             stops = gt.query_stops(i_geo, route_data_dir + "stops.txt", verbose=verb)
@@ -307,7 +307,7 @@ def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_pat
             stops[-1] = 0
 
             # Get the signal data
-            signals = gt.query_signals(i_geo, route_data_dir +"Signals/KCM_signals.shp", verbose=verb)
+            signals = gt.query_signals(i_geo, route_data_dir +"Signals/bound_KCM_signals.shp", verbose=verb)
 
             # Generate a new test route
             route = gt.Route(i_geo, smellev, limits=limits, stops=stops, signals=signals, signs = [-1]*len(i_geo), smooth_grades=True )

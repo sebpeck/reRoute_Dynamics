@@ -512,18 +512,21 @@ def query_signals(geometry, signal_data_path, key="SIGNAL_ID", epsg = 4326, marg
     if verbose: verbose_line_updater("Processing signals...")
     with alive_bar(len(geometry)) as bar:
         for point in list(geometry):
+            try:
+                # use the geodesic formula to get the distances between the current point and each point in the series, in meters
+                signals['dist'] = signals.geometry.apply(lambda x: geodesic_formula(x.x, x.y, point.x, point.y)*1000)
+                # get the closest signal through the minimum distance
+                closest_signal = signals[signals['dist'] == signals['dist'].min()].reset_index().iloc[0]
 
-            # use the geodesic formula to get the distances between the current point and each point in the series, in meters
-            signals['dist'] = signals.geometry.apply(lambda x: geodesic_formula(x.x, x.y, point.x, point.y)*1000)
+                # check if the signal is within the margin, and if so, append it to the list. If not, append -1.
 
-            # get the closest signal through the minimum distance
-            closest_signal = signals[signals['dist'] == signals['dist'].min()].reset_index().iloc[0]
-
-            # check if the signal is within the margin, and if so, append it to the list. If not, append -1.
-            signal_id_list.append((int(closest_signal['dist'])<margin)*closest_signal[key] - int(closest_signal['dist']>margin))
+                signal_id_list.append(int((int(closest_signal['dist'])<margin)*closest_signal[key] - int(closest_signal['dist']>margin)))
+            except:
+                signal_id_list.append(int(-1))
+                #verbose_line_updater("No signal data in bounds.")
             bar()
     if verbose: verbose_line_updater("Signals processed. Returning values.")
-        
+    
     # return the list.
     return repeat_id_remover(signal_id_list)
 
