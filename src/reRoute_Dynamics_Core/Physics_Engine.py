@@ -345,6 +345,7 @@ def maintain(velocity,
     return results
 
 
+
 def accelerate(velocity,
                mass,
                travel_distance,
@@ -355,8 +356,8 @@ def accelerate(velocity,
                braking_factor = DEFAULT_BR_FACTOR,
                inertial_factor = DEFAULT_I_FACTOR,
                max_power = DEFAULT_MAX_POWER,
-               max_acc = DEFAULT_MAX_ACC,
-               max_timestep = DEFAULT_MAX_DT):
+               max_acc = DEFAULT_MAX_ACC, # Depricated
+               max_timestep = DEFAULT_MAX_DT): # Depricated
     '''
     accelerate() is used to determine the velocity change, time change, and power consumption of accelerating
     a mass at a given velocity over a set distance, with a given acceleration profile.
@@ -403,20 +404,9 @@ def accelerate(velocity,
         # Otherwise, set the max acceleration based on max power.
         a_max = P_max/(mass*velocity)
     
-    # get a copy of the profile
-    a_prof_ext = raw_a_prof.copy()
-    
-    # get the profile of the acceleration.
-    a_prof = pd.concat([raw_a_prof]).reset_index(drop=True)
-    
-    # Set the last index of the acceleration profile as the max timestep and accel.
-    for i in range(2):
-        
-        # Also, extend the profile with the timestep and acceleration.
-        a_prof.at[-1, 0] = max_timestep + list(a_prof[0])[-1]
-        a_prof.at[-1, 1] = max_acc
-        a_prof = a_prof.reset_index(drop=True)
-    
+
+    a_prof = raw_a_prof.copy()
+
     #Convert the acceleration to needed acceleration.
     needed_a = a_prof[1].apply(lambda x: (x+a_counter)*inertial_factor)
     
@@ -442,11 +432,11 @@ def accelerate(velocity,
     
     # a_net = a_engine/f_i - a_counter
     true_a = possible_a/inertial_factor - a_counter # USE THIS FOR CALCULATING TIME AND DISTANCE AND VELOCITY
-    clipped_true_a = true_a.clip(0)
+    clipped_true_a = true_a.apply(lambda x: x*(x>0))
 
     # dv = a * dt
     vels = clipped_true_a * a_prof[0]
-    
+
     # Create a profile dataframe using the existing data so as to index through it. 
     a_prof = pd.concat([a_prof[0], possible_a, clipped_true_a, powers, vels, (vels * a_prof[0]).cumsum()], axis=1)
     a_prof.columns = ['dt','int_a','net_a','power', 'dv', 'dx']
@@ -507,25 +497,30 @@ def accelerate(velocity,
             step_dv = row['dv']
             step_a = row['net_a']
             
-            # Adjust the initial dv 
+            # Adjust the initial dv based on the regulated velocity
             i_dv = 0
             if col==0:
-                i_dv = row['dv'] - (velocity-reg_vel[starting_index])
+                i_dv = step_dv - (velocity-reg_vel[starting_index])
             else:
-                 i_dv = row['dv']
+                 i_dv = step_dv
             
             v_f_i = v_f + i_dv
             i_dx = .5*(v_f_i + v_f_i-i_dv)*row['dt']# <--- Should this be dt or i_dt? 
 
+            # if acceleration is zero, recalculate it based on the velocity change.
+            if step_a == 0: 
+                step_a = i_dv/row['dt']
             # if the travel distance is less than using the whole next step of the profile,
             # and if the travel distance is the same as the cumulative distance,
             if i_dx > (travel_distance-dx):
                 
+                i_dx = travel_distance-dx
+                
                 # back-calculate the time, velocity, distance, and energy change
                 # starting with the quadratic formula from the kinematic eqn
                 # for time without final velocity.
-                i_dx = travel_distance-dx
-                i_dt = (-v_f + np.sqrt(v_f**2 + 2*i_dx*row['net_a']))/row['net_a']
+                
+                i_dt = (-v_f + np.sqrt(v_f**2 + 2*i_dx*step_a))/step_a
 
                 # Calculate the cumulative values
                 v_f = i_dx/i_dt

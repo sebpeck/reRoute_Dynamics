@@ -34,10 +34,16 @@ class Bus:
         self.f_i = i_factor
         self.dmax = max_dist
         self.a_prof = pd.read_csv(a_prof_path, header=None)
-        self.a_prof[1] = self.a_prof.apply(lambda x: x[1]*9.81, axis=1)
         self.a_max = max_acc
         self.dt_max = max_dt
         self.P_max = max_P
+        
+            
+        self.a_prof[1] = self.a_prof.apply(lambda x: x[1]*9.81, axis=1)
+        
+        if (self.a_prof.iloc[-1][0] != self.dt_max + self.a_prof.iloc[-2][0]) and self.a_prof.iloc[-1][1] != self.a_max:
+            self.a_prof = pd.concat([self.a_prof,  pd.DataFrame([{0: self.dt_max + self.a_prof.iloc[-1][0], 1: self.a_max}])]).reset_index(drop=True)
+
         
     def copy(self):
         return Bus(self.mass, self._w, self._h, self.Cd, self.Cf, self.a_br, self.f_br, self.f_i, self.dmax, self._a_prof_path, self.a_max, self.dt_max, self.P_max)
