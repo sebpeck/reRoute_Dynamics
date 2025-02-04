@@ -98,7 +98,11 @@ class ESS:
                  simple_load = 7000, # Watts - Adelaty & Mohamed
                  regen_eff = .6, # Gallet Et Al
                  max_regen = -100000, # Watts, currently a guess. Needs Source.
-                 max_power = 160000 #w, peak power200kw. 160kw cont.  HDS200 https://cptdb.ca/wiki/index.php/BAE_Systems#HybriDrive
+                 cell_ocv = 3.3, # Nominal LFP voltage for A123 26650 https://www.buya123products.com/uploads/vipcase/844c1bd8bdd1190ebb364d572bc1e6e7.pdf
+                 cell_res = .008, #ohms, cell internal resistance LFP A123 26650 https://www.buya123products.com/uploads/vipcase/844c1bd8bdd1190ebb364d572bc1e6e7.pdf
+                 module_struct = (12, 8),# Series, parallel config for a module of cells
+                 bus_struct = (16, 1), # Series, parallel config for the modules of the bus
+                 cell_cap = 2.3 # Ah, nominal cell capacity https://www.buya123products.com/uploads/vipcase/844c1bd8bdd1190ebb364d572bc1e6e7.pdf
                 ):
         self.Em = motor_eff
         self.Ei = inverter_eff
@@ -106,14 +110,41 @@ class ESS:
         self.Er = regen_eff
         self.P_aux = simple_load
         self.P_regen = max_regen
-        self.P_max = max_power
+        self.V_cell = cell_ocv
+        self.R_cell = cell_res
+        self.module_S_P = module_struct
+        self.bus_S_P = bus_struct
+        self.R_bus = self.R_cell*self.module_S_P[0]/self.module_S_P[1]*self.bus_S_P[0]/self.bus_S_P[1]
+        self.Q_cell = cell_cap
+        
+        
         
     def copy(self):
-        return ESS(self.Em, self.Ei, self.Ea, self.P_aux, self.Er, self.P_regen, self.P_max)
+        return ESS(self.Em,
+                   self.Ei,
+                   self.Ea,
+                   self.P_aux,
+                   self.Er,
+                   self.P_regen,
+                   self.V_cell,
+                   self.R_cell,
+                   self.module_S_P,
+                   self.bus_S_P,
+                   self.Q_cell)
     
     
     def save(self, filepath):
-        data = "{},{},{},{},{},{},{}".format(self.Em, self.Ei, self.Ea, self.P_aux, self.Er, self.P_regen, self.P_max)
+        data = "{},{},{},{},{},{},{},{},{},{},{}".format(self.Em,
+                                             self.Ei,
+                                             self.Ea,
+                                             self.P_aux,
+                                             self.Er,
+                                             self.P_regen,
+                                             self.V_cell,
+                                             self.R_cell,
+                                             self.module_S_P,
+                                             self.bus_S_P,
+                                             self.Q_cell)
         
         # Clear the file
         open(filepath, 'w').close()
@@ -122,6 +153,47 @@ class ESS:
         with open(filepath, 'w') as f:
             f.write(data)
         return filepath
+    
+    
+    def calc_instance_power(self, value):
+        '''
+        calc_instance_power takes in a power value,
+        and converts it to the corresponding load on the ESS.
+        This is a simple stopgap.
+
+        Parameters:
+        value: a power value in Watts, as an int or float.
+
+        Returns:
+        converted battery power as a float.
+        '''
+
+        # set the battery power to zero.
+        bat_pow = 0
+        # Including Auxilliary load, though not strictly important at the moment. 
+        if (value >= 0):
+            # Discharging, converting the needed power into power battery must exert
+            bat_pow = value/(self.Em*self.Ei) + (self.P_aux/self.Ea)
+        elif(value*self.Er*self.Em > self.P_regen):
+
+            #charging, the regenerative braking ALL the time, max regen is 100
+            bat_pow = (value*self.Er*self.Em) + (self.P_aux/self.Ea)
+
+        else:
+            bat_pow = self.P_regen + (self.P_aux/self.Ea)
+
+
+        # Return the battery power.
+        return bat_pow
+    
+    def calc_voltage_simple(self, value):
+        '''
+        Use a simple resistance model to calculate the voltage of a cell based off of a given power.
+        '''
+        v = self.module_S_P[0] * (self.V_cell - (self.R_cell * np.sqrt(value / self.R_bus) / (self.bus_S_P[1] * self.module_S_P[1])))
+        return v
+        
+
     
 
 def load_ESS_params(filepath):
