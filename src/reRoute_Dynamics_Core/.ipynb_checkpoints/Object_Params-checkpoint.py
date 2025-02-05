@@ -3,6 +3,7 @@ Object_Params.py
 '''
 import pandas as pd
 import numpy as np
+from ast import literal_eval
 
 
 class Bus:
@@ -114,46 +115,14 @@ class ESS:
         self.R_cell = cell_res
         self.module_S_P = module_struct
         self.bus_S_P = bus_struct
-        self.R_bus = self.R_cell*self.module_S_P[0]/self.module_S_P[1]*self.bus_S_P[0]/self.bus_S_P[1]
         self.Q_cell = cell_cap
-        
-        
-        
-    def copy(self):
-        return ESS(self.Em,
-                   self.Ei,
-                   self.Ea,
-                   self.P_aux,
-                   self.Er,
-                   self.P_regen,
-                   self.V_cell,
-                   self.R_cell,
-                   self.module_S_P,
-                   self.bus_S_P,
-                   self.Q_cell)
     
-    
-    def save(self, filepath):
-        data = "{},{},{},{},{},{},{},{},{},{},{}".format(self.Em,
-                                             self.Ei,
-                                             self.Ea,
-                                             self.P_aux,
-                                             self.Er,
-                                             self.P_regen,
-                                             self.V_cell,
-                                             self.R_cell,
-                                             self.module_S_P,
-                                             self.bus_S_P,
-                                             self.Q_cell)
+    def bus_E_cap(self):
+        return self.V_cell*self.module_S_P[0]*self.bus_S_P[0]*self.Q_cell*self.module_S_P[1]*self.bus_S_P[1]
         
-        # Clear the file
-        open(filepath, 'w').close()
         
-        # Write the params
-        with open(filepath, 'w') as f:
-            f.write(data)
-        return filepath
-    
+    def R_bus(self):
+        return self.R_cell*self.module_S_P[0]/self.module_S_P[1]*self.bus_S_P[0]/self.bus_S_P[1] 
     
     def calc_instance_power(self, value):
         '''
@@ -186,28 +155,77 @@ class ESS:
         # Return the battery power.
         return bat_pow
     
+    
     def calc_voltage_simple(self, value):
         '''
-        Use a simple resistance model to calculate the voltage of a cell based off of a given power.
+        Use a simple resistance model to calculate the voltage of a module based off of a given power.
         '''
-        v = self.module_S_P[0] * (self.V_cell - (self.R_cell * np.sqrt(value / self.R_bus) / (self.bus_S_P[1] * self.module_S_P[1])))
-        return v
-        
 
+        if value <0:
+            sign = -1
+        else:
+            sign = 1
+            
+
+        I = sign*np.sqrt(abs(value)/self.R_bus())
+        v_module = self.module_S_P[0] *(self.V_cell - (self.R_cell * I)/(self.bus_S_P[1] * self.module_S_P[1]))
+        return v_module
+        
+        
+    def copy(self):
+        return ESS(self.Em,
+                   self.Ei,
+                   self.Ea,
+                   self.P_aux,
+                   self.Er,
+                   self.P_regen,
+                   self.V_cell,
+                   self.R_cell,
+                   self.module_S_P,
+                   self.bus_S_P,
+                   self.Q_cell)
     
+    
+    def save(self, filepath):
+        data = "{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}".format(self.Em,
+                                             self.Ei,
+                                             self.Ea,
+                                             self.P_aux,
+                                             self.Er,
+                                             self.P_regen,
+                                             self.V_cell,
+                                             self.R_cell,
+                                             self.module_S_P,
+                                             self.bus_S_P,
+                                             self.Q_cell)
+        
+        # Clear the file
+        open(filepath, 'w').close()
+        
+        # Write the params
+        with open(filepath, 'w') as f:
+            f.write(data)
+        return filepath
+
 
 def load_ESS_params(filepath):
     data = ''
     with open(filepath, 'r') as f:
         data = f.read()
-    data_list = data.split(',')
+    data_list = data.split('|')
     
-    numerical_indexes = [0, 1, 2, 3, 4, 5, 6]
+    numerical_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 10]
+    tuple_indexes = [8, 9]
     
+
     for index in numerical_indexes:
         data_list[index] = float(data_list[index])
+        
+    for index in tuple_indexes:
+        data_list[index] = literal_eval(data_list[index])
+        
     args = tuple(data_list)
-    
+
     return ESS(*args)
           
         
