@@ -58,7 +58,7 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
     dxs = list(pd.Series(route.d_X)*1000)
 
     # get the speed limits, in m/s, and affect it by the trip's traffic parameter
-    limits = list(pd.Series(route.limits)*1000*((1-(trip.traffic/2))))
+    limits = list(pd.Series(route.limits)*1000*((1-(trip.traffic/2)))*(1+bus.f_a))
 
     # get the bearing angle from headings/
     bearings = list(pd.Series(route.bearings).apply(lambda x: gt.heading_to_angle(x)))

@@ -16,6 +16,7 @@ class Bus:
                  friction_coeff = .01, # Abdelaty & Mohamed
                  braking_accel = 1.5, #m/s^2 # https://www.apta.com/wp-content/uploads/APTA-BTS-BC-RP-001-05_Rev1.pdf <-- Possible source, handbrake road minimum is ~1.5
                  br_factor = .5, # Not tied to any true value.
+                 a_factor=.5, # Not tied to any true value
                  i_factor = 1.1, # intertial factor, Asamer Et. Al
                  max_dist = 304.8, # m, Assembled from google measurements of offramps from I5
                  a_prof_path = '/media/sebastian/Slepnir/Route_Data/Accel_Prof/acceleration.csv', #TODO: NEEDS SOURCE
@@ -38,6 +39,7 @@ class Bus:
         self.a_max = max_acc
         self.dt_max = max_dt
         self.P_max = max_P
+        self.f_a = a_factor
         
             
         self.a_prof[1] = self.a_prof.apply(lambda x: x[1]*9.81, axis=1)
@@ -47,16 +49,17 @@ class Bus:
 
         
     def copy(self):
-        return Bus(self.mass, self._w, self._h, self.Cd, self.Cf, self.a_br, self.f_br, self.f_i, self.dmax, self._a_prof_path, self.a_max, self.dt_max, self.P_max)
+        return Bus(self.mass, self._w, self._h, self.Cd, self.Cf, self.a_br, self.f_br, self.f_a, self.f_i, self.dmax, self._a_prof_path, self.a_max, self.dt_max, self.P_max)
     
     def save(self, filepath):
-        data = "{},{},{},{},{},{},{},{},{},{},{},{},{}".format(self.mass,
+        data = "{},{},{},{},{},{},{},{},{},{},{},{},{},{}".format(self.mass,
                                                             self._w,
                                                             self._h,
                                                             self.Cd,
                                                             self.Cf,
                                                             self.a_br,
                                                             self.f_br,
+                                                            self.f_a,
                                                             self.f_i,
                                                             self.dmax,
                                                             self._a_prof_path,
@@ -81,7 +84,7 @@ def load_bus_params(filepath):
         data = f.read()
     data_list = data.split(',')
     
-    numerical_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12]
+    numerical_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8,9, 11, 12, 13]
 
     for index in numerical_indexes:
         data_list[index] = float(data_list[index])
