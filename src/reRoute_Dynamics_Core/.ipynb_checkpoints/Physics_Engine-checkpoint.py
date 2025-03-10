@@ -510,6 +510,7 @@ def accelerate(velocity,
             # if acceleration is zero, recalculate it based on the velocity change.
             if step_a == 0: 
                 step_a = i_dv/row['dt']
+
             # if the travel distance is less than using the whole next step of the profile,
             # and if the travel distance is the same as the cumulative distance,
             if i_dx > (travel_distance-dx):
@@ -519,7 +520,7 @@ def accelerate(velocity,
                 # back-calculate the time, velocity, distance, and energy change
                 # starting with the quadratic formula from the kinematic eqn
                 # for time without final velocity.
-                
+
                 i_dt = (-v_f + np.sqrt(v_f**2 + 2*i_dx*step_a))/step_a
 
                 # Calculate the cumulative values
