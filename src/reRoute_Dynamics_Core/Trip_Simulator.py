@@ -33,7 +33,7 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
     signal_series[signal_series == -1] = 0
 
     # multiply the signal values by a boolean of if the stoplight has been hit or not.
-    signal_series.apply(lambda x: x*it.check_hit_signal(stoplight_chance = trip.chance_sig, seed=trip.seed))
+    signal_series = signal_series.apply(lambda x: x*it.check_hit_signal(stoplight_chance = trip.chance_sig, seed=trip.seed))
 
 
     # convert the data to a list.
