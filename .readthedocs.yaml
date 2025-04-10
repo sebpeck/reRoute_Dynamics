@@ -6,7 +6,7 @@ version: 2
 
 # Set the OS, Python version, and other tools you might need
 build:
-  os: "Ubuntu 22.04.5 LTS"
+  os: "Ubuntu-22.04.5-LTS"
   tools:
     python: "3.12.3"
 
