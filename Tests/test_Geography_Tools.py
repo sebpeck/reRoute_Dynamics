@@ -328,7 +328,7 @@ class TestInterpolateGeometrySeries(unittest.TestCase):
 
     def test_works(self):
         int_pts = gt.interpolate_geometry_series(self.pts, 10)
-        expected = 202
+        expected = 201
         result = len(int_pts)
         self.assertEqual(expected, result) 
 

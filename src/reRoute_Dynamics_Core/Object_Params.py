@@ -19,7 +19,7 @@ class Bus:
                  a_factor=.5, # Not tied to any true value
                  i_factor = 1.1, # intertial factor, Asamer Et. Al
                  max_dist = 304.8, # m, Assembled from google measurements of offramps from I5
-                 a_prof_path = '/media/sebastian/Slepnir/Route_Data/Accel_Prof/acceleration.csv', #TODO: NEEDS SOURCE
+                 a_prof_path = './KC_Example_Data/Acceleration_Profiles/Braunschweig_Acceleration.csv', #TODO: NEEDS SOURCE
                  max_acc = .4, # m/s^2, the default accel after profile finishes.
                  max_dt = 1, # s, timestep for the default acceleration betond the profile.
                  max_P = 160000 # Watts, max power output by the motors. 

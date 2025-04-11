@@ -11,7 +11,6 @@ import Trip_Simulator as ts
 import KC_Query_Tools as kqt
 import Object_Params as op
 import Geography_Tools as gt
-import ESS
 import matplotlib.pyplot as plt
 
 
@@ -143,13 +142,7 @@ def run_trip(path, trip, bus, bus_ESS, export_figures = False, seed_list=np.aran
         route_results = pd.DataFrame(running_data)
 
         # Use ESS to calculate the battery power from the required power. 
-        route_results['BP'] = route_results['P'].apply(lambda x: ESS.calc_instance_power(x,
-                                                                                         motor_eff=bus_ESS.Em,
-                                                                                         invert_eff=bus_ESS.Ei,
-                                                                                         aux_eff=bus_ESS.Ea,
-                                                                                         aux_load=bus_ESS.P_aux,
-                                                                                         regen_eff=bus_ESS.Er,
-                                                                                         max_regen=bus_ESS.P_regen))
+        route_results['BP'] = route_results['P'].apply(lambda x: bus_ESS.calc_instance_power(x))
         
         
         
@@ -261,7 +254,6 @@ def hyperbaric_time_chamber(testing_routes,
     Returns:
     list containing the list of results for each combination of period and route shape.
     '''
-
     # create batches of route paths and trips
     batches_of_routes = [list(testing_routes['path'])[i:i + batch_size] for i in range(0, len(list(testing_routes['path'])), batch_size)][:end_dex]
     batches_of_trips = [list(testing_routes['trip'])[i:i + batch_size] for i in range(0, len(list(testing_routes['trip'])), batch_size)][:end_dex]

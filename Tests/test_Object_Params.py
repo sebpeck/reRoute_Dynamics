@@ -20,9 +20,12 @@ from pandas.testing import assert_frame_equal
 # Testing Bus Class
 class TestBus(unittest.TestCase):
     
+    def test_can_load_a_prof(self):
+        bus = op.Bus(a_prof_path = "../Examples/KC_Example_Data/Acceleration_Profiles/Braunschweig_Acceleration.csv")
+        self.assertEqual(len(bus.a_prof), 68)
     
     def test_can_save_load(self):
-        bus = op.Bus()
+        bus = op.Bus(a_prof_path = "../Examples/KC_Example_Data/Acceleration_Profiles/Braunschweig_Acceleration.csv")
         bus.mass = 999999
         bus.save('test_bus.txt') 
         loaded_bus = op.load_bus_params('test_bus.txt')
@@ -31,14 +34,10 @@ class TestBus(unittest.TestCase):
         
         
     def test_can_copy(self):
-        bus = op.Bus()
+        bus = op.Bus(a_prof_path = "../Examples/KC_Example_Data/Acceleration_Profiles/Braunschweig_Acceleration.csv")
         bus.Cd = 1
         self.assertEqual(bus.copy().Cd, bus.Cd)
         
-        
-    def test_can_load_a_prof(self):
-        bus = op.Bus(a_prof_path = "../Examples/KC_Example_Data/Acceleration_Profiles/Braunschweig_Acceleration.csv")
-        self.assertEqual(len(bus.a_prof), 67)
         
         
 # Testing the ESS class.

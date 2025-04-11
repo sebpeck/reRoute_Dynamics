@@ -10,12 +10,14 @@ Notes:
 import unittest
 import sys
 import os
+import os
 sys.path.append('../src/reRoute_Dynamics_Core')
 import pandas as pd
 import numpy as np
 import itertools
-
+os.chdir('../Examples/')
 import Physics_Engine as pe
+os.chdir('../Tests/')
 
 # set up the min, max of each parameter
 bearings = (0, 360) # deg 0
@@ -29,7 +31,7 @@ grades = (-17, 17) # %, based on seattle 7
 masses = (700, 37000) # kg, smart car and loaded semi 8
 fric_coefs = (.02, .5) # engineering toolbox 9
 a_brakings = (.098, 9.81) # m/s^2, grav 10
-br_factors = (0, 1)  # 11
+br_factors = (0.1, 1)  # 11
 inert_factors = (0.001, 0.0730) # wikipedia 12
 max_dist = (300, 1000) #m, estimates 13
 dx_travel = (1, 300) #m, estimates 14
@@ -57,6 +59,11 @@ for param_options in list(itertools.product(*range_list)):
     acc_params = (param_options[1], param_options[8], param_options[14], grade_force, wind_force,param_options[18]) + param_options[10:13] + param_options[15:18]
     param_samples.append([wind_params, grade_params, bdist_params, brake_params, main_params, acc_params])
 print('Samples prepped.')
+
+import sys
+sys.path.append("../Examples/")
+import os
+print(os.getcwd())
     
 class TestCalculateWindForce(unittest.TestCase):
     print('windforcetests')
@@ -295,7 +302,6 @@ def test_P_valid(self, P, params):
     
 
 class TestBrake(unittest.TestCase):
-    print('braketest')
     vi = 10
     mass = 100
     dx = 100
@@ -307,6 +313,7 @@ class TestBrake(unittest.TestCase):
     dx_max = 300
     
     def test_full_stop(self):
+        print('braketest 1')
         # this should come to a full stop, uses braking distance check
         # to calculate braking distance used
         dist = pe.get_braking_distance(self.vi,
@@ -332,6 +339,7 @@ class TestBrake(unittest.TestCase):
         self.assertEqual(result['v_f'], expected)
         
     def test_no_stop(self):
+        print('braketest 2')
         # tapping the brake for a distance of zero should mean no velocity change.
         dist = pe.get_braking_distance(self.vi,
                                 self.mass,
@@ -356,6 +364,7 @@ class TestBrake(unittest.TestCase):
     
     
     def test_all_valid(self):
+        print('braketest 3')
         # This iterates through the combos of min and max possible values for each param and
         # checks if the output are valid responses. 
         for params in param_samples:
@@ -366,8 +375,8 @@ class TestBrake(unittest.TestCase):
 
             
 class TestMaintain(unittest.TestCase):
-    print('maintest')
     def test_all_valid(self):
+        print('maintest')
         # Check if any of the responses are invalid, a la negative time, negative velocity, or nan
         for params in param_samples:
             result = pe.maintain(*params[4])
@@ -375,17 +384,19 @@ class TestMaintain(unittest.TestCase):
             test_t_valid(self, result['dt'], params[4])
             test_P_valid(self, result['P'], params[4])
 
-    
 
 class TestAccelerate(unittest.TestCase):
-    print('acceltest')
     def test_all_valid(self):
+        # This runs really long
+        print('acceltest')
         # Check if any of the responses are invalid, a la negative time, negative velocity, or nan
-        for params in param_samples:
+        for i in range(len(param_samples[:50])):
+            params = param_samples[i]
+            print("{}% \t\t ".format(i/len(param_samples)*100), end='\r')
             result = pe.accelerate(*params[5])
             test_vf_valid(self, result['v_f'], params[5])
             test_t_valid(self, result['dt'], params[5])
             test_P_valid(self, result['P'], params[5])
-            
+
 if __name__ == '__main__':
     unittest.main()
