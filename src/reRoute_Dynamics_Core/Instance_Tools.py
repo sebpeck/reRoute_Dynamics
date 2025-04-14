@@ -1,5 +1,18 @@
 '''
 Instance_Tools.py
+S. Peck
+
+Instance_Tools.py contains methods used in the processing and handling of individual points on a route and other
+miscellaneous methods in generating a trip.
+
+Methods:
+generate_riders() - method used to generate a series of ridership changes at each stop based on the
+expected ridership of that series.
+check_hit_signal() - method to return if a signal light has been hit or not based on random chance.
+determine_stop_type() - method used to determine what kind of stop a position is based on ridership, signals, and signs.
+get_stop_type() - method to create an array of stop type booleans for a given position.
+get_distances_to_stop() - method to determine how much distance is between the current index and the next stop.
+
 '''
 
 import numpy as np

@@ -1,5 +1,39 @@
 '''
 Geography_Tools.py
+S. Peck
+
+Geography_Tools.py is a module that contains the methods primarily used in the interpretation
+of geospatial data for the ultimate creation of Route .json files from position and elevation data.
+
+Methods: 
+geodesic_formula() - method to calculate the geodesic distance between two (lat, lon) points.
+compass_heading() - method to determine cardinal compass heading from an angle off of North.
+heading_to_angle() - method to determine the compass degree angle from a cardinal direction.
+point_bearing() - method to determine the travel bearing between two points.
+get_bounding_box() - method to create the smallest possible box that encompasses all the points in a shape.
+interpolate_points() - method to interpolate additional points between two initial geospatial points.
+repeat_id_remover() - method to swap any repeated value in an iterable with -1. 
+verbose_line_updater() - method to provide line updates for verbosity
+query_elevation_changes() - method to determine the elevation changes in an iterable of elevation.
+query_stops() - method to assign stops to their closest corresponding point in a geometry series.
+query_signals() - method to assign signals to their closest corresponding point in a geometry series.
+query_distance_traveled() - method to calculate the distance traveled from point to point in a geometry series.
+query_speed_limits() - method to assign speed limits to each point in a geometry series. 
+query_bearings() - method to query the bearing to the next point for each point in a geometric series.
+get_rasterfiles() - method to return all standard .tif files in a directory.
+reproject_rasterfiles() - method to reproject and save raster files to a particular geographic projection.
+query_elevation_series() - method to query the elevation from each point in a geometry series using rasterfiles.
+smooth_elevation() - method to use a savisky-golay filter to smooth out elevation changes (or otherwise)
+calculate_grades() - method to calculate the slope grade at each point in a geometry series with elevations
+interpolate_geometry_series() - method to take a whole series of points and interolate extra points if there are significant gaps.
+load_from_json() - method to load a Route object from a saved .json file. 
+
+Classes:
+Route - a class used to store information on a route, like geometry, elevation, signals, limits, and stops. 
+    save_to_json() - class method used to encode and store a Route class as a .json file
+    query_point() - class method used to query the information of a point at an index in the route
+    to_gdf() - class method used to convert a Route class's stored information to a GeoDataFrame.
+    
 '''
 import pandas as pd
 import geopandas as gpd

@@ -4,9 +4,95 @@
 ---
 reRoute_Dynamics is a software package that is a more thourouglhly refined version of [Route_Dynamics](https://github.com/EricaEgg/Route_Dynamics). Its intention is to provide the tools and framework needed to estimate energy demand for a battery-electric bus (or other vehicle) provided adequate geospatial and conditional data. 
 
-## Dependencies & Platforms
+
+## Table of Contents
+---
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Repository Structure](#repository-structure)
+- [Credits & Contribution](#credits-and-contribution)
+- [Misc](#misc)
+- [Licese](#license)
+
+
+## Installation (via git)
 ---
 This set of tools is based in Python 3.12. Any and all packages needed are listed in the environment.yml file, which can be used with Conda to re-generate the development environment. The package was developed and tested in Ubuntu 22.04, and validated to run on Windows 10.
+
+1. Clone the repository & navigate in:
+```bash
+git clone https://github.com/sebpeck/reRoute_Dynamics
+
+cd reRoute_Dynamics
+```
+
+2. Set up an environment in conda from the environment.yml file and open the environment:
+```bash
+conda env create --name MyEnvironmentName --file=environment.yml
+
+conda activate MyEnvironmentName
+```
+
+For more detailed instructions on installing conda, please visit the [Conda install guide](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html).
+
+## Usage
+---
+The following two options are the most bare-bones examples. For more detailed and comprehensive uses, please see:
+```bash
+/Examples/
+```
+1. Using reRoute_Dynamics as a package:
+
+First, get the package set up for use in your current directory
+```python
+import os
+import sys
+sys.path.append('../src/reRoute_Dynamics_Core/')
+```
+Now, we use Geography_Tools to load up a route path. For more information on making a route path, see:
+```bash
+/Examples/Geography_Tools_Examples.ipynb.
+```
+
+```python
+# import the geography tools module
+import Geography_Tools as gt
+
+# Use geography_tools to load a premade route path.
+route_obj = gt.load_from_json("path/to/route/file.json")
+```
+
+Then, we need to load up our Trip, Bus, and ESS. More information about these files can be found in:
+```bash
+/Examples/Object_Params_Example.ipynb
+```
+
+```python
+# import the object parameters module
+import Object_Params as op
+
+# Load up the trip, bus, and ESS object parameters. For more information on making
+# these, see Object_Params_Example.ipynb
+trip_obj = op.load_trip_params("path/to/trip/file.txt")
+bus_obj = op.load_bus_params("path/to/bus/file.txt")
+ESS_obj = op.load_ESS_params("path/to/ESS/file.txt")
+```
+
+Finally, we use Trip_Simulator to run the trip.
+```python
+# import the trip simulator module
+import Trip_Simulator as ts
+
+results = ts.simulate_trip(route_obj, trip_obj, bus_obj, ESS_obj)
+```
+
+2. Using reRoute_Dynamics as a script:
+Trip_Simulator.py can also be run as a standalone script, assuming you have your route and object files prepared:
+```bash
+python3 /src/reRoute_Dynamics_Core/Trip_Simulator.py
+```
+If no extra arguments are provided, it will prompt the user for the correct input, and then save the results as a .feather file.
 
 
 ## Repository Structure
@@ -51,15 +137,28 @@ This set of tools is based in Python 3.12. Any and all packages needed are liste
 - environment.yml: Environment file, used in Conda to recreate python kernel environment.
 
 
-## Examples
+## Credits & Contribution:
 ---
-Many examples on how to use specific aspects of this software package can be found within the /Examples/ directory of the repository, but as a brief rundown:
-TO DO
+### Credits: 
+- Author: Sebastian Peck
+- Advisor: Dr. Daniel T. Schwartz
+- Original Concept & Initial iteration: Dr. Erica Eggleton
+- Acknowledgments:
+Special thanks to Dr. Dave Beck for providing additional support and mentorship during this process!
 
-## Credits:
-### Author: Sebastian Peck
-### Advisor: Dr. Daniel T. Schwartz
-### Original Concept + Core ideas: Dr. Erica Eggleton
+### Contribution:
+If you have ideas or thoughts you'd like to contribute, please feel free to do it through the 2 following methods:
+1. Issues: 
+If you encounter any issues or have possible ideas, please raise an issue on GitHub.
+
+2. Modifications & Updates:
+If you'd like to contribute fixes or changes, please take the following steps:
+- Fork the Repositry
+- Create a new branch: `git checkout -b BranchName`.
+- Make changes.
+- Push branch: `git push origin BranchName`.
+- Create a pull request.
+
 
 
 ## Misc 
@@ -67,15 +166,18 @@ TO DO
 https://gis-kingcounty.opendata.arcgis.com/maps/284a6b7a12a04016ab8b754e3b354e47
 
 ## Sebastian's To Do List: 
-4/11/2025
-- Write preliminary use case example in readme
-- Review documentation 
-- Contact Nels to figure out how to set up readthedocs
+4/14/2025
+- Finalize in-line parameter citations in Geography_Tools, Object_Params and Physics_Engine
+- Set up ReadTheDocs
 - Draft Joss Paper again
 - Adress Issue 1 completely
     - Verify where Erica's previous code has been presented or published
-    - Make sure user gued is user friendly and followable
+    - Make sure user guide is user friendly and followable
     - Are Demos reproducible on Mac?
     - Fully revise paper from current rough draft state
     - Contact Erica to review
     
+    
+# License
+---
+This project is licensed under the [MIT License](https://en.wikipedia.org/wiki/MIT_License)

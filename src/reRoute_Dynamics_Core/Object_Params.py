@@ -1,5 +1,31 @@
 '''
 Object_Params.py
+S. Peck
+
+Object_Params is used to create, save, and load object classes that store relevant parameters for modeling.
+
+Methods:
+load_bus_params() - method to load a Bus object from a saved txt file.
+load_ESS_params() - method to load an ESS object from a saved txt file.
+load_trip_params() - method ot load a trip object from a saved txt file.
+a_eqn() - method to calculate the acceleration at a given time in accordance to a fitting equation.
+generate_a_profile() - method to create and save an acceleration profile based on a fitting equation.
+
+Classes:
+Bus - a class that is used to store modeling parameters for a bus vehicle. 
+    copy() - method to create a copy of the bus class
+    save() - method to save the bus object to a txt file
+ESS - a class that is used to store modeling parameters and methods for an Energy Storage System.
+    copy() - method to create a copy of the ESS
+    save() - method to save the ESS object to a txt file
+    bus_E_cap() - method to calculate the energy capacity of the ESS
+    R_bus() - method to calculate the resistance of the ESS
+    calc_instance_power() - method to calculate the load on the ESS based on the load needed
+    calc_voltage_simple() - method to calculate the pack voltage using a simple resistance model at a given power.
+Trip - a class that is used to store modeling parameters for a given vehicle trip.
+    copy() - method to create a copy of the Trip
+    save() - method to save the trip object to a txt file. 
+ 
 '''
 import pandas as pd
 import numpy as np

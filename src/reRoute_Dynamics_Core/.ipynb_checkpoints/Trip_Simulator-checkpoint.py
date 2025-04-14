@@ -1,5 +1,15 @@
 '''
 Trip_Simulator.py
+S. Peck
+
+Trip_Simulator.py contains the method and scripting used to simulate a vehicle trip by passing a vehicle and its driving
+conditions through logic and then into a Longitudinal Dynamics Model in Physics_Engine.py.
+This can also be run as a standalone script. 
+
+Methods:
+simulate_trip.py - method to run a vehicle with a given ESS on a given trip over a given route.
+
+
 '''
 import Instance_Tools as it
 import pandas as pd
@@ -9,6 +19,19 @@ import Geography_Tools as gt
 from alive_progress import alive_bar
 
 def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
+    '''
+    simulate_trip() takes a route, and returns a modeled power consumption and velocity
+    for a vehicle on that given trip. 
+    
+    Params:
+    route: a route object as exported by Geography_Tools.py that the vehicle will traverse
+    trip: Default - Object_Parameters.Trip(), a trip object from Object_Params that determines the external conditions of the trip
+    bus: Default - Object_Parameters.Bus(), a bus object from Object_Params that determines the vehicle design
+    ESS: Default - Object_Parameters.ESS(),an ess object from Object_Params that determines the Energy Storage System design
+    
+    Return:
+    a geodataframe that provides all the relevant driving conditions, positional velocity, and modeled power required (NOT ESS LOAD). 
+    '''
     
     # make copies so there isnt accidental overwriting of params.
     trip = trip.copy()

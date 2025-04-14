@@ -1,5 +1,19 @@
 '''
 Physics_Engine.py
+S. Peck
+
+Physics_Engine.py contains methods used in the calculation of energy, speed changes, and time
+for a bus object based on external conditions, using a Longitudinal Dynamic Model. 
+
+Methods:
+calculate_wind_force() - method for determining the force that wind exerts on a moving vehicle.
+sign() - method to get what sign (positive or negative) a number is
+calculate_grade_froce() - method for determining the force that the road exerts on a moving vehicle.
+get_braking_distance() - method to calculate the distance it will take a vehicle to stop at its current conditions.
+brake() - method that determines the final velocity, power use, and time change to brake a vehicle for a distance.
+maintain() - method that determines the final velocity, power use, and time change to maintain a vehicle's speed.
+accelerate() - method to determine the final velocity, power use, and time change to accelerate a vehicle with a given profile.
+
 '''
 import numpy as np
 import pandas as pd
