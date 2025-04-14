@@ -30,20 +30,20 @@ affiliations:
    ror: 00hx57361 TODO
 date: XX April 2025
 bibliography: paper.bib
-
 ---
 
 # Summary
 
-To mitigate antropogenic climate change, the field of public transportation is steadily comitting to fully-electric vehicles. To effectively implement battery-electric buses, knowing the limits and dynamic energy needs of any given route is of particular value. Longitudinal Dynamics Models are a well established method for determining the energy requirements of a vehicle through straightforward physics - reRoute_Dynamics provides the tools to couple geospatial data and an LDM to generate models of route-specific drive cycles and their power requirements. This tool opens up the avenue for high-throughput insights into route optimization and battery aging. 
+To mitigate anthropogenic climate change, the field of public transportation is steadily comitting to fully-electric vehicles. To effectively implement battery-electric buses, knowing the limits and dynamic energy needs of any given route is of particular value. Longitudinal Dynamics Models are a well established method for determining the energy requirements of a vehicle through straightforward physics - reRoute_Dynamics provides the tools to couple geospatial data and an LDM to generate models of route-specific drive cycles and their power requirements. This tool opens up the avenue for high-throughput insights into route optimization and battery aging. 
 
 # Statement of Need
 
 when testing battery-electric vehicles for their milage, the EPA standard [@epa_range_testing] is to run these EVs on a Dynamometer in accordance with one of several standard EPA driving cycles. The resulting milage is typically reduced by a factor of .7 to account for variability in driving conditions, driver aggresion, and HVAC use. However, this one-size-fits-all approach may not accurately encompass the variability in driving conditions, especially when it comes to larger vehicles being used for public transit. With frequent stops, sufficiently dynamic mass, and highly variable traffic and road conditions depending on geographic location, a standard drive cycle based solely on velocity has enough uncertainty it's worth taking a look at closer alternatives. 
 
-/autoref{fig:EPAcycle} [@epa_drive_cycle]
+![Standard Drive Cycle Velocity Profile.](Urban_Dynanometer.png)<br>
+*Figure 1*: A standard EPA Drive Cycle [@epa_drive_cycle]
 
-/autoref{fig:Realcycle} 
+\autoref{fig:Realcycle} 
 
 Longitudinal Dynamics Models are a well-established method of determining the energy use of a vehicle based on simple rigid-body physics and standard equations of motion. Previous work has shown that these models can effectively be used to model bus energy [@thesis],[@abdelaty] in software like simulink or python. However, these have been conventionally coupled with the aformentioned standard driving cycles. Instead, reRoute_Dynamics allows for the generation the drive cycle alongside the use of the LDM in accordance with provided geospatial data like elevation, path, stops, and signals. Additionally, while many previous papers handled acceleration as a simple value, modern busses are operated using acceleration profiles controlled by a governer. This set of tools allow for the implementation of such a profile in vehicle acceleration behavior, should the user desire that. Beyond this, the high customizability of parameters enables the option to generate Monte Carlo simulations of a given route to get a better understanding of the range of conditions the energy storage system may face. 
 
@@ -80,9 +80,10 @@ At the moment, this toolkit has been shown to make reasonable models of realisti
 
 
 # Figures
+![Standard Drive Cycle Velocity Profile.](Urban_Dynanometer.png)<br>
+*Figure 1*: A standard EPA Drive Cycle
+![Velocity Profile of King County Metro Route 49, collected by GPS.\label{fig:Realcycle}](r49cycle.png)
 
-![Standard Drive Cycle Velocity Profile.\label{fig:EPAcycle}](Urban Dynanometer.png)
-![Velocity Profile of King County Metro Route 45, collected by GPS.\label{fig:Realcycle}]()
 ![Diagram of a Longitudinal Dynamic Model.\label{fig:LDM}]()
 ![Model comparison of velocity and acceleration distributions of a Monte Carlo simulation of KCM route 45.\label{fig:Monte_Carlo}]()
 ![Diagram of module interplay.\label{fig:PackageInterplay}]()
