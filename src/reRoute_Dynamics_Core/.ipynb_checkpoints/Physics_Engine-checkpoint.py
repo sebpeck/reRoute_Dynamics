@@ -22,20 +22,20 @@ import Geography_Tools as gt
 DEFAULT_AIR_DENSITY = 1.2 #kg/m^3, approximate of 20 deg C.
 DEFAULT_WIND_SPEED = 4 #m/s Typical for seattle
 DEFAULT_WIND_BEARING = gt.heading_to_angle('SE') # Typical for seattle
-DEFAULT_DRAG_COEFF = 0.6 # From Aggregate, Abdelaty & Mohamed []
-DEFAULT_FRONTAL_AREA = 2.6 * 3.3 # meters, width times height New Flyer Xcelsior Charge []
+DEFAULT_DRAG_COEFF = 0.6 # From Aggregate,@Abdelaty_Mohamed
+DEFAULT_FRONTAL_AREA = 2.6 * 3.3 # meters, width times height @NF_Xcelsior
 
-DEFAULT_COEFF_F = .01 # Abdelaty & Mohamed
+DEFAULT_COEFF_F = .01 # @Abdelaty_Mohamed
 
-DEFAULT_BR_ACCEL = 1.5 #m/s^2 https://www.apta.com/wp-content/uploads/APTA-BTS-BC-RP-001-05_Rev1.pdf <-- Possible source, handbrake road minimum is ~1.5
+DEFAULT_BR_ACCEL = 1.5 #m/s^2 @APTA_Braking_Standards
 DEFAULT_BR_FACTOR = .5 # Half of braking accel.
-DEFAULT_I_FACTOR = 1.1 # intertial factor, Asamer Et. Al []
+DEFAULT_I_FACTOR = 1.1 # intertial factor, @Asamer_Et_Al
 DEFAULT_MAX_DIST = 304.8 # meters, approx based on offramp length for I-5
 
-DEFAULT_MAX_POWER = 160000 # Watts
+DEFAULT_MAX_POWER = 160000 # Watts, Approximation
 
 
-DEFAULT_A_PROF = pd.read_csv("./KC_Example_Data/Acceleration_Profiles/Braunschweig_Acceleration.csv", header=None) # Default acceleration profile.
+DEFAULT_A_PROF = pd.read_csv("./KC_Example_Data/Acceleration_Profiles/Braunschweig_Acceleration.csv", header=None) # Default acceleration profile. @NREL_Drive_Cycles
 DEFAULT_A_PROF[1] = DEFAULT_A_PROF[1].apply(lambda x: x*9.81)
 DEFAULT_MAX_ACC = .4 #m/s^2 the asymptotic acceleration a profile will achieve.
 DEFAULT_MAX_DT = .5 #second, the timestep in the profile corresponding to the max acceleration.
@@ -511,7 +511,7 @@ def accelerate(velocity,
             step_dv = row['dv']
             step_a = row['net_a']
             
-            # Adjust the initial dv based on the regulated velocity
+            # Adjust the initial dv based on the regulated velocity2
             i_dv = 0
             if col==0:
                 i_dv = step_dv - (velocity-reg_vel[starting_index])

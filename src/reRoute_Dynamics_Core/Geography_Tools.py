@@ -77,7 +77,7 @@ def _haversine_formula(x1, y1, x2, y2):
     lon2=np.radians(y2)
     
     # Get the radius of earth in kilometers - using the average of the radii
-    R = 6371.009 #https://en.wikipedia.org/wiki/Great-circle_distance
+    R = 6371.009 #@Great_Circle_Distance
     
     # calculate the difference in radians
     dlon=lon2-lon1

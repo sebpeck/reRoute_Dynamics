@@ -35,20 +35,20 @@ from ast import literal_eval
 class Bus:
     def __init__(self,
                  # Bus Params
-                 bus_mass = 13300, # kg, https://en.wikipedia.org/wiki/New_Flyer_Xcelsior
-                 frontal_width = 2.59, # m, https://en.wikipedia.org/wiki/New_Flyer_Xcelsior
-                 frontal_height = 3.38, #m, https://en.wikipedia.org/wiki/New_Flyer_Xcelsior
-                 drag_coeff =.6, # From Aggregate, Abdelaty & Mohamed
-                 friction_coeff = .01, # Abdelaty & Mohamed
-                 braking_accel = 1.5, #m/s^2 # https://www.apta.com/wp-content/uploads/APTA-BTS-BC-RP-001-05_Rev1.pdf <-- Possible source, handbrake road minimum is ~1.5
+                 bus_mass = 13300, # kg, @NF_Excelsior
+                 frontal_width = 2.59, # m, @NF_Excelsior
+                 frontal_height = 3.38, #m, @NF_Excelsior
+                 drag_coeff =.6, # From Aggregate, @Abdelaty_Mohamed
+                 friction_coeff = .01, # @Abdelaty_Mohamed
+                 braking_accel = 1.5, #m/s^2 @APTA_Braking_Standards <-- Possible source, handbrake road minimum is ~1.5
                  br_factor = .5, # Not tied to any true value.
                  a_factor=.5, # Not tied to any true value
-                 i_factor = 1.1, # intertial factor, Asamer Et. Al
+                 i_factor = 1.1, # intertial factor, @Asamer_Et_Al
                  max_dist = 304.8, # m, Assembled from google measurements of offramps from I5
-                 a_prof_path = './KC_Example_Data/Acceleration_Profiles/Braunschweig_Acceleration.csv', #TODO: NEEDS SOURCE
+                 a_prof_path = './KC_Example_Data/Acceleration_Profiles/Braunschweig_Acceleration.csv', #@NREL_Drive_Cycles
                  max_acc = .4, # m/s^2, the default accel after profile finishes.
                  max_dt = 1, # s, timestep for the default acceleration betond the profile.
-                 max_P = 160000 # Watts, max power output by the motors. 
+                 max_P = 160000 # Watts, max power output by the motors. Default not tied to a true value.
                 ):
         self._a_prof_path=a_prof_path
         self._w = frontal_width
@@ -122,17 +122,17 @@ def load_bus_params(filepath):
 class ESS: 
     def __init__(self,
                  # ESS instance
-                 motor_eff = .916, # <-- NEEDS SOURCE
-                 inverter_eff = .971, # <-- NEEDS SOURCE
-                 aux_eff = .89, # <-- NEEDS SOURCE
-                 simple_load = 7000, # Watts - Adelaty & Mohamed
-                 regen_eff = .6, # Gallet Et Al
-                 max_regen = -100000, # Watts, currently a guess. Needs Source.
-                 cell_ocv = 3.3, # Nominal LFP voltage for A123 26650 https://www.buya123products.com/uploads/vipcase/844c1bd8bdd1190ebb364d572bc1e6e7.pdf
-                 cell_res = .008, #ohms, cell internal resistance LFP A123 26650 https://www.buya123products.com/uploads/vipcase/844c1bd8bdd1190ebb364d572bc1e6e7.pdf
+                 motor_eff = .916, #Approximation
+                 inverter_eff = .971, #Approximation
+                 aux_eff = .89, # Approximation
+                 simple_load = 7000, # Watts - @Abdelaty_Mohamed
+                 regen_eff = .6, # @Gallet
+                 max_regen = -100000, # Watts,Approximation
+                 cell_ocv = 3.3, # Nominal LFP voltage for A123 26650 @A123_26650
+                 cell_res = .008, #ohms, cell internal resistance LFP A123 26650 @A123_25550
                  module_struct = (12, 8),# Series, parallel config for a module of cells
                  bus_struct = (16, 1), # Series, parallel config for the modules of the bus
-                 cell_cap = 2.3 # Ah, nominal cell capacity https://www.buya123products.com/uploads/vipcase/844c1bd8bdd1190ebb364d572bc1e6e7.pdf
+                 cell_cap = 2.3 # Ah, nominal cell capacity @A123_26650
                 ):
         self.Em = motor_eff
         self.Ei = inverter_eff
@@ -260,19 +260,19 @@ def load_ESS_params(filepath):
         
 class Trip:
     def __init__(self,
-                 pass_mass = 70, # kg
+                 pass_mass = 70, # kg Approximation
                  limit_MOE = 4.47, #m/s, or 10 mph <- Custom
-                 signal_rest = 65/2, # s, based on https://wsdot.wa.gov/travel/operations-services/traffic-signals
-                 signal_chance=.541666,
-                 stop_rest = 7, # seconds per passenger boarding
-                 sign_rest = 7, # guess.
-                 end_rest = 10, # seconds, doesn't need to be precise.
+                 signal_rest = 65/2, # s, based on @WSDOT_Signals
+                 signal_chance=.541666, # Approximation
+                 stop_rest = 7, # seconds per passenger boarding, Approximation
+                 sign_rest = 7, # Approximation
+                 end_rest = 10, # seconds before engine shutdown/startup - Approxiamaiton
                  air_density = 1.2 , # kg/m^3, approximate at 20 deg C.
-                 wind_speed = 1.78, # m/s, typical for seattle per  https://weatherspark.com/y/913/Average-Weather-in-Seattle-Washington-United-States-Year-Round
-                 wind_heading = 'SE', #per https://weatherspark.com/y/913/Average-Weather-in-Seattle-Washington-United-States-Year-Round
-                 temperature = 12.788, #deg C, per https://weatherspark.com/y/913/Average-Weather-in-Seattle-Washington-United-States-Year-Round 
-                 interp_length = 10, # meters, guess. 
-                 mean_ridership = 3.5, # People. Back of napkin. 
+                 wind_speed = 1.78, # m/s, typical for seattle @Weatherspark_Seattle
+                 wind_heading = 'SE', #per @Weatherspark_Seattle
+                 temperature = 12.788, #deg C, @Weatherspark_Seattle
+                 interp_length = 10, # meters, Approximation
+                 mean_ridership = 3.5, # People. Approximate average value across all trips. Not Accurate. 
                  seed = 42, # random seed
                  lg=43, #savgol param
                  deg = 3, #savgol param
