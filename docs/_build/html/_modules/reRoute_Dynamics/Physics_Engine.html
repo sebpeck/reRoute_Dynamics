@@ -1,0 +1,687 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reRoute_Dynamics.Physics_Engine &mdash; reRoute_Dynamics 25w16a documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d146563a"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            reRoute_Dynamics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">reRoute_Dynamics_Core</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">reRoute_Dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">reRoute_Dynamics.Physics_Engine</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for reRoute_Dynamics.Physics_Engine</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Physics_Engine.py</span>
+<span class="sd">S. Peck</span>
+
+<span class="sd">Physics_Engine.py contains methods used in the calculation of energy, speed changes, and time</span>
+<span class="sd">for a bus object based on external conditions, using a Longitudinal Dynamic Model. </span>
+
+<span class="sd">Methods:</span>
+<span class="sd">calculate_wind_force() - method for determining the force that wind exerts on a moving vehicle.</span>
+<span class="sd">sign() - method to get what sign (positive or negative) a number is</span>
+<span class="sd">calculate_grade_froce() - method for determining the force that the road exerts on a moving vehicle.</span>
+<span class="sd">get_braking_distance() - method to calculate the distance it will take a vehicle to stop at its current conditions.</span>
+<span class="sd">brake() - method that determines the final velocity, power use, and time change to brake a vehicle for a distance.</span>
+<span class="sd">maintain() - method that determines the final velocity, power use, and time change to maintain a vehicle&#39;s speed.</span>
+<span class="sd">accelerate() - method to determine the final velocity, power use, and time change to accelerate a vehicle with a given profile.</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">Geography_Tools</span> <span class="k">as</span> <span class="n">gt</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;../src/reRoute_Dynamics/&quot;</span><span class="p">))</span>
+<span class="n">A_PROF_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;../Examples/KC_Example_Data/Acceleration_Profiles/Braunschweig_Acceleration.csv&#39;</span><span class="p">)</span>
+
+<span class="n">DEFAULT_AIR_DENSITY</span> <span class="o">=</span> <span class="mf">1.2</span> <span class="c1">#kg/m^3, approximate of 20 deg C.</span>
+<span class="n">DEFAULT_WIND_SPEED</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1">#m/s Typical for seattle</span>
+<span class="n">DEFAULT_WIND_BEARING</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">heading_to_angle</span><span class="p">(</span><span class="s1">&#39;SE&#39;</span><span class="p">)</span> <span class="c1"># Typical for seattle</span>
+<span class="n">DEFAULT_DRAG_COEFF</span> <span class="o">=</span> <span class="mf">0.6</span> <span class="c1"># From Aggregate,@Abdelaty_Mohamed</span>
+<span class="n">DEFAULT_FRONTAL_AREA</span> <span class="o">=</span> <span class="mf">2.6</span> <span class="o">*</span> <span class="mf">3.3</span> <span class="c1"># meters, width times height @NF_Xcelsior</span>
+
+<span class="n">DEFAULT_COEFF_F</span> <span class="o">=</span> <span class="mf">.01</span> <span class="c1"># @Abdelaty_Mohamed</span>
+
+<span class="n">DEFAULT_BR_ACCEL</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="c1">#m/s^2 @APTA_Braking_Standards</span>
+<span class="n">DEFAULT_BR_FACTOR</span> <span class="o">=</span> <span class="mf">.5</span> <span class="c1"># Half of braking accel.</span>
+<span class="n">DEFAULT_I_FACTOR</span> <span class="o">=</span> <span class="mf">1.1</span> <span class="c1"># intertial factor, @Asamer_Et_Al</span>
+<span class="n">DEFAULT_MAX_DIST</span> <span class="o">=</span> <span class="mf">304.8</span> <span class="c1"># meters, approx based on offramp length for I-5</span>
+
+<span class="n">DEFAULT_MAX_POWER</span> <span class="o">=</span> <span class="mi">160000</span> <span class="c1"># Watts, Approximation</span>
+
+
+<span class="n">DEFAULT_A_PROF</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">A_PROF_PATH</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="c1"># Default acceleration profile. @NREL_Drive_Cycles</span>
+<span class="n">DEFAULT_A_PROF</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_A_PROF</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="mf">9.81</span><span class="p">)</span>
+<span class="n">DEFAULT_MAX_ACC</span> <span class="o">=</span> <span class="mf">.4</span> <span class="c1">#m/s^2 the asymptotic acceleration a profile will achieve.</span>
+<span class="n">DEFAULT_MAX_DT</span> <span class="o">=</span> <span class="mf">.5</span> <span class="c1">#second, the timestep in the profile corresponding to the max acceleration.</span>
+
+
+
+<div class="viewcode-block" id="calculate_wind_force">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Physics_Engine.calculate_wind_force">[docs]</a>
+<span class="k">def</span> <span class="nf">calculate_wind_force</span><span class="p">(</span><span class="n">bearing</span><span class="p">,</span>
+                         <span class="n">speed</span><span class="p">,</span>
+                         <span class="n">wind_bearing</span> <span class="o">=</span> <span class="n">DEFAULT_WIND_BEARING</span><span class="p">,</span>
+                         <span class="n">wind_speed</span> <span class="o">=</span> <span class="n">DEFAULT_WIND_SPEED</span><span class="p">,</span>
+                         <span class="n">air_density</span> <span class="o">=</span> <span class="n">DEFAULT_AIR_DENSITY</span><span class="p">,</span>
+                         <span class="n">drag_coeff</span> <span class="o">=</span> <span class="n">DEFAULT_DRAG_COEFF</span><span class="p">,</span>
+                         <span class="n">frontal_area</span> <span class="o">=</span> <span class="n">DEFAULT_FRONTAL_AREA</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    calculate_wind_force() is used to calculate the force exerted against</span>
+<span class="sd">    the bus&#39;s direction of travel by the wind.</span>
+<span class="sd">    </span>
+<span class="sd">    Params:</span>
+<span class="sd">    bearing - compass heading, in degrees (float), the bus is travelling in.</span>
+<span class="sd">    speed - current bus velocity. (float)</span>
+<span class="sd">    wind_bearing - compass heading, in degrees (float), the wind is in. Default of SE directon</span>
+<span class="sd">    wind_speed - current wind velocity in its direction of travel. (float) Default of 4 m/s</span>
+<span class="sd">    air_density - current air density. (float), default 1.2 kg/m^3</span>
+<span class="sd">    drag_coeff - drag coefficient of the bus. (float), default .6.</span>
+<span class="sd">    frontal_area - frontal area of bus.  (float), default 2.6*3.3 m^2</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    float representation of force exerted against bus&#39;s direction</span>
+<span class="sd">    of travel. Negative means the bus is being accelerated by the wind.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="c1"># convert bearing to angle between -180 and 180:</span>
+    <span class="n">centered_bearing</span> <span class="o">=</span> <span class="n">bearing</span> <span class="o">-</span> <span class="mi">180</span>
+    <span class="n">centered_wind_bearing</span> <span class="o">=</span> <span class="n">wind_bearing</span> <span class="o">-</span> <span class="mi">180</span>
+    
+    <span class="c1"># get wind angle relative to bus:</span>
+    <span class="n">relative_wind_angle</span> <span class="o">=</span> <span class="n">centered_wind_bearing</span> <span class="o">-</span> <span class="n">centered_bearing</span>
+    
+    <span class="c1"># get velocity of wind relative to bus:</span>
+    <span class="n">relative_wind_v</span> <span class="o">=</span> <span class="o">-</span><span class="n">wind_speed</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">relative_wind_angle</span><span class="p">))</span>
+    
+    <span class="n">air_force</span> <span class="o">=</span> <span class="n">sign</span><span class="p">(</span><span class="n">relative_wind_v</span><span class="p">)</span><span class="o">*</span><span class="n">drag_coeff</span><span class="o">*</span><span class="n">frontal_area</span><span class="o">*</span><span class="n">air_density</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">speed</span> <span class="o">-</span> <span class="n">relative_wind_v</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    
+    <span class="k">return</span> <span class="n">air_force</span></div>
+
+
+
+<div class="viewcode-block" id="sign">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Physics_Engine.sign">[docs]</a>
+<span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    sign checks the sign of a number.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">num</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span></div>
+
+
+    
+<div class="viewcode-block" id="calculate_grade_force">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Physics_Engine.calculate_grade_force">[docs]</a>
+<span class="k">def</span> <span class="nf">calculate_grade_force</span><span class="p">(</span><span class="n">grade</span><span class="p">,</span> <span class="n">mass</span><span class="p">,</span> <span class="n">f_coeff</span><span class="o">=</span><span class="n">DEFAULT_COEFF_F</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    calculate_grade_force takes a grade of a slope, a mass, and friction</span>
+<span class="sd">    coefficient, and calculates the force due to gravity against the direction of</span>
+<span class="sd">    travel of the mass. Negative value means the object is being accelerated, </span>
+<span class="sd">    rather than decellerated.</span>
+<span class="sd">    </span>
+<span class="sd">    Params:</span>
+<span class="sd">    grade - grade angle of a point, as a percent float.</span>
+<span class="sd">    mass - mass of object as a float, in kg</span>
+<span class="sd">    f_coeff - the coefficient of friction. default .01.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    net force due to gravity as float, in Newtons</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="c1"># get the angle of the grade</span>
+    <span class="n">grade_angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">grade</span><span class="o">/</span><span class="mi">100</span><span class="p">)</span>
+    
+    <span class="c1"># calculate the hill force</span>
+    <span class="n">hill_force</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">grade_angle</span><span class="p">)</span> <span class="o">*</span> <span class="mf">9.81</span> <span class="o">*</span> <span class="n">mass</span>
+    
+    <span class="c1"># calculate the frictional force (always positive and opposing direction of travel)</span>
+    <span class="n">fric_force</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">grade_angle</span><span class="p">)</span> <span class="o">*</span> <span class="mf">9.81</span> <span class="o">*</span> <span class="n">mass</span> <span class="o">*</span> <span class="n">f_coeff</span>
+    
+    <span class="c1"># return the net force on the object at that point.</span>
+    <span class="k">return</span> <span class="n">hill_force</span> <span class="o">+</span> <span class="n">fric_force</span></div>
+
+
+
+<div class="viewcode-block" id="get_braking_distance">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Physics_Engine.get_braking_distance">[docs]</a>
+<span class="k">def</span> <span class="nf">get_braking_distance</span><span class="p">(</span><span class="n">velocity</span><span class="p">,</span>
+                         <span class="n">mass</span><span class="p">,</span>
+                         <span class="n">grade_force</span><span class="p">,</span>
+                         <span class="n">wind_force</span><span class="p">,</span>
+                         <span class="n">braking_acceleration</span> <span class="o">=</span> <span class="n">DEFAULT_BR_ACCEL</span><span class="p">,</span>
+                         <span class="n">braking_factor</span> <span class="o">=</span> <span class="n">DEFAULT_BR_FACTOR</span><span class="p">,</span>
+                         <span class="n">inertial_factor</span> <span class="o">=</span> <span class="n">DEFAULT_I_FACTOR</span><span class="p">,</span>
+                         <span class="n">max_distance</span> <span class="o">=</span> <span class="n">DEFAULT_MAX_DIST</span>
+                         <span class="p">):</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    get_braking_distance() is used to determine how far an object needs to stop.</span>
+<span class="sd">    </span>
+<span class="sd">    Params:</span>
+<span class="sd">    velocity - object&#39;s initial velocity as a float, in m/s.</span>
+<span class="sd">    mass - mass of the object in kg.</span>
+<span class="sd">    grade_force - force, in N, due to the grade of the slope the object experiences.</span>
+<span class="sd">    wind_force - force, in N, experienced by the object due to wind resistance.</span>
+<span class="sd">    braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2</span>
+<span class="sd">    braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.</span>
+<span class="sd">    inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1</span>
+<span class="sd">    max_distance - float representing the ideal maximum distance the bust takes to stop. Default 304.8 m.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    a dict containing braking distance dx, braking factor bf, and decelleration rate ad.</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># in other words, the force being applied against the bus&#39;s direction of travel before braking</span>
+    <span class="n">net_external_force</span> <span class="o">=</span> <span class="n">grade_force</span> <span class="o">+</span> <span class="n">wind_force</span> <span class="c1"># positive means decellerating the bus.</span>
+    
+    <span class="c1"># calculate an initial pass of decelleration</span>
+    <span class="n">rate_decell</span> <span class="o">=</span> <span class="p">(</span><span class="n">braking_acceleration</span><span class="o">*</span><span class="n">braking_factor</span><span class="o">*</span><span class="n">inertial_factor</span><span class="p">)</span> <span class="o">+</span> <span class="n">net_external_force</span><span class="o">/</span><span class="n">mass</span>
+    
+    <span class="c1"># check if the current deceleration rate is higher than the &#39;maximum that&#39;s expected&#39;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">rate_decell</span> <span class="o">&gt;</span> <span class="n">braking_acceleration</span><span class="o">*</span><span class="n">inertial_factor</span><span class="p">)</span> <span class="ow">and</span> <span class="n">braking_factor</span> <span class="o">&gt;</span> <span class="mf">0.01</span><span class="p">:</span>
+        <span class="c1"># reduce braking factor</span>
+        <span class="n">braking_factor</span> <span class="o">-=</span> <span class="mf">.0001</span>
+        
+        <span class="c1"># recalculate the decelleration</span>
+        <span class="n">rate_decell</span> <span class="o">=</span> <span class="p">(</span><span class="n">braking_acceleration</span><span class="o">*</span><span class="n">braking_factor</span><span class="o">*</span><span class="n">inertial_factor</span><span class="p">)</span> <span class="o">+</span> <span class="n">net_external_force</span><span class="o">/</span><span class="n">mass</span>
+    
+    
+    <span class="c1"># Check to make sure the object is actually decelerating to be able to stop over the max distance.</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="n">braking_factor</span><span class="o">&lt;</span><span class="mf">1.001</span><span class="p">)</span> <span class="ow">and</span> <span class="n">rate_decell</span> <span class="o">&lt;</span> <span class="n">velocity</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">max_distance</span><span class="p">):</span>
+        
+        <span class="c1"># if it isn&#39;t, up the braking factor.</span>
+        <span class="n">braking_factor</span> <span class="o">+=</span> <span class="mf">.0001</span>
+        
+        <span class="c1"># update the rate of deceleration.</span>
+        <span class="n">rate_decell</span> <span class="o">=</span> <span class="p">(</span><span class="n">braking_acceleration</span><span class="o">*</span><span class="n">braking_factor</span><span class="o">*</span><span class="n">inertial_factor</span><span class="p">)</span> <span class="o">+</span> <span class="n">net_external_force</span><span class="o">/</span><span class="n">mass</span>
+
+            
+    <span class="c1"># calculate the braking distance.</span>
+    <span class="n">braking_dist</span> <span class="o">=</span> <span class="n">velocity</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">rate_decell</span><span class="p">)</span>
+    <span class="c1">#if braking_dist&lt;0:</span>
+        <span class="c1">#print(velocity, mass, grade_force, wind_force, braking_acceleration, braking_factor, inertial_factor, max_distance)</span>
+    <span class="c1"># return the braking distance.</span>
+    
+    <span class="c1">#print(&#39;test&#39;)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;dx&#39;</span><span class="p">:</span><span class="n">braking_dist</span><span class="p">,</span> <span class="s1">&#39;bf&#39;</span><span class="p">:</span><span class="n">braking_factor</span><span class="p">,</span> <span class="s1">&#39;ad&#39;</span><span class="p">:</span><span class="n">rate_decell</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="brake">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Physics_Engine.brake">[docs]</a>
+<span class="k">def</span> <span class="nf">brake</span><span class="p">(</span><span class="n">velocity</span><span class="p">,</span>
+          <span class="n">mass</span><span class="p">,</span>
+          <span class="n">travel_distance</span><span class="p">,</span>
+          <span class="n">grade_force</span><span class="p">,</span>
+          <span class="n">wind_force</span><span class="p">,</span>
+          <span class="n">braking_acceleration</span> <span class="o">=</span> <span class="n">DEFAULT_BR_ACCEL</span><span class="p">,</span>
+          <span class="n">braking_factor</span> <span class="o">=</span> <span class="n">DEFAULT_BR_FACTOR</span><span class="p">,</span>
+          <span class="n">inertial_factor</span> <span class="o">=</span> <span class="n">DEFAULT_I_FACTOR</span><span class="p">,</span>
+          <span class="n">max_distance</span> <span class="o">=</span> <span class="n">DEFAULT_MAX_DIST</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    brake() is used to determine the velocity change, time change, and power consumption of braking</span>
+<span class="sd">    a mass at a given velocity over a set distance.</span>
+<span class="sd">    </span>
+<span class="sd">    Params:</span>
+<span class="sd">    velocity - object&#39;s initial velocity as a float, in m/s.</span>
+<span class="sd">    mass - mass of the object in kg.</span>
+<span class="sd">    travel_distance - distance to brake over, in meters.</span>
+<span class="sd">    grade_force - force, in N, due to the grade of the slope the object experiences.</span>
+<span class="sd">    wind_force - force, in N, experienced by the object due to wind resistance.</span>
+<span class="sd">    braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2</span>
+<span class="sd">    braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.</span>
+<span class="sd">    inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1</span>
+<span class="sd">    max_distance - float representing the ideal maximum distance the bust takes to stop. Default 304.8 m. **UNUSED**</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    a dict containing final velocity v_f, time change dt, power P, and braking factor bf.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">vf</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="mi">99999</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="mi">99999</span>
+    <span class="n">bf</span> <span class="o">=</span> <span class="n">braking_factor</span>
+    
+    <span class="k">if</span> <span class="n">velocity</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+
+        <span class="c1"># initial rate of deceleration</span>
+        <span class="n">rate_decell</span> <span class="o">=</span> <span class="p">(</span><span class="n">braking_acceleration</span> <span class="o">*</span> <span class="n">inertial_factor</span> <span class="o">*</span> <span class="n">braking_factor</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">grade_force</span> <span class="o">+</span> <span class="n">wind_force</span><span class="p">)</span><span class="o">/</span><span class="n">mass</span>
+        <span class="c1"># first pass for vf</span>
+        <span class="n">pre_root</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">rate_decell</span><span class="o">*</span><span class="n">travel_distance</span> <span class="o">+</span> <span class="n">velocity</span><span class="o">**</span><span class="mi">2</span>
+
+        <span class="k">if</span> <span class="n">pre_root</span> <span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">vf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="n">rate_decell</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">travel_distance</span><span class="o">+</span><span class="p">(</span><span class="n">velocity</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vf</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># calculate time</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">velocity</span><span class="o">-</span><span class="n">vf</span><span class="p">)</span><span class="o">/</span><span class="n">rate_decell</span>
+
+        <span class="c1"># use the bus&#39;s acceleration without externalities to calculate power needed</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">mass</span><span class="o">*-</span><span class="p">(</span><span class="n">braking_acceleration</span> <span class="o">*</span> <span class="n">inertial_factor</span> <span class="o">*</span> <span class="n">braking_factor</span><span class="p">)</span><span class="o">*</span><span class="n">travel_distance</span><span class="o">/</span><span class="n">t</span>
+
+        <span class="c1"># Check if velocity is 0 to re-do the power</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">P</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">vf</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># create a dict of results</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;v_f&#39;</span><span class="p">:</span><span class="n">vf</span><span class="p">,</span>
+               <span class="s1">&#39;dt&#39;</span><span class="p">:</span><span class="n">t</span><span class="p">,</span>
+               <span class="s1">&#39;P&#39;</span><span class="p">:</span><span class="n">P</span><span class="p">,</span>
+               <span class="s1">&#39;bf&#39;</span><span class="p">:</span><span class="n">braking_factor</span><span class="p">}</span>
+    
+    <span class="c1"># return the results</span>
+    <span class="k">return</span> <span class="n">results</span></div>
+
+        
+
+<div class="viewcode-block" id="maintain">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Physics_Engine.maintain">[docs]</a>
+<span class="k">def</span> <span class="nf">maintain</span><span class="p">(</span><span class="n">velocity</span><span class="p">,</span>
+             <span class="n">mass</span><span class="p">,</span>
+             <span class="n">travel_distance</span><span class="p">,</span>
+             <span class="n">grade_force</span><span class="p">,</span>
+             <span class="n">wind_force</span><span class="p">,</span>
+             <span class="n">braking_acceleration</span> <span class="o">=</span> <span class="n">DEFAULT_BR_ACCEL</span><span class="p">,</span>
+             <span class="n">braking_factor</span> <span class="o">=</span> <span class="n">DEFAULT_BR_FACTOR</span><span class="p">,</span>
+             <span class="n">inertial_factor</span> <span class="o">=</span> <span class="n">DEFAULT_I_FACTOR</span><span class="p">,</span>
+             <span class="n">max_power</span> <span class="o">=</span> <span class="n">DEFAULT_MAX_POWER</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    maintain() is used to determine the velocity change, time change, and power consumption of maintaining</span>
+<span class="sd">    a mass at a given velocity over a set distance.</span>
+<span class="sd">    </span>
+<span class="sd">    Params:</span>
+<span class="sd">    velocity - object&#39;s initial velocity as a float, in m/s.</span>
+<span class="sd">    mass - mass of the object in kg.</span>
+<span class="sd">    travel_distance - distance to brake over, in meters.</span>
+<span class="sd">    grade_force - force, in N, due to the grade of the slope the object experiences.</span>
+<span class="sd">    wind_force - force, in N, experienced by the object due to wind resistance.</span>
+<span class="sd">    braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2</span>
+<span class="sd">    braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.</span>
+<span class="sd">    inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1</span>
+<span class="sd">    max_power - float representing the maximum motor power. Default 160000 W.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    a dict containing final velocity v_f, time change dt, and power P.</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="c1"># Calculate the counter-acceleration to counteract all external forces</span>
+    <span class="n">a_counter</span> <span class="o">=</span> <span class="p">(</span><span class="n">grade_force</span> <span class="o">+</span> <span class="n">wind_force</span><span class="p">)</span><span class="o">/</span><span class="n">mass</span>
+    
+    <span class="c1"># set variables</span>
+    <span class="n">P_max</span> <span class="o">=</span> <span class="n">max_power</span>
+    
+    <span class="c1"># Current power is the power needed to counteract all external forces</span>
+    <span class="n">P_current</span> <span class="o">=</span> <span class="n">mass</span><span class="o">*</span><span class="n">a_counter</span><span class="o">*</span><span class="n">velocity</span>
+    
+    <span class="c1"># P_brake_max is the maximum power the bus can output from braking</span>
+    <span class="n">P_brake_max</span> <span class="o">=</span> <span class="o">-</span><span class="n">mass</span><span class="o">*</span><span class="n">velocity</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">*</span><span class="n">braking_acceleration</span><span class="o">*</span><span class="n">inertial_factor</span><span class="p">)</span>
+    
+    <span class="c1"># others</span>
+    <span class="n">v_f</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">v_i</span> <span class="o">=</span> <span class="n">velocity</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">mass</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">travel_distance</span>
+    <span class="k">if</span> <span class="n">v_i</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Check if there is enough motor power</span>
+        <span class="c1">#print(P_max, P_current, P_brake_max)</span>
+        <span class="k">if</span> <span class="n">P_max</span> <span class="o">&gt;=</span> <span class="n">P_current</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1">#print(&quot;Enough motor power&quot;)</span>
+            <span class="n">v_f</span> <span class="o">=</span> <span class="n">v_i</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">dx</span><span class="o">/</span><span class="n">v_f</span>
+            <span class="n">P</span> <span class="o">=</span> <span class="n">P_current</span>
+
+        <span class="c1"># Check if there isn&#39;t enough motor power to overcome.</span>
+        <span class="k">elif</span> <span class="n">P_current</span> <span class="o">&gt;</span> <span class="n">P_max</span><span class="p">:</span>
+            <span class="c1">#print(&quot;Not enough motor power&quot;)</span>
+            <span class="n">da</span> <span class="o">=</span> <span class="p">(</span><span class="n">P_current</span> <span class="o">-</span> <span class="n">P_max</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">m</span><span class="o">*</span><span class="n">v_i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">v_i</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">dx</span><span class="o">*</span><span class="n">da</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">v_f</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">v_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">v_i</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">dx</span><span class="o">*</span><span class="n">da</span><span class="p">)</span>
+            <span class="n">P</span> <span class="o">=</span> <span class="n">P_max</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="p">(</span><span class="n">v_i</span> <span class="o">-</span> <span class="n">v_f</span><span class="p">)</span> <span class="o">/</span> <span class="n">da</span>
+
+        <span class="c1"># Check if there&#39;s enough braking power to overcome.</span>
+        <span class="k">elif</span> <span class="mi">0</span> <span class="o">&gt;=</span> <span class="n">P_current</span> <span class="o">&gt;</span> <span class="n">P_brake_max</span><span class="p">:</span>
+            <span class="c1">#print(&quot;Enough braking power&quot;)</span>
+            <span class="n">v_f</span> <span class="o">=</span> <span class="n">v_i</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">dx</span><span class="o">/</span><span class="n">v_f</span>
+            <span class="n">P</span><span class="o">=</span><span class="n">P_current</span>
+
+
+        <span class="c1"># Check if there&#39;s not enough braking power to overcome.</span>
+        <span class="k">elif</span> <span class="n">P_brake_max</span> <span class="o">&gt;=</span> <span class="n">P_current</span><span class="p">:</span>
+            <span class="c1">#print(&quot;Not enough braking power&quot;)</span>
+            <span class="c1"># this is somehow either giving netative time or the acceleration is wrong - 1/10/2025</span>
+            <span class="n">da</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">P_current</span><span class="o">-</span><span class="n">P_brake_max</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">m</span><span class="o">*</span><span class="n">v_i</span><span class="p">)</span>
+            <span class="n">v_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">v_i</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">dx</span><span class="o">*</span><span class="n">da</span><span class="p">)</span>
+            <span class="n">P</span> <span class="o">=</span> <span class="n">P_brake_max</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="p">(</span><span class="n">v_f</span> <span class="o">-</span> <span class="n">v_i</span><span class="p">)</span> <span class="o">/</span> <span class="n">da</span>
+
+
+
+        <span class="c1"># Otherwise, error time!</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You shouldn&#39;t be here&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mass </span><span class="si">{}</span><span class="s1">, a_counter </span><span class="si">{}</span><span class="s1">, velocity </span><span class="si">{}</span><span class="s1">, braking_Factor </span><span class="si">{}</span><span class="s1">, braking_accel </span><span class="si">{}</span><span class="s1">, i_factor </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="n">a_counter</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">braking_factor</span><span class="p">,</span> <span class="n">braking_acceleration</span><span class="p">,</span> <span class="n">inertial_factor</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pmax </span><span class="si">{}</span><span class="s2">, pcurrent </span><span class="si">{}</span><span class="s2">, pmin </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">P_max</span><span class="p">,</span> <span class="n">P_current</span><span class="p">,</span> <span class="n">P_brake_max</span><span class="p">))</span>
+
+        <span class="c1"># turn the results into a dict</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">v_f</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;v_f&#39;</span><span class="p">:</span><span class="n">v_f</span><span class="p">,</span>
+               <span class="s1">&#39;dt&#39;</span><span class="p">:</span><span class="n">dt</span><span class="p">,</span>
+               <span class="s1">&#39;P&#39;</span><span class="p">:</span><span class="n">P</span><span class="p">}</span>
+
+    
+    <span class="c1"># return the results</span>
+    <span class="k">return</span> <span class="n">results</span></div>
+
+
+
+
+<div class="viewcode-block" id="accelerate">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Physics_Engine.accelerate">[docs]</a>
+<span class="k">def</span> <span class="nf">accelerate</span><span class="p">(</span><span class="n">velocity</span><span class="p">,</span>
+               <span class="n">mass</span><span class="p">,</span>
+               <span class="n">travel_distance</span><span class="p">,</span>
+               <span class="n">grade_force</span><span class="p">,</span>
+               <span class="n">wind_force</span><span class="p">,</span>
+               <span class="n">raw_a_prof</span> <span class="o">=</span> <span class="n">DEFAULT_A_PROF</span><span class="p">,</span>
+               <span class="n">braking_acceleration</span> <span class="o">=</span> <span class="n">DEFAULT_BR_ACCEL</span><span class="p">,</span>
+               <span class="n">braking_factor</span> <span class="o">=</span> <span class="n">DEFAULT_BR_FACTOR</span><span class="p">,</span>
+               <span class="n">inertial_factor</span> <span class="o">=</span> <span class="n">DEFAULT_I_FACTOR</span><span class="p">,</span>
+               <span class="n">max_power</span> <span class="o">=</span> <span class="n">DEFAULT_MAX_POWER</span><span class="p">,</span>
+               <span class="n">max_acc</span> <span class="o">=</span> <span class="n">DEFAULT_MAX_ACC</span><span class="p">,</span> <span class="c1"># Depricated</span>
+               <span class="n">max_timestep</span> <span class="o">=</span> <span class="n">DEFAULT_MAX_DT</span><span class="p">):</span> <span class="c1"># Depricated</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    accelerate() is used to determine the velocity change, time change, and power consumption of accelerating</span>
+<span class="sd">    a mass at a given velocity over a set distance, with a given acceleration profile.</span>
+<span class="sd">    </span>
+<span class="sd">    Params:</span>
+<span class="sd">    velocity - object&#39;s initial velocity as a float, in m/s.</span>
+<span class="sd">    mass - mass of the object in kg.</span>
+<span class="sd">    travel_distance - distance to brake over, in meters.</span>
+<span class="sd">    grade_force - force, in N, due to the grade of the slope the object experiences.</span>
+<span class="sd">    wind_force - force, in N, experienced by the object due to wind resistance.</span>
+<span class="sd">    raw_a_prof - an acceleration profile, with the 0 index column being cumulative time, and the 1 being acceleration at that time (in m/s^2)</span>
+<span class="sd">    braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2</span>
+<span class="sd">    braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.</span>
+<span class="sd">    inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1</span>
+<span class="sd">    max_power - float representing the maximum motor power. Default 160000 W.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    a dict containing final velocity v_f, time change dt, and power P.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="n">a_counter</span> <span class="o">=</span> <span class="p">(</span><span class="n">grade_force</span> <span class="o">+</span> <span class="n">wind_force</span><span class="p">)</span><span class="o">/</span><span class="n">mass</span>
+    <span class="c1">#print(a_counter)</span>
+    
+    <span class="c1"># set variables to adjust later.</span>
+    <span class="n">P_max</span> <span class="o">=</span> <span class="n">max_power</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">v_f</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">a_max</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="c1"># Assume the bus can always start up. If the velocity is 0,</span>
+    <span class="k">if</span> <span class="n">velocity</span> <span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        
+        <span class="c1"># get the maximum acceleration as the first value + enough to counter.</span>
+        <span class="n">a_max</span> <span class="o">=</span> <span class="n">a_counter</span> <span class="o">+</span> <span class="n">raw_a_prof</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="c1"># while the power is greater than the max power, reduce the max acceleration</span>
+        <span class="k">while</span> <span class="n">a_max</span><span class="o">*</span><span class="n">mass</span><span class="o">*</span><span class="n">travel_distance</span><span class="o">/</span><span class="n">max_timestep</span> <span class="o">&gt;</span> <span class="n">P_max</span><span class="p">:</span>
+            <span class="n">a_max</span> <span class="o">-=</span> <span class="mf">.0001</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Otherwise, set the max acceleration based on max power.</span>
+        <span class="n">a_max</span> <span class="o">=</span> <span class="n">P_max</span><span class="o">/</span><span class="p">(</span><span class="n">mass</span><span class="o">*</span><span class="n">velocity</span><span class="p">)</span>
+    
+
+    <span class="n">a_prof</span> <span class="o">=</span> <span class="n">raw_a_prof</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1">#Convert the acceleration to needed acceleration.</span>
+    <span class="n">needed_a</span> <span class="o">=</span> <span class="n">a_prof</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">a_counter</span><span class="p">)</span><span class="o">*</span><span class="n">inertial_factor</span><span class="p">)</span>
+    
+    <span class="c1"># convert times to time steps</span>
+    <span class="n">a_prof</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">a_prof</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">a_prof</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">a_prof</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_timestep</span>
+    
+
+    <span class="c1"># get the regulator velocities</span>
+    <span class="n">reg_vel</span> <span class="o">=</span> <span class="p">(</span><span class="n">a_prof</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">a_prof</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+    
+    <span class="c1"># using the regulator velocities, get the starting index:</span>
+    <span class="n">starting_index</span><span class="o">=</span><span class="p">(</span><span class="n">reg_vel</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">velocity</span><span class="p">))</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="c1"># P = m*a_engine*(v+dt*a_engine)</span>
+    <span class="n">powers</span> <span class="o">=</span> <span class="n">mass</span><span class="o">*</span><span class="n">needed_a</span><span class="o">*</span><span class="p">(</span><span class="n">velocity</span> <span class="o">+</span> <span class="n">a_prof</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">needed_a</span><span class="p">)</span>
+    <span class="c1">#powers = powers.clip(0, P_max)</span>
+    <span class="n">powers</span> <span class="o">=</span> <span class="n">powers</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">P_max</span><span class="o">&gt;</span><span class="n">x</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">P_max</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">&gt;</span><span class="n">P_max</span><span class="p">))</span>
+    
+    <span class="c1"># Quadratic formula to solve for possible a from power equation</span>
+    <span class="n">possible_a</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">velocity</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">velocity</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">a_prof</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">powers</span><span class="o">/</span><span class="n">mass</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a_prof</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">possible_a</span> <span class="o">=</span> <span class="n">possible_a</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">possible_a</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="c1"># USE THIS FOR CALCULATING POWER</span>
+    
+    <span class="c1"># a_net = a_engine/f_i - a_counter</span>
+    <span class="n">true_a</span> <span class="o">=</span> <span class="n">possible_a</span><span class="o">/</span><span class="n">inertial_factor</span> <span class="o">-</span> <span class="n">a_counter</span> <span class="c1"># USE THIS FOR CALCULATING TIME AND DISTANCE AND VELOCITY</span>
+    <span class="n">clipped_true_a</span> <span class="o">=</span> <span class="n">true_a</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="c1"># dv = a * dt</span>
+    <span class="n">vels</span> <span class="o">=</span> <span class="n">clipped_true_a</span> <span class="o">*</span> <span class="n">a_prof</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Create a profile dataframe using the existing data so as to index through it. </span>
+    <span class="n">a_prof</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">a_prof</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">possible_a</span><span class="p">,</span> <span class="n">clipped_true_a</span><span class="p">,</span> <span class="n">powers</span><span class="p">,</span> <span class="n">vels</span><span class="p">,</span> <span class="p">(</span><span class="n">vels</span> <span class="o">*</span> <span class="n">a_prof</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">a_prof</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">,</span><span class="s1">&#39;int_a&#39;</span><span class="p">,</span><span class="s1">&#39;net_a&#39;</span><span class="p">,</span><span class="s1">&#39;power&#39;</span><span class="p">,</span> <span class="s1">&#39;dv&#39;</span><span class="p">,</span> <span class="s1">&#39;dx&#39;</span><span class="p">]</span>
+    <span class="n">a_prof</span><span class="p">[</span><span class="s1">&#39;cum_dv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">a_prof</span><span class="p">[</span><span class="s1">&#39;dv&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+    <span class="n">a_prof</span><span class="p">[</span><span class="s1">&#39;cum_dx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">a_prof</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+    <span class="n">a_prof</span><span class="p">[</span><span class="s1">&#39;cum_dx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">a_prof</span><span class="p">[</span><span class="s1">&#39;cum_dx&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">a_prof</span><span class="p">[</span><span class="s1">&#39;cum_dx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">starting_index</span><span class="p">]</span> <span class="o">-</span> <span class="n">travel_distance</span>
+    
+    <span class="c1"># Get the closest index to the end of the acceleration profile.</span>
+    
+    <span class="n">closest_end_index</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">a_prof</span><span class="p">[</span><span class="s1">&#39;cum_dx&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+    
+    <span class="c1">#Check if the starting and ending indexes are the same </span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">starting_index</span> <span class="o">==</span> <span class="n">closest_end_index</span><span class="p">):</span>
+        <span class="c1">#print(&#39;same&#39;)</span>
+        <span class="c1"># get the data from the index</span>
+        <span class="n">ea_prof</span> <span class="o">=</span> <span class="n">a_prof</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">starting_index</span><span class="p">]</span>
+        
+        <span class="c1"># Calculate final velocity</span>
+        <span class="n">v_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">travel_distance</span><span class="o">*</span><span class="n">ea_prof</span><span class="p">[</span><span class="s1">&#39;net_a&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">velocity</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        
+        <span class="c1"># Calculate change in time</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">velocity</span> <span class="o">-</span> <span class="n">v_f</span><span class="p">)</span> <span class="o">/</span> <span class="n">ea_prof</span><span class="p">[</span><span class="s1">&#39;net_a&#39;</span><span class="p">]</span>
+        
+        <span class="c1"># Calculate power.</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">mass</span><span class="o">*</span><span class="n">ea_prof</span><span class="p">[</span><span class="s1">&#39;int_a&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">travel_distance</span><span class="o">/</span><span class="n">dt</span>
+
+    <span class="c1"># if the forces are too hard to overcome, the starting index will</span>
+    <span class="c1"># be greater than the end index</span>
+    <span class="k">elif</span><span class="p">(</span><span class="n">starting_index</span> <span class="o">&gt;</span> <span class="n">closest_end_index</span><span class="p">):</span>
+        <span class="c1">#print(&#39;overforce&#39;)</span>
+        <span class="c1"># get the acceleration from the true net accels.</span>
+        <span class="n">a</span><span class="o">=</span><span class="n">true_a</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">starting_index</span><span class="p">]</span>
+        <span class="c1"># calculate the velocity</span>
+        <span class="n">v_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">travel_distance</span><span class="o">*</span><span class="n">a</span> <span class="o">+</span> <span class="n">velocity</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1">#print(travel_distance, a, velocity)</span>
+        
+        <span class="c1"># Calculate time change.</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">((</span><span class="n">velocity</span><span class="o">-</span><span class="n">v_f</span><span class="p">)</span><span class="o">/</span><span class="n">a</span><span class="p">)</span>
+        
+        <span class="c1"># use the max power.</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">P_max</span>
+    
+    <span class="c1"># otherwise, </span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># get the selection range of data</span>
+        <span class="n">ea_prof</span> <span class="o">=</span> <span class="n">a_prof</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">starting_index</span><span class="p">:</span><span class="n">closest_end_index</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1">#print(ea_prof)</span>
+        <span class="c1"># initialize the final velocity</span>
+        <span class="n">v_f</span> <span class="o">=</span> <span class="n">velocity</span>
+        
+        <span class="c1"># intialize the total energy</span>
+        <span class="n">en</span><span class="o">=</span><span class="mi">0</span>
+
+        <span class="c1"># iterate through the range and adjust the</span>
+        <span class="c1"># velocity, time, and energy accordingly</span>
+        <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">ea_prof</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="c1"># Calculate an initial pass of distance and velocity change</span>
+            <span class="n">step_dv</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dv&#39;</span><span class="p">]</span>
+            <span class="n">step_a</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;net_a&#39;</span><span class="p">]</span>
+            
+            <span class="c1"># Adjust the initial dv based on the regulated velocity2</span>
+            <span class="n">i_dv</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">col</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">i_dv</span> <span class="o">=</span> <span class="n">step_dv</span> <span class="o">-</span> <span class="p">(</span><span class="n">velocity</span><span class="o">-</span><span class="n">reg_vel</span><span class="p">[</span><span class="n">starting_index</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                 <span class="n">i_dv</span> <span class="o">=</span> <span class="n">step_dv</span>
+            
+            <span class="n">v_f_i</span> <span class="o">=</span> <span class="n">v_f</span> <span class="o">+</span> <span class="n">i_dv</span>
+            <span class="n">i_dx</span> <span class="o">=</span> <span class="mf">.5</span><span class="o">*</span><span class="p">(</span><span class="n">v_f_i</span> <span class="o">+</span> <span class="n">v_f_i</span><span class="o">-</span><span class="n">i_dv</span><span class="p">)</span><span class="o">*</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span><span class="c1"># &lt;--- Should this be dt or i_dt? </span>
+
+            <span class="c1"># if acceleration is zero, recalculate it based on the velocity change.</span>
+            <span class="k">if</span> <span class="n">step_a</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
+                <span class="n">step_a</span> <span class="o">=</span> <span class="n">i_dv</span><span class="o">/</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+
+            <span class="c1"># if the travel distance is less than using the whole next step of the profile,</span>
+            <span class="c1"># and if the travel distance is the same as the cumulative distance,</span>
+            <span class="k">if</span> <span class="n">i_dx</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">travel_distance</span><span class="o">-</span><span class="n">dx</span><span class="p">):</span>
+                
+                <span class="n">i_dx</span> <span class="o">=</span> <span class="n">travel_distance</span><span class="o">-</span><span class="n">dx</span>
+                
+                <span class="c1"># back-calculate the time, velocity, distance, and energy change</span>
+                <span class="c1"># starting with the quadratic formula from the kinematic eqn</span>
+                <span class="c1"># for time without final velocity.</span>
+
+                <span class="n">i_dt</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">v_f</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">v_f</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">i_dx</span><span class="o">*</span><span class="n">step_a</span><span class="p">))</span><span class="o">/</span><span class="n">step_a</span>
+
+                <span class="c1"># Calculate the cumulative values</span>
+                <span class="n">v_f</span> <span class="o">=</span> <span class="n">i_dx</span><span class="o">/</span><span class="n">i_dt</span>
+                <span class="n">en</span> <span class="o">+=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;power&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">i_dt</span>
+                <span class="n">dx</span> <span class="o">+=</span> <span class="n">i_dx</span>
+                <span class="n">dt</span> <span class="o">+=</span> <span class="n">i_dt</span>
+                <span class="k">break</span>
+            <span class="c1"># Otherwise, use the existing chane calues.</span>
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="n">v_f</span> <span class="o">=</span> <span class="n">v_f_i</span>
+                <span class="n">i_dt</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+                <span class="n">dt</span> <span class="o">+=</span> <span class="n">i_dt</span>
+                <span class="n">en</span> <span class="o">+=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;power&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">i_dt</span>
+                <span class="n">dx</span><span class="o">+=</span><span class="n">i_dx</span>
+                
+        <span class="c1"># calculate the power.</span>
+        <span class="c1">#print(en/dt, dx)</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">en</span><span class="o">/</span><span class="n">dt</span>
+        
+    <span class="c1"># Get the results.</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;v_f&#39;</span><span class="p">:</span><span class="n">v_f</span><span class="p">,</span>
+               <span class="s1">&#39;dt&#39;</span><span class="p">:</span><span class="n">dt</span><span class="p">,</span>
+               <span class="s1">&#39;P&#39;</span><span class="p">:</span><span class="n">P</span><span class="p">}</span>
+    <span class="c1">#print(&quot;ding!\n&quot;)</span>
+
+    <span class="c1"># return the results</span>
+    <span class="k">return</span> <span class="n">results</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Sebastian Peck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

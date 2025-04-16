@@ -1,0 +1,478 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reRoute_Dynamics.Trip_Simulator &mdash; reRoute_Dynamics 25w16a documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d146563a"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            reRoute_Dynamics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">reRoute_Dynamics_Core</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">reRoute_Dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">reRoute_Dynamics.Trip_Simulator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for reRoute_Dynamics.Trip_Simulator</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Trip_Simulator.py</span>
+<span class="sd">S. Peck</span>
+
+<span class="sd">Trip_Simulator.py contains the method and scripting used to simulate a vehicle trip by passing a vehicle and its driving</span>
+<span class="sd">conditions through logic and then into a Longitudinal Dynamics Model in Physics_Engine.py.</span>
+<span class="sd">This can also be run as a standalone script. </span>
+
+<span class="sd">Methods:</span>
+<span class="sd">simulate_trip.py - method to run a vehicle with a given ESS on a given trip over a given route.</span>
+
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">Instance_Tools</span> <span class="k">as</span> <span class="n">it</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">Object_Params</span> <span class="k">as</span> <span class="n">op</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">Physics_Engine</span> <span class="k">as</span> <span class="n">pe</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">Geography_Tools</span> <span class="k">as</span> <span class="n">gt</span>
+<span class="kn">from</span> <span class="nn">alive_progress</span> <span class="kn">import</span> <span class="n">alive_bar</span>
+
+<div class="viewcode-block" id="simulate_trip">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Trip_Simulator.simulate_trip">[docs]</a>
+<span class="k">def</span> <span class="nf">simulate_trip</span><span class="p">(</span><span class="n">route</span><span class="p">,</span> <span class="n">trip</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">Trip</span><span class="p">(),</span> <span class="n">bus</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">Bus</span><span class="p">(),</span> <span class="n">ESS</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">ESS</span><span class="p">()):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    simulate_trip() takes a route, and returns a modeled power consumption and velocity</span>
+<span class="sd">    for a vehicle on that given trip. </span>
+<span class="sd">    </span>
+<span class="sd">    Params:</span>
+<span class="sd">    route: a route object as exported by Geography_Tools.py that the vehicle will traverse</span>
+<span class="sd">    trip: Default - Object_Parameters.Trip(), a trip object from Object_Params that determines the external conditions of the trip</span>
+<span class="sd">    bus: Default - Object_Parameters.Bus(), a bus object from Object_Params that determines the vehicle design</span>
+<span class="sd">    ESS: Default - Object_Parameters.ESS(),an ess object from Object_Params that determines the Energy Storage System design</span>
+<span class="sd">    </span>
+<span class="sd">    Return:</span>
+<span class="sd">    a geodataframe that provides all the relevant driving conditions, positional velocity, and modeled power required (NOT ESS LOAD). </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="c1"># make copies so there isnt accidental overwriting of params.</span>
+    <span class="n">trip</span> <span class="o">=</span> <span class="n">trip</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">bus</span> <span class="o">=</span> <span class="n">bus</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">ESS</span> <span class="o">=</span> <span class="n">ESS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+    <span class="c1"># take the stops and convert such that -1 is 0.</span>
+    <span class="n">rider_series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">route</span><span class="o">.</span><span class="n">stops</span><span class="p">)</span>
+    <span class="n">rider_series</span> <span class="o">=</span> <span class="n">rider_series</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># get total number of stops by filtering out the 0&#39;s</span>
+    <span class="n">n_stops</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rider_series</span><span class="p">[</span><span class="n">rider_series</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="c1"># set the positions with stops to ridership changes instead using generate_riders</span>
+    <span class="n">rider_series</span><span class="p">[</span><span class="n">rider_series</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">generate_riders</span><span class="p">(</span><span class="n">n_stops</span><span class="p">,</span> <span class="n">mean_ridership</span> <span class="o">=</span> <span class="n">trip</span><span class="o">.</span><span class="n">m_riders</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">trip</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="c1"># convert the ridership data to a list.</span>
+    <span class="n">rider_changes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rider_series</span><span class="p">)</span>
+
+    <span class="c1"># take the signal data and convert invalid points to 0</span>
+    <span class="n">signal_series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">route</span><span class="o">.</span><span class="n">signals</span><span class="p">)</span>
+    <span class="n">signal_series</span><span class="p">[</span><span class="n">signal_series</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># multiply the signal values by a boolean of if the stoplight has been hit or not.</span>
+    <span class="n">signal_series</span> <span class="o">=</span> <span class="n">signal_series</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">it</span><span class="o">.</span><span class="n">check_hit_signal</span><span class="p">(</span><span class="n">stoplight_chance</span> <span class="o">=</span> <span class="n">trip</span><span class="o">.</span><span class="n">chance_sig</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">trip</span><span class="o">.</span><span class="n">seed</span><span class="p">))</span>
+
+
+    <span class="c1"># convert the data to a list.</span>
+    <span class="n">signals_hit</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">signal_series</span><span class="p">)</span>
+
+    <span class="c1"># get the stop type arrays for each point</span>
+    <span class="n">stop_types</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">determine_stop_type</span><span class="p">(</span><span class="n">rider_changes</span><span class="p">,</span> <span class="n">signals_hit</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">route</span><span class="o">.</span><span class="n">signs</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># use the stop type arrays and running distance to get the distance from each point to its next stop.</span>
+    <span class="n">stop_distances</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">get_distances_to_stops</span><span class="p">(</span><span class="n">stop_types</span><span class="p">,</span> <span class="n">route</span><span class="o">.</span><span class="n">cum_d_X</span><span class="p">)</span>
+
+    <span class="c1"># Convert stop distances to meters</span>
+    <span class="n">stop_distances</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">stop_distances</span><span class="p">)</span><span class="o">*</span><span class="mi">1000</span><span class="p">)</span>
+
+    <span class="c1"># Get the grades</span>
+    <span class="n">grades</span> <span class="o">=</span> <span class="n">route</span><span class="o">.</span><span class="n">grades</span>
+
+    <span class="c1"># get the grade forces</span>
+    <span class="n">grade_forces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">grades</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">pe</span><span class="o">.</span><span class="n">calculate_grade_force</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">bus</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span> <span class="n">bus</span><span class="o">.</span><span class="n">Cf</span><span class="p">)))</span>
+
+    <span class="c1"># Get the changes in travel distance, in meters</span>
+    <span class="n">dxs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">route</span><span class="o">.</span><span class="n">d_X</span><span class="p">)</span><span class="o">*</span><span class="mi">1000</span><span class="p">)</span>
+
+    <span class="c1"># get the speed limits, in m/s, and affect it by the trip&#39;s traffic parameter</span>
+    <span class="n">limits</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">route</span><span class="o">.</span><span class="n">limits</span><span class="p">)</span><span class="o">*</span><span class="mi">1000</span><span class="o">*</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="p">(</span><span class="n">trip</span><span class="o">.</span><span class="n">traffic</span><span class="o">/</span><span class="mi">2</span><span class="p">)))</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">bus</span><span class="o">.</span><span class="n">f_a</span><span class="p">))</span>
+
+    <span class="c1"># get the bearing angle from headings/</span>
+    <span class="n">bearings</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">route</span><span class="o">.</span><span class="n">bearings</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">gt</span><span class="o">.</span><span class="n">heading_to_angle</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+
+    <span class="c1"># get the geodesic distances in meters</span>
+    <span class="n">geodes_dists</span> <span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">route</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span><span class="o">*</span><span class="mi">1000</span><span class="p">)</span>
+
+    <span class="c1"># get the elevations, in km</span>
+    <span class="n">elevations</span> <span class="o">=</span> <span class="n">route</span><span class="o">.</span><span class="n">elevation</span>
+    
+    <span class="n">geometry</span> <span class="o">=</span> <span class="n">route</span><span class="o">.</span><span class="n">geometry</span>
+    
+    <span class="n">wind_angle</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">heading_to_angle</span><span class="p">(</span><span class="n">trip</span><span class="o">.</span><span class="n">wind_bearing</span><span class="p">)</span>
+
+    <span class="c1"># create an empty dict to store the result structure</span>
+    <span class="n">initialize_result</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;initialize&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;v_f&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                       <span class="s1">&#39;dt&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                       <span class="s1">&#39;P&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                       <span class="s1">&#39;dx&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                       <span class="s1">&#39;grade&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                       <span class="s1">&#39;limit&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                       <span class="s1">&#39;stop_clf&#39;</span><span class="p">:[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span>
+                        <span class="s1">&#39;gdx&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="s1">&#39;elevation&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="s1">&#39;dx_to_next&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="s1">&#39;b_dx&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="s1">&#39;geometry&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span>
+
+    <span class="c1"># Initialize the running data with the initialize dict.</span>
+    <span class="n">running_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">initialize_result</span><span class="p">]</span>
+
+    <span class="c1"># Loop through each point.</span>
+    <span class="c1">#with alive_bar(len(stop_distances)-1) as bar:</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stop_distances</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="c1">#print(running_data[-1])</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">running_data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Query point data</span>
+        <span class="n">dx_to_next_stop</span> <span class="o">=</span> <span class="n">stop_distances</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">grade</span> <span class="o">=</span> <span class="n">grades</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">grade_force</span> <span class="o">=</span> <span class="n">grade_forces</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">dxs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">limit</span> <span class="o">=</span> <span class="n">limits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">bearing</span> <span class="o">=</span> <span class="n">bearings</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">stop_classes</span> <span class="o">=</span> <span class="n">stop_types</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">rider_change</span> <span class="o">=</span> <span class="n">rider_changes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">geodes_dist</span> <span class="o">=</span> <span class="n">geodes_dists</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">elevation</span> <span class="o">=</span> <span class="n">elevations</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">geometry</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="c1"># Calculate the wind force</span>
+        <span class="n">wind_force</span> <span class="o">=</span> <span class="n">pe</span><span class="o">.</span><span class="n">calculate_wind_force</span><span class="p">(</span><span class="n">bearing</span><span class="p">,</span>
+                                             <span class="n">v</span><span class="p">,</span>
+                                             <span class="n">wind_angle</span><span class="p">,</span>
+                                             <span class="n">trip</span><span class="o">.</span><span class="n">v_wind</span><span class="p">,</span>
+                                             <span class="n">trip</span><span class="o">.</span><span class="n">p_air</span><span class="p">,</span>
+                                             <span class="n">bus</span><span class="o">.</span><span class="n">Cd</span><span class="p">,</span>
+                                             <span class="n">bus</span><span class="o">.</span><span class="n">area</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the braking distance</span>
+        <span class="n">braking_distance_data</span> <span class="o">=</span> <span class="n">pe</span><span class="o">.</span><span class="n">get_braking_distance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span>
+                                                        <span class="n">bus</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span>
+                                                        <span class="n">grade_force</span><span class="p">,</span>
+                                                        <span class="n">wind_force</span><span class="p">,</span>
+                                                        <span class="n">bus</span><span class="o">.</span><span class="n">a_br</span><span class="p">,</span>
+                                                        <span class="n">bus</span><span class="o">.</span><span class="n">f_br</span><span class="p">,</span>
+                                                        <span class="n">bus</span><span class="o">.</span><span class="n">f_i</span><span class="p">,</span>
+                                                        <span class="n">bus</span><span class="o">.</span><span class="n">dmax</span><span class="p">)</span>
+
+        <span class="c1"># Parse braking information</span>
+        <span class="n">braking_distance</span> <span class="o">=</span> <span class="n">braking_distance_data</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">]</span>
+        <span class="n">adjusted_braking_factor</span> <span class="o">=</span> <span class="n">braking_distance_data</span><span class="p">[</span><span class="s1">&#39;bf&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Conditional booleans</span>
+        <span class="n">above_limit</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">limit</span> <span class="o">+</span> <span class="n">trip</span><span class="o">.</span><span class="n">MOE</span><span class="o">*</span><span class="n">limit</span><span class="p">))</span>
+        <span class="n">below_limit</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">limit</span> <span class="o">-</span> <span class="n">trip</span><span class="o">.</span><span class="n">MOE</span><span class="o">*</span><span class="n">limit</span><span class="p">))</span>
+        <span class="n">stopped</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span> <span class="o">&lt;</span> <span class="n">trip</span><span class="o">.</span><span class="n">stop_margin</span><span class="p">)</span>
+        <span class="n">stop_upcoming</span> <span class="o">=</span> <span class="p">(</span><span class="n">braking_distance</span><span class="o">+</span><span class="n">limit</span><span class="o">*</span><span class="n">bus</span><span class="o">.</span><span class="n">dt_max</span> <span class="o">&gt;=</span> <span class="n">dx_to_next_stop</span> <span class="p">)</span>
+
+        <span class="c1"># check if the distance to the next stop is not 0</span>
+        <span class="k">if</span> <span class="n">dx_to_next_stop</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">braking_distance_data</span> <span class="o">=</span> <span class="n">pe</span><span class="o">.</span><span class="n">get_braking_distance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span>
+                                                        <span class="n">bus</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span>
+                                                        <span class="n">grade_force</span><span class="p">,</span>
+                                                        <span class="n">wind_force</span><span class="p">,</span>
+                                                        <span class="n">bus</span><span class="o">.</span><span class="n">a_br</span><span class="p">,</span>
+                                                        <span class="n">bus</span><span class="o">.</span><span class="n">f_br</span><span class="p">,</span>
+                                                        <span class="n">bus</span><span class="o">.</span><span class="n">f_i</span><span class="p">,</span>
+                                                        <span class="n">dx_to_next_stop</span><span class="p">)</span>
+                <span class="c1"># Parse braking information</span>
+            <span class="n">braking_distance</span> <span class="o">=</span> <span class="n">braking_distance_data</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">]</span>
+            <span class="n">adjusted_braking_factor</span> <span class="o">=</span> <span class="n">braking_distance_data</span><span class="p">[</span><span class="s1">&#39;bf&#39;</span><span class="p">]</span>
+
+
+        <span class="c1"># Set up a dict for the true result.</span>
+        <span class="n">true_result</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;NULL&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;v_f&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="s1">&#39;dt&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="s1">&#39;P&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="s1">&#39;dx&#39;</span><span class="p">:</span><span class="n">dx</span><span class="p">,</span>
+                       <span class="s1">&#39;grade&#39;</span><span class="p">:</span><span class="n">grade</span><span class="p">,</span>
+                       <span class="s1">&#39;limit&#39;</span><span class="p">:</span><span class="n">limit</span><span class="p">,</span>
+                       <span class="s1">&#39;stop_clf&#39;</span><span class="p">:</span><span class="n">stop_classes</span><span class="p">,</span>
+                       <span class="s1">&#39;gdx&#39;</span><span class="p">:</span><span class="n">geodes_dist</span><span class="p">,</span>
+                       <span class="s1">&#39;elevation&#39;</span><span class="p">:</span><span class="n">elevation</span><span class="p">,</span>
+                       <span class="s1">&#39;dx_to_next&#39;</span><span class="p">:</span><span class="n">dx_to_next_stop</span><span class="p">,</span>
+                       <span class="s1">&#39;b_dx&#39;</span><span class="p">:(</span><span class="n">braking_distance</span><span class="p">,</span> <span class="n">adjusted_braking_factor</span><span class="p">),</span>
+                       <span class="s1">&#39;geometry&#39;</span><span class="p">:</span><span class="n">position</span><span class="p">}</span>
+
+        <span class="c1"># Check if there&#39;s a stop upcoming and if the bus is still moving</span>
+        <span class="k">if</span> <span class="n">stop_upcoming</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">stopped</span><span class="p">:</span>
+            <span class="c1">#brake to stop.</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">pe</span><span class="o">.</span><span class="n">brake</span><span class="p">(</span><span class="n">v</span><span class="p">,</span>
+                              <span class="n">bus</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span>
+                              <span class="n">dx</span><span class="p">,</span>
+                              <span class="n">grade_force</span><span class="p">,</span>
+                              <span class="n">wind_force</span><span class="p">,</span>
+                              <span class="n">bus</span><span class="o">.</span><span class="n">a_br</span><span class="p">,</span>
+                              <span class="n">adjusted_braking_factor</span><span class="p">,</span>
+                              <span class="n">bus</span><span class="o">.</span><span class="n">f_i</span><span class="p">,</span>
+                              <span class="n">bus</span><span class="o">.</span><span class="n">dmax</span><span class="p">)</span>
+
+
+
+            <span class="c1"># insert the results.</span>
+            <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;stp_brk&#39;</span>
+            <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span>
+            <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+            <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span>
+            <span class="n">running_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">true_result</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span> <span class="c1">#&lt;-- This has to use the copy, otherwise it will change prev. values</span>
+
+            <span class="c1"># if the speed is within the stop margin, stop the bus.</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">trip</span><span class="o">.</span><span class="n">stop_margin</span><span class="p">):</span>
+                <span class="n">result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="c1"># Calculate the stop time based on the class.</span>
+                <span class="n">stop_time</span> <span class="o">=</span> <span class="n">stop_classes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">trip</span><span class="o">.</span><span class="n">t_stop</span> <span class="o">+</span> <span class="n">stop_classes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">trip</span><span class="o">.</span><span class="n">t_sig</span> <span class="o">+</span> <span class="n">stop_classes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">trip</span><span class="o">.</span><span class="n">t_sign</span> <span class="o">+</span> <span class="n">stop_classes</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">*</span><span class="n">trip</span><span class="o">.</span><span class="n">t_end</span>  <span class="c1"># ridership, signal, sign, end</span>
+
+                <span class="c1"># Adjust the mass of the bus</span>
+                <span class="n">bus</span><span class="o">.</span><span class="n">mass</span> <span class="o">+=</span> <span class="n">rider_change</span><span class="o">*</span><span class="n">trip</span><span class="o">.</span><span class="n">m_pass</span>
+
+                <span class="c1"># Add the results.</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;rest&#39;</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stop_time</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">tmp_storage</span> <span class="o">=</span> <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;stop_clf&#39;</span><span class="p">]</span>
+
+                <span class="n">running_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">true_result</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+        <span class="c1"># otherwise, if the bus is not coming up to a stop:</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">stopped</span><span class="p">:</span>
+                <span class="c1">#accelerate</span>
+
+                <span class="c1"># Get a list of the results for accelerate (done like this as accelerate *may*</span>
+                <span class="c1"># give a number of dicts depending on how development goes</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="n">pe</span><span class="o">.</span><span class="n">accelerate</span><span class="p">(</span><span class="n">v</span><span class="p">,</span>
+                                       <span class="n">bus</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span>
+                                       <span class="n">dx</span><span class="p">,</span>
+                                       <span class="n">grade_force</span><span class="p">,</span>
+                                       <span class="n">wind_force</span><span class="p">,</span>
+                                       <span class="n">bus</span><span class="o">.</span><span class="n">a_prof</span><span class="p">,</span>
+                                       <span class="n">bus</span><span class="o">.</span><span class="n">a_br</span><span class="p">,</span>
+                                       <span class="n">bus</span><span class="o">.</span><span class="n">f_br</span><span class="p">,</span>
+                                       <span class="n">bus</span><span class="o">.</span><span class="n">f_i</span><span class="p">,</span>
+                                       <span class="n">bus</span><span class="o">.</span><span class="n">P_max</span><span class="p">,</span>
+                                       <span class="n">bus</span><span class="o">.</span><span class="n">a_max</span><span class="p">,</span>
+                                       <span class="n">bus</span><span class="o">.</span><span class="n">dt_max</span><span class="p">)]</span>
+
+                <span class="c1"># Append the results</span>
+                <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+                    <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ac_from_0&#39;</span>
+                    <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span>
+                    <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+                    <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span>
+                    <span class="c1">#print(&#39;ac_from_0:&#39;,result)</span>
+                    <span class="n">running_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">true_result</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+                <span class="c1">#print(&quot;v, dx, grade_force, wind_force = {}, {}, {}, {}&quot;.format(v, dx, grade_force, wind_force))</span>
+
+            <span class="k">elif</span> <span class="n">below_limit</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">stopped</span><span class="p">:</span>
+                <span class="c1">#accelerate</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="n">pe</span><span class="o">.</span><span class="n">accelerate</span><span class="p">(</span><span class="n">v</span><span class="p">,</span>
+                           <span class="n">bus</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span>
+                           <span class="n">dx</span><span class="p">,</span>
+                           <span class="n">grade_force</span><span class="p">,</span>
+                           <span class="n">wind_force</span><span class="p">,</span>
+                           <span class="n">bus</span><span class="o">.</span><span class="n">a_prof</span><span class="p">,</span>
+                           <span class="n">bus</span><span class="o">.</span><span class="n">a_br</span><span class="p">,</span>
+                           <span class="n">bus</span><span class="o">.</span><span class="n">f_br</span><span class="p">,</span>
+                           <span class="n">bus</span><span class="o">.</span><span class="n">f_i</span><span class="p">,</span>
+                           <span class="n">bus</span><span class="o">.</span><span class="n">P_max</span><span class="p">,</span>
+                           <span class="n">bus</span><span class="o">.</span><span class="n">a_max</span><span class="p">,</span>
+                           <span class="n">bus</span><span class="o">.</span><span class="n">dt_max</span><span class="p">)]</span>
+                <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+                    <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ac_below&#39;</span>
+                    <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span>
+                    <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+                    <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span>
+                    <span class="c1">#print(&#39;ac_below:&#39;,result)</span>
+                    <span class="n">running_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">true_result</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+            <span class="k">elif</span> <span class="n">above_limit</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">stopped</span><span class="p">:</span>
+                <span class="c1">#brake</span>
+
+                <span class="n">result</span> <span class="o">=</span> <span class="n">pe</span><span class="o">.</span><span class="n">brake</span><span class="p">(</span><span class="n">v</span><span class="p">,</span>
+                              <span class="n">bus</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span>
+                              <span class="n">dx</span><span class="p">,</span>
+                              <span class="n">grade_force</span><span class="p">,</span>
+                              <span class="n">wind_force</span><span class="p">,</span>
+                              <span class="n">bus</span><span class="o">.</span><span class="n">a_br</span><span class="p">,</span>
+                              <span class="n">adjusted_braking_factor</span><span class="p">,</span>
+                              <span class="n">bus</span><span class="o">.</span><span class="n">f_i</span><span class="p">,</span>
+                              <span class="n">bus</span><span class="o">.</span><span class="n">dmax</span><span class="p">)</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;br_above&#39;</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span>
+                <span class="c1">#print(&#39;br_above:&#39;,result)</span>
+                <span class="n">running_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">true_result</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1">#maintain</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">pe</span><span class="o">.</span><span class="n">maintain</span><span class="p">(</span><span class="n">v</span><span class="p">,</span>
+                                     <span class="n">bus</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span>
+                                     <span class="n">dx</span><span class="p">,</span>
+                                     <span class="n">grade_force</span><span class="p">,</span>
+                                     <span class="n">wind_force</span><span class="p">,</span>
+                                     <span class="n">bus</span><span class="o">.</span><span class="n">a_br</span><span class="p">,</span>
+                                     <span class="n">bus</span><span class="o">.</span><span class="n">f_br</span><span class="p">,</span>
+                                     <span class="n">bus</span><span class="o">.</span><span class="n">f_i</span><span class="p">,</span> 
+                                     <span class="n">bus</span><span class="o">.</span><span class="n">P_max</span><span class="p">)</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;main&#39;</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span>
+                <span class="c1">#print(&#39;main:&#39;,result)</span>
+                <span class="n">running_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">true_result</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+            <span class="c1">#print(running_data[-1])</span>
+            <span class="c1">#bar()</span>
+
+    <span class="c1"># Not converted to ESS yet</span>
+    <span class="k">return</span> <span class="n">running_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    
+    <span class="c1"># load the arguments</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Simulate a bus trip.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-r&#39;</span><span class="p">,</span><span class="s2">&quot;--route&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to a Route export json from Geography_Tools.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-t&#39;</span><span class="p">,</span><span class="s2">&quot;--trip&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to a trip parameter export txt from Object_Params.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-b&#39;</span><span class="p">,</span><span class="s2">&quot;--bus&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to a bus parameter export txt from Object_Params.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-e&#39;</span><span class="p">,</span><span class="s2">&quot;--ESS&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to a ESS parameter export txt from Object_Params.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="s2">&quot;-output&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Output filepath.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="s2">&quot;-name&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Output filename.&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># parse the arguments</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    
+    <span class="c1">#  Check for the optional params</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">trip</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span> <span class="n">trip_obj</span> <span class="o">=</span> <span class="n">OP</span><span class="o">.</span><span class="n">Trip</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span> <span class="n">trip_obj</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">load_trip_params</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">trip</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">bus</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span> <span class="n">bus_obj</span> <span class="o">=</span> <span class="n">OP</span><span class="o">.</span><span class="n">Bus</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span> <span class="n">bus_obj</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">load_bus_params</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">bus</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">ESS</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span> <span class="n">ESS_obj</span> <span class="o">=</span> <span class="n">OP</span><span class="o">.</span><span class="n">ESS</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span> <span class="n">ESS_obj</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">load_ESS_params</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">ESS</span><span class="p">)</span>
+
+    <span class="c1"># get the path params</span>
+    <span class="n">output_path</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">output</span>
+    <span class="n">output_name</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">name</span>
+    
+    <span class="c1"># Check the required params</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">route</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span> <span class="n">route_obj</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">load_from_json</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;[ Trip_Simulator.py ] Route filepath: &quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span> <span class="n">output_path</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;[ Trip_Simulator.py ] Output path: &quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">output_name</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span> <span class="n">output_name</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;[ Trip_Simulator.py ] Output name: &quot;</span><span class="p">)</span>
+
+    <span class="c1"># run the simulation</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">simulate_trip</span><span class="p">(</span><span class="n">route_obj</span><span class="p">,</span> <span class="n">trip_obj</span><span class="p">,</span> <span class="n">bus_obj</span><span class="p">,</span> <span class="n">ESS_obj</span><span class="p">)</span>
+    
+    <span class="c1"># Save the data as a feather.</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">.</span><span class="n">to_feather</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1">.feather&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">output_name</span><span class="p">))</span>
+    
+    
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Sebastian Peck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

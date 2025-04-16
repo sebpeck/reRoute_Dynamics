@@ -1,0 +1,327 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reRoute_Dynamics.Instance_Tools &mdash; reRoute_Dynamics 25w16a documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d146563a"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            reRoute_Dynamics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">reRoute_Dynamics_Core</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">reRoute_Dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">reRoute_Dynamics.Instance_Tools</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for reRoute_Dynamics.Instance_Tools</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Instance_Tools.py</span>
+<span class="sd">S. Peck</span>
+
+<span class="sd">Instance_Tools.py contains methods used in the processing and handling of individual points on a route and other</span>
+<span class="sd">miscellaneous methods in generating a trip.</span>
+
+<span class="sd">Methods:</span>
+<span class="sd">generate_riders() - method used to generate a series of ridership changes at each stop based on the</span>
+<span class="sd">expected ridership of that series.</span>
+<span class="sd">check_hit_signal() - method to return if a signal light has been hit or not based on random chance.</span>
+<span class="sd">determine_stop_type() - method used to determine what kind of stop a position is based on ridership, signals, and signs.</span>
+<span class="sd">get_stop_type() - method to create an array of stop type booleans for a given position.</span>
+<span class="sd">get_distances_to_stop() - method to determine how much distance is between the current index and the next stop.</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+
+<div class="viewcode-block" id="generate_riders">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Instance_Tools.generate_riders">[docs]</a>
+<span class="k">def</span> <span class="nf">generate_riders</span><span class="p">(</span><span class="n">n_stops</span><span class="p">,</span> <span class="n">mean_ridership</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    generate_riders() uses a number of stops, and mean ridership,</span>
+<span class="sd">    and then generates a list of riderhsip changes by stops, such that</span>
+<span class="sd">    the ridership is as close to the ceiling of the mean as possible.</span>
+<span class="sd">    </span>
+<span class="sd">    Params:</span>
+<span class="sd">    n_stops - int of number of stops.</span>
+<span class="sd">    mean_ridership - float of the mean ridership for the trip</span>
+<span class="sd">    seed - int, default None, used for the seed of the randomness.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    list of randomly generated ridership changes at each stop.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="c1"># Check if the seed isn&#39;t None/</span>
+    <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        
+        <span class="c1"># Implement the seed.</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">n_stops</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># create a list of indexes</span>
+        <span class="n">rider_list_indexes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_stops</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># create a list of zeros based on number of stops</span>
+        <span class="n">riders_on</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">n_stops</span>
+
+        <span class="c1"># for each rider in the mean, randomly select a stop they get on at.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">mean_ridership</span><span class="p">))):</span>
+            <span class="n">riders_on</span><span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">rider_list_indexes</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span> <span class="o">+=</span> <span class="mi">1</span>
+            
+        <span class="c1"># tally for current riders.</span>
+        <span class="n">current_riders</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># list to store ridership changes</span>
+        <span class="n">rider_changes</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># loop through each stop in the ridership on changes</span>
+        <span class="k">for</span> <span class="n">stop</span> <span class="ow">in</span> <span class="n">riders_on</span><span class="p">:</span>
+
+            <span class="c1"># a number between 0 and the current number of riders disembark.</span>
+            <span class="n">riders_off</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">current_riders</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># The current riders is updated for the net change in ridership.</span>
+            <span class="n">current_riders</span> <span class="o">+=</span> <span class="n">stop</span> <span class="o">-</span> <span class="n">riders_off</span>
+
+            <span class="c1"># the ridership change is calculated.</span>
+            <span class="n">rider_change</span> <span class="o">=</span> <span class="n">stop</span> <span class="o">-</span> <span class="n">riders_off</span>
+
+            <span class="c1"># the change is appended.</span>
+            <span class="n">rider_changes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rider_change</span><span class="p">)</span>
+
+
+        <span class="c1"># if not everyone is off by the last stop, shove em off.</span>
+        <span class="k">if</span> <span class="n">current_riders</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">rider_changes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="n">current_riders</span>
+
+        <span class="c1"># return the rider changes.</span>
+        <span class="k">return</span> <span class="n">rider_changes</span>
+    
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="check_hit_signal">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Instance_Tools.check_hit_signal">[docs]</a>
+<span class="k">def</span> <span class="nf">check_hit_signal</span><span class="p">(</span><span class="n">stoplight_chance</span><span class="o">=</span><span class="mf">.541666</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    check_hit_signal() takes a chance to hit a yellow/red,</span>
+<span class="sd">    and randomly generates a flag if the light is hit (a stop) or not.</span>
+<span class="sd">    </span>
+<span class="sd">    Params:</span>
+<span class="sd">    stoplight_chance - float, the fraction of time a stoplight will be hit. defualt based on 120s cycle, 55s g, 65 red/yellow. https://wsdot.wa.gov/travel/operations-services/traffic-signals</span>
+<span class="sd">    seed - int, default none, used for the seed of randomness.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    an int, 0 or 1, depending if the light is green or red.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="c1"># Check if the seed isn&#39;t None/</span>
+    <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        
+        <span class="c1"># Implement the seed.</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        
+    <span class="c1"># generate a number between 1 and 100, if it&#39;s lower than the chance, it&#39;s a stop.</span>
+    <span class="n">hit</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">101</span><span class="p">)</span><span class="o">&lt;</span><span class="n">stoplight_chance</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
+    
+    <span class="c1"># return the generated hits.</span>
+    <span class="k">return</span> <span class="n">hit</span></div>
+
+
+
+<div class="viewcode-block" id="determine_stop_type">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Instance_Tools.determine_stop_type">[docs]</a>
+<span class="k">def</span> <span class="nf">determine_stop_type</span><span class="p">(</span><span class="n">rider_changes</span><span class="p">,</span> <span class="n">hit_signals</span><span class="p">,</span> <span class="n">signs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    determine_stop_type() is used to determine the stop types based on</span>
+<span class="sd">    ridership, signals, and signs, and ends.</span>
+<span class="sd">    </span>
+<span class="sd">    Params:</span>
+<span class="sd">    rider_changes - iterable of ridership changes for a route</span>
+<span class="sd">    hit_signals - iterable of signals for a route</span>
+<span class="sd">    signs - iterable of signs for a route.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    a list of lists containing 0 or 1 for each stop type, with index of the sub-lists</span>
+<span class="sd">    corresponding to the passed stop types.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    
+    <span class="n">stop_data</span> <span class="o">=</span>  <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span>
+                 <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">rider_changes</span><span class="p">),</span>
+                 <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">hit_signals</span><span class="p">),</span>
+                 <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">signs</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">stopinfo</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">stop_data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">get_stop_type</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    
+    <span class="c1"># make sure the ends have stops.</span>
+    <span class="n">stopinfo</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">stopinfo</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    
+    <span class="k">return</span> <span class="n">stopinfo</span></div>
+
+    
+
+<div class="viewcode-block" id="get_stop_type">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Instance_Tools.get_stop_type">[docs]</a>
+<span class="k">def</span> <span class="nf">get_stop_type</span><span class="p">(</span><span class="n">ridership</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">sign</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    get_stop_type() takes a ridership, signal, and sign point,</span>
+<span class="sd">    and converts to a list of 0&#39;s and 1&#39;s depending on if each is</span>
+<span class="sd">    valid or not.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">bus_stop_flag</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">signal_flag</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">sign_flag</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">end_flag</span> <span class="o">=</span> <span class="kc">False</span>
+    
+    <span class="k">if</span> <span class="n">ridership</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">bus_stop_flag</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">signal</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">signal_flag</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">sign</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">sign_flag</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">end</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">end_flag</span> <span class="o">=</span> <span class="kc">True</span>
+    
+    <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">bus_stop_flag</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">signal_flag</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">sign_flag</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">end_flag</span><span class="p">)]</span></div>
+
+
+
+<div class="viewcode-block" id="get_distances_to_stops">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Instance_Tools.get_distances_to_stops">[docs]</a>
+<span class="k">def</span> <span class="nf">get_distances_to_stops</span><span class="p">(</span><span class="n">stop_types</span><span class="p">,</span> <span class="n">traveled_distance</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    get_distances_to_stops() takes an iterable of stop types, and the corresponding cumulative travel distances,</span>
+<span class="sd">    and then generates an iterable of distance to the next stop of any type.</span>
+<span class="sd">    </span>
+<span class="sd">    Params:</span>
+<span class="sd">    stop_types - iterable of stop types as generated by determine_stop_type()</span>
+<span class="sd">    traveled_distance - iterable of cumulative traveled distance.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    iterable of the distance to the next stop based on current locaton.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="c1"># join the two iterables</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">stop_types</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">traveled_distance</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    
+    <span class="c1"># check if the stop types indicate any stop</span>
+    <span class="n">df</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    
+    <span class="c1"># filter to only stops</span>
+    <span class="n">stops_and_distances</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">]</span>
+    
+    <span class="c1"># first position is a stop and should be marked as such</span>
+    <span class="n">dx_to_stop</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># loop through the remaining</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">stops_and_distances</span><span class="p">)):</span>
+        
+        <span class="c1"># get the current and last index of the filtered data</span>
+        <span class="n">current_index</span> <span class="o">=</span> <span class="n">stops_and_distances</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">last_index</span> <span class="o">=</span> <span class="n">stops_and_distances</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="c1"># Get the data range between the indexes</span>
+        <span class="n">current_range</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">last_index</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">current_index</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="c1"># Get the stop distance, (the last of the current range</span>
+        <span class="n">stop_distance</span> <span class="o">=</span> <span class="n">current_range</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="c1"># get the difference between the stop distance and each point</span>
+        <span class="n">current_range</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">stop_distance</span><span class="o">-</span><span class="n">current_range</span><span class="p">)</span>
+        
+        <span class="c1"># extend the distance list with the recalculation</span>
+        <span class="n">dx_to_stop</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">current_range</span><span class="p">))</span>
+        
+    <span class="c1"># return the data</span>
+    <span class="k">return</span> <span class="n">dx_to_stop</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Sebastian Peck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,911 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reRoute_Dynamics package &mdash; reRoute_Dynamics 25w16a documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=d146563a"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="reRoute_Dynamics_Core" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            reRoute_Dynamics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">reRoute_Dynamics_Core</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">reRoute_Dynamics package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-reRoute_Dynamics.Geography_Tools">reRoute_Dynamics.Geography_Tools module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.Route"><code class="docutils literal notranslate"><span class="pre">Route</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.calculate_grades"><code class="docutils literal notranslate"><span class="pre">calculate_grades()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.compass_heading"><code class="docutils literal notranslate"><span class="pre">compass_heading()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.geodesic_formula"><code class="docutils literal notranslate"><span class="pre">geodesic_formula()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.get_bounding_box"><code class="docutils literal notranslate"><span class="pre">get_bounding_box()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.get_rasterfiles"><code class="docutils literal notranslate"><span class="pre">get_rasterfiles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.heading_to_angle"><code class="docutils literal notranslate"><span class="pre">heading_to_angle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.interpolate_geometry_series"><code class="docutils literal notranslate"><span class="pre">interpolate_geometry_series()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.interpolate_points"><code class="docutils literal notranslate"><span class="pre">interpolate_points()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.load_from_json"><code class="docutils literal notranslate"><span class="pre">load_from_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.point_bearing"><code class="docutils literal notranslate"><span class="pre">point_bearing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.query_bearings"><code class="docutils literal notranslate"><span class="pre">query_bearings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.query_distance_traveled"><code class="docutils literal notranslate"><span class="pre">query_distance_traveled()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.query_elevation_changes"><code class="docutils literal notranslate"><span class="pre">query_elevation_changes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.query_elevation_series"><code class="docutils literal notranslate"><span class="pre">query_elevation_series()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.query_signals"><code class="docutils literal notranslate"><span class="pre">query_signals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.query_speed_limits"><code class="docutils literal notranslate"><span class="pre">query_speed_limits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.query_stops"><code class="docutils literal notranslate"><span class="pre">query_stops()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.repeat_id_remover"><code class="docutils literal notranslate"><span class="pre">repeat_id_remover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.reproject_rasterfiles"><code class="docutils literal notranslate"><span class="pre">reproject_rasterfiles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.smooth_elevation"><code class="docutils literal notranslate"><span class="pre">smooth_elevation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Geography_Tools.verbose_line_updater"><code class="docutils literal notranslate"><span class="pre">verbose_line_updater()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-reRoute_Dynamics.Instance_Tools">reRoute_Dynamics.Instance_Tools module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Instance_Tools.check_hit_signal"><code class="docutils literal notranslate"><span class="pre">check_hit_signal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Instance_Tools.determine_stop_type"><code class="docutils literal notranslate"><span class="pre">determine_stop_type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Instance_Tools.generate_riders"><code class="docutils literal notranslate"><span class="pre">generate_riders()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Instance_Tools.get_distances_to_stops"><code class="docutils literal notranslate"><span class="pre">get_distances_to_stops()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Instance_Tools.get_stop_type"><code class="docutils literal notranslate"><span class="pre">get_stop_type()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-reRoute_Dynamics.Object_Params">reRoute_Dynamics.Object_Params module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Object_Params.Bus"><code class="docutils literal notranslate"><span class="pre">Bus</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Object_Params.ESS"><code class="docutils literal notranslate"><span class="pre">ESS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Object_Params.Trip"><code class="docutils literal notranslate"><span class="pre">Trip</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Object_Params.a_eqn"><code class="docutils literal notranslate"><span class="pre">a_eqn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Object_Params.generate_a_profile"><code class="docutils literal notranslate"><span class="pre">generate_a_profile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Object_Params.load_ESS_params"><code class="docutils literal notranslate"><span class="pre">load_ESS_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Object_Params.load_bus_params"><code class="docutils literal notranslate"><span class="pre">load_bus_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Object_Params.load_trip_params"><code class="docutils literal notranslate"><span class="pre">load_trip_params()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-reRoute_Dynamics.Physics_Engine">reRoute_Dynamics.Physics_Engine module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Physics_Engine.accelerate"><code class="docutils literal notranslate"><span class="pre">accelerate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Physics_Engine.brake"><code class="docutils literal notranslate"><span class="pre">brake()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Physics_Engine.calculate_grade_force"><code class="docutils literal notranslate"><span class="pre">calculate_grade_force()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Physics_Engine.calculate_wind_force"><code class="docutils literal notranslate"><span class="pre">calculate_wind_force()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Physics_Engine.get_braking_distance"><code class="docutils literal notranslate"><span class="pre">get_braking_distance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Physics_Engine.maintain"><code class="docutils literal notranslate"><span class="pre">maintain()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Physics_Engine.sign"><code class="docutils literal notranslate"><span class="pre">sign()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-reRoute_Dynamics.Trip_Simulator">reRoute_Dynamics.Trip_Simulator module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#reRoute_Dynamics.Trip_Simulator.simulate_trip"><code class="docutils literal notranslate"><span class="pre">simulate_trip()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-reRoute_Dynamics">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">reRoute_Dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">reRoute_Dynamics_Core</a></li>
+      <li class="breadcrumb-item active">reRoute_Dynamics package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/reRoute_Dynamics.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="reroute-dynamics-package">
+<h1>reRoute_Dynamics package<a class="headerlink" href="#reroute-dynamics-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-reRoute_Dynamics.Geography_Tools">
+<span id="reroute-dynamics-geography-tools-module"></span><h2>reRoute_Dynamics.Geography_Tools module<a class="headerlink" href="#module-reRoute_Dynamics.Geography_Tools" title="Link to this heading"></a></h2>
+<p>Geography_Tools.py
+S. Peck</p>
+<p>Geography_Tools.py is a module that contains the methods primarily used in the interpretation
+of geospatial data for the ultimate creation of Route .json files from position and elevation data.</p>
+<p>Methods:
+geodesic_formula() - method to calculate the geodesic distance between two (lat, lon) points.
+compass_heading() - method to determine cardinal compass heading from an angle off of North.
+heading_to_angle() - method to determine the compass degree angle from a cardinal direction.
+point_bearing() - method to determine the travel bearing between two points.
+get_bounding_box() - method to create the smallest possible box that encompasses all the points in a shape.
+interpolate_points() - method to interpolate additional points between two initial geospatial points.
+repeat_id_remover() - method to swap any repeated value in an iterable with -1.
+verbose_line_updater() - method to provide line updates for verbosity
+query_elevation_changes() - method to determine the elevation changes in an iterable of elevation.
+query_stops() - method to assign stops to their closest corresponding point in a geometry series.
+query_signals() - method to assign signals to their closest corresponding point in a geometry series.
+query_distance_traveled() - method to calculate the distance traveled from point to point in a geometry series.
+query_speed_limits() - method to assign speed limits to each point in a geometry series.
+query_bearings() - method to query the bearing to the next point for each point in a geometric series.
+get_rasterfiles() - method to return all standard .tif files in a directory.
+reproject_rasterfiles() - method to reproject and save raster files to a particular geographic projection.
+query_elevation_series() - method to query the elevation from each point in a geometry series using rasterfiles.
+smooth_elevation() - method to use a savisky-golay filter to smooth out elevation changes (or otherwise)
+calculate_grades() - method to calculate the slope grade at each point in a geometry series with elevations
+interpolate_geometry_series() - method to take a whole series of points and interolate extra points if there are significant gaps.
+load_from_json() - method to load a Route object from a saved .json file.</p>
+<p>Classes:
+Route - a class used to store information on a route, like geometry, elevation, signals, limits, and stops.
+save_to_json() - class method used to encode and store a Route class as a .json file
+query_point() - class method used to query the information of a point at an index in the route
+to_gdf() - class method used to convert a Route class’s stored information to a GeoDataFrame.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.Route">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">Route</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elevation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stops</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intersperse_empty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth_grades</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#Route"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.Route" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Route class is is used to store route information.</p>
+<p>Params:
+geometry - iterable of shapely geometry points
+elevation - iterable of elevation data
+limits - iterable of speed limit at each point. (optional, defaults to 25mph in km/s)
+stops - iterable of stop flags at each point. (optional, defaults to 10 evenly spaced stops.)
+signals - iterable of signal flags at each point. (optional, defaults to 8 evenly spaced signals.)
+signs - iterable of sign flags at each point. (optional, defaults to 3 evenly spaced stop signs.)
+intersperse_empty - boolean flag to intersperse any empty parameters. Default False.</p>
+<p>Methods:
+save_to_json() - saves the stored data to a json file. can be loaded again with Geography Tools’ load_from_json.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.Route.query_point">
+<span class="sig-name descname"><span class="pre">query_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#Route.query_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.Route.query_point" title="Link to this definition"></a></dt>
+<dd><p>query_point() takes an index of a point and returns the data for the corresponding point.</p>
+<p>Params:
+index - index of the route which data you would like to query.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.Route.save_to_json">
+<span class="sig-name descname"><span class="pre">save_to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#Route.save_to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.Route.save_to_json" title="Link to this definition"></a></dt>
+<dd><p>save_to_json() is used to encode and save the Route data to a json file.</p>
+<p>Params:
+path - path and filename to be saved to, as str. Should end with ‘.json’.</p>
+<p>Returns:
+path to the saved json file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.Route.to_gdf">
+<span class="sig-name descname"><span class="pre">to_gdf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#Route.to_gdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.Route.to_gdf" title="Link to this definition"></a></dt>
+<dd><p>to_gdf() takes the constituent information in geography_tools and converts it to a geodataframe.</p>
+<p>Params:
+N/A</p>
+<p>Returns:
+geodataframe of all information contained by a Route object.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.calculate_grades">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">calculate_grades</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elevations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_grade</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#calculate_grades"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.calculate_grades" title="Link to this definition"></a></dt>
+<dd><p>calculate_grades takes the distance between points,
+as well as the elevations at each point, and returns the grade at each point.</p>
+<p>Params:
+dx - an iterable of distances between each point
+elevations - an iterable of elevations corresponding to each point.
+clip - boolean to determine to clip the grades or not. Default True.
+max_grade - an int representing the maximum grade a point can be without being clipped to. Default 7.5</p>
+<p>Returns:
+iterable of the slope grade at each point.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.compass_heading">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">compass_heading</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bearing</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#compass_heading"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.compass_heading" title="Link to this definition"></a></dt>
+<dd><p>compass_heading converts a bearing in degrees to a
+compass value like North, South, or East.</p>
+<p>Params:
+bearing - the bearing value, in degrees, as float.</p>
+<p>Returns:
+string representation of compass heading.</p>
+<p>Notes:
+11/18/2024 - There is a more mathematically elegant solution to this, but I’m not bothering with it right now.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.geodesic_formula">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">geodesic_formula</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#geodesic_formula"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.geodesic_formula" title="Link to this definition"></a></dt>
+<dd><p>geodesic_formula takex the latitude and longitude of two separate points,
+and calculates the distance in kilometers between those two points as a crow flies,
+according to the geodesic formula as calculated by geopy.</p>
+<p>Params:
+x1 - latitude pt 1 in degrees
+y1 - longitude pt 1 in degrees
+x2 - latitude pt 2 in degrees
+y2 - longitude pt 2 in degrees</p>
+<p>Returns:
+distance between the points in kilometers.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.get_bounding_box">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">get_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">how</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'basic'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#get_bounding_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.get_bounding_box" title="Link to this definition"></a></dt>
+<dd><p>get_bounding_box() takes in a shapely shape,
+and then generates a polygon that is a rectangular bounding box.</p>
+<p>Parameters:
+shape: any shapely shape</p>
+<p>Returns:
+shapely.polygon that fits around the provided shape</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.get_rasterfiles">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">get_rasterfiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#get_rasterfiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.get_rasterfiles" title="Link to this definition"></a></dt>
+<dd><p>get_rasterfiles takes a path to a directory and returns a series of paths to any .tif files
+contained therin.</p>
+<p>Params:
+dir_path - path to directory, as str.</p>
+<p>Returns:
+pandas series of path strings to each .tif file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.heading_to_angle">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">heading_to_angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heading</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#heading_to_angle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.heading_to_angle" title="Link to this definition"></a></dt>
+<dd><p>heading_to_angle() takes a compass heading of 8 directions,
+and converts it to an angle in degrees.</p>
+<p>Params:
+heading - a string representing heading.</p>
+<p>Returns: a compass bearing angle as float.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.interpolate_geometry_series">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">interpolate_geometry_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#interpolate_geometry_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.interpolate_geometry_series" title="Link to this definition"></a></dt>
+<dd><p>interpolate_geometry_series takes an iterable of geospatial shapely points,
+and then generates an interpolated series in the event that
+the maximum distance (in meters) is exceeded.</p>
+<p>Params:
+geometry - a series of shapely points of lat and lon
+max_distance - int representing maximum distance the points can be without interpolation</p>
+<p>Returns:
+iterable of lists of shapely points that have been interpolated.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.interpolate_points">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">interpolate_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#interpolate_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.interpolate_points" title="Link to this definition"></a></dt>
+<dd><p>interpolate_points takes two shapely points and a maximum distance,
+and then interpolates between the points if the maximum distance is exceeded.</p>
+<p>Params:
+point_1 - starting point as a shapely point of lat, lon
+point_2 - final point as a shapely point of lat, lon
+max_dist - maximum distance the points can be without interpolation. Default int of 1.</p>
+<p>Returns:
+an iterable of lon,lat shapely points.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.load_from_json">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">load_from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#load_from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.load_from_json" title="Link to this definition"></a></dt>
+<dd><p>load_from_json() takes in a path to a json file from an exported Route object,
+and returns a path object as close as possible to what was saved.
+Waring: Some data types may be altered or adjusted. Speed limits are expected to be floats, stops, signals, signs, are expected to be ints.</p>
+<p>Params:
+path - path to json file.</p>
+<p>Returns: a Route object.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.point_bearing">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">point_bearing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bearing_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Angle'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#point_bearing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.point_bearing" title="Link to this definition"></a></dt>
+<dd><p>point_bearing takex in the latitude and longitude of two separate ponts,
+and calculates the bearing when travelling from point 1 and point 2.</p>
+<p>Params:
+x1 - latitude pt 1 in degrees
+y1 - longitude pt 1 in degrees
+x2 - latitude pt 2 in degrees
+y2 - longitude pt 2 in degrees
+bearing_type - determine the bearing output. Options: Angle - return the angle in degrees. Compass - return the angle as a directional bearing (eg: N, E, S, W)</p>
+<p>Returns:
+bearing of the vector between the two points.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.query_bearings">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">query_bearings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bearing_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Angle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#query_bearings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.query_bearings" title="Link to this definition"></a></dt>
+<dd><p>query_bearings takes a geometric iterable of shapely points,
+and returns the corresponding bearing when travelling form one point to the next.</p>
+<p>Params:
+geometry - a series of shapely points of lat and lon
+bearing_type - determine the bearing output. Options: Angle - return the angle in degrees. Compass - return the angle as a directional bearing (eg: N, E, S, W)
+verbose - boolean to enable verbosity. Default False.</p>
+<p>Returns:
+list of bearings when travelling to subsequent point.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.query_distance_traveled">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">query_distance_traveled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#query_distance_traveled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.query_distance_traveled" title="Link to this definition"></a></dt>
+<dd><p>query_distance_traveled takes in a series of points,
+and then calculates the distance traveled from point to point, in kilometers.</p>
+<p>Parameters:
+geometry_series - a series of shapely points of lat and lon.
+verbose - boolean to enable verbosity. default False.</p>
+<p>Returns:
+an iterable representing the change in distance between each point and the next.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.query_elevation_changes">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">query_elevation_changes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elev</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#query_elevation_changes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.query_elevation_changes" title="Link to this definition"></a></dt>
+<dd><p>query_elevation_change takes an iterable of elevation,
+and returns the elevation change between the point at the
+current index, and the next poinnt.</p>
+<p>Params:
+elev - iterable of elevation data</p>
+<p>Returns:
+list of elevation changes to reach the next point.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.query_elevation_series">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">query_elevation_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtiff_dir_ser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#query_elevation_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.query_elevation_series" title="Link to this definition"></a></dt>
+<dd><p>query_elevation_series takes a series of geometric shapely points, and an iterable of
+geotiff filepaths, and generates a pandas series of elevations from each point in
+the geometry.
+Also for some reason tifs store lat and long in (lon, lat), so i swap em.</p>
+<p>Params:
+geometry - a series of shapely points of lat and lon
+gtiff_dir_ser - an iterable of geometric shapely points. Must have an identical projection to the raster files.
+verbose - boolean parameter to specify verbosity. Defualt False.</p>
+<p>Returns:
+pandas series of elevations corresponding to the geometry iterable, in km.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.query_signals">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">query_signals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_data_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SIGNAL_ID'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4326</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#query_signals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.query_signals" title="Link to this definition"></a></dt>
+<dd><p>query_signals takes in a geometric series of shapely points,
+a path to stoplight signal data, and returns a list of the signal id at
+each point in that series.</p>
+<p>Parameters:
+geometry - a series of shapely points of lat and lon.
+signal_data_path - path, as str, to a shapefile containing stop signal data.
+key - the column identifier of signal id (or other target value) to be queried
+epsg - the epsg the data will be re-set as. Default is 4326.
+margin - the distance, in meters, that the signal is allowed to be from a given point to qualify.
+verbose - boolean to enable verbosity. Default False.</p>
+<p>Returns:
+list of signal IDs, or other info about the signal, as specified.
+-1 if none found.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.query_speed_limits">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">query_speed_limits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit_data_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SPEED_LIM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4326</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0003</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_known_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0089408</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#query_speed_limits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.query_speed_limits" title="Link to this definition"></a></dt>
+<dd><p>query_speed_limits takes a geometric iterable of shapely points,
+a path to speed limit geodata, and returns the corresponding speed limits at
+each point.</p>
+<p>Params:
+geometry - a series of shapely points of lat and lon
+limit_data_path - path to shapefile of speed limit data as str
+key - column identifier of a speed limit or other value as str, assumed to be an int in units of mph
+margin - distance a point can be from the street to qualify, default 5e-5
+last_known_limit - the speed limit int value that the bus will assumedly start at or above. default 20 mph
+verbose - boolean to enable verbosity. Default False.</p>
+<p>Returns:
+list of speed limits corresponding to the geometry.</p>
+<p>Notes:
+11/13/2024 - This can be adjusted such that instead of the first value, it’s the true closest. Also can probably be combined with the other queries in such a way that it reduces individual methods. FIXED – 11/19/2024
+11/18/2024 - Currently Broken. - FIXED – 11/19/2024</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.query_stops">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">query_stops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_table_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stop_id'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsg_from</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4326</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsg_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4326</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#query_stops"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.query_stops" title="Link to this definition"></a></dt>
+<dd><p>query_stops takes in a geometry point series for a given route, and a path to
+all stop ids and geometry, and then returns a list of stop id’s in the order the
+bus will arrive.</p>
+<p>Params:
+geometry - a series of shapely points representing longitude and latitude
+stop_table_path - a path to the dataset containing stop geodata csv, as str
+key - column identifier for the stop id (or whatever value you want) as str
+epsg_from - the epsg projection the csv is in as an int, default is 4326
+epsg_to - the epsg projection the data should be reporojected to as an int, default is 4326
+margin - distance, in meters, that the stop is allowed to be from a given point to qualify, as int.
+verbose - boolean to enable verbosity. default False.</p>
+<p>Returns:
+list of stop ids (or other queried values from the data), with invalid points being labeled -1.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.repeat_id_remover">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">repeat_id_remover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#repeat_id_remover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.repeat_id_remover" title="Link to this definition"></a></dt>
+<dd><p>repeat_id_remover takes an iterable of IDs where -1 is invalid,
+and swaps out any repeat index with an invalid.</p>
+<p>Params:
+sequence - a sequence of id values in an iterable.</p>
+<p>Returns:
+sequence with repeated values swapped for a -1.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.reproject_rasterfiles">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">reproject_rasterfiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath_sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_crs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'EPSG:4326'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#reproject_rasterfiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.reproject_rasterfiles" title="Link to this definition"></a></dt>
+<dd><p>reproject_rasterfiles takes an iterable of geotiff files, and
+then reprojects them as a target crs and saves them in the same
+directory as the original.</p>
+<p>Params:
+filepath_sequence - an iterable of filepaths to geotiff files.
+target_crs - the projection system the rasterfiles are to be re-projected to.
+verbose - specify if the output is verbose. Boolean default False.</p>
+<p>Returns:
+iterable sequence of the newly reprojected files.</p>
+<p>Notes:
+11/14/2024 - This should be made to have the ability to override if requested. For now, leaving it as-is is fine.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.smooth_elevation">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">smooth_elevation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elev_series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">43</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#smooth_elevation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.smooth_elevation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.verbose_line_updater">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">verbose_line_updater</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#verbose_line_updater"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.verbose_line_updater" title="Link to this definition"></a></dt>
+<dd><p>verbose_line_updater generates a verbose message with timestamps and
+method calls based on a passed message. Can reset printline if specified.</p>
+<p>Params:
+message - message, as str, to be printed with the line.
+reset - boolean to reset carrige or not. Default false.</p>
+<p>Returns:
+The string to be printed.</p>
+</dd></dl>
+
+</section>
+<section id="module-reRoute_Dynamics.Instance_Tools">
+<span id="reroute-dynamics-instance-tools-module"></span><h2>reRoute_Dynamics.Instance_Tools module<a class="headerlink" href="#module-reRoute_Dynamics.Instance_Tools" title="Link to this heading"></a></h2>
+<p>Instance_Tools.py
+S. Peck</p>
+<p>Instance_Tools.py contains methods used in the processing and handling of individual points on a route and other
+miscellaneous methods in generating a trip.</p>
+<p>Methods:
+generate_riders() - method used to generate a series of ridership changes at each stop based on the
+expected ridership of that series.
+check_hit_signal() - method to return if a signal light has been hit or not based on random chance.
+determine_stop_type() - method used to determine what kind of stop a position is based on ridership, signals, and signs.
+get_stop_type() - method to create an array of stop type booleans for a given position.
+get_distances_to_stop() - method to determine how much distance is between the current index and the next stop.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Instance_Tools.check_hit_signal">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Instance_Tools.</span></span><span class="sig-name descname"><span class="pre">check_hit_signal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stoplight_chance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.541666</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Instance_Tools.html#check_hit_signal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Instance_Tools.check_hit_signal" title="Link to this definition"></a></dt>
+<dd><p>check_hit_signal() takes a chance to hit a yellow/red,
+and randomly generates a flag if the light is hit (a stop) or not.</p>
+<p>Params:
+stoplight_chance - float, the fraction of time a stoplight will be hit. defualt based on 120s cycle, 55s g, 65 red/yellow. <a class="reference external" href="https://wsdot.wa.gov/travel/operations-services/traffic-signals">https://wsdot.wa.gov/travel/operations-services/traffic-signals</a>
+seed - int, default none, used for the seed of randomness.</p>
+<p>Returns:
+an int, 0 or 1, depending if the light is green or red.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Instance_Tools.determine_stop_type">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Instance_Tools.</span></span><span class="sig-name descname"><span class="pre">determine_stop_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rider_changes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hit_signals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Instance_Tools.html#determine_stop_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Instance_Tools.determine_stop_type" title="Link to this definition"></a></dt>
+<dd><p>determine_stop_type() is used to determine the stop types based on
+ridership, signals, and signs, and ends.</p>
+<p>Params:
+rider_changes - iterable of ridership changes for a route
+hit_signals - iterable of signals for a route
+signs - iterable of signs for a route.</p>
+<p>Returns:
+a list of lists containing 0 or 1 for each stop type, with index of the sub-lists
+corresponding to the passed stop types.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Instance_Tools.generate_riders">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Instance_Tools.</span></span><span class="sig-name descname"><span class="pre">generate_riders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_stops</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_ridership</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Instance_Tools.html#generate_riders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Instance_Tools.generate_riders" title="Link to this definition"></a></dt>
+<dd><p>generate_riders() uses a number of stops, and mean ridership,
+and then generates a list of riderhsip changes by stops, such that
+the ridership is as close to the ceiling of the mean as possible.</p>
+<p>Params:
+n_stops - int of number of stops.
+mean_ridership - float of the mean ridership for the trip
+seed - int, default None, used for the seed of the randomness.</p>
+<p>Returns:
+list of randomly generated ridership changes at each stop.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Instance_Tools.get_distances_to_stops">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Instance_Tools.</span></span><span class="sig-name descname"><span class="pre">get_distances_to_stops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stop_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traveled_distance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Instance_Tools.html#get_distances_to_stops"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Instance_Tools.get_distances_to_stops" title="Link to this definition"></a></dt>
+<dd><p>get_distances_to_stops() takes an iterable of stop types, and the corresponding cumulative travel distances,
+and then generates an iterable of distance to the next stop of any type.</p>
+<p>Params:
+stop_types - iterable of stop types as generated by determine_stop_type()
+traveled_distance - iterable of cumulative traveled distance.</p>
+<p>Returns:
+iterable of the distance to the next stop based on current locaton.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Instance_Tools.get_stop_type">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Instance_Tools.</span></span><span class="sig-name descname"><span class="pre">get_stop_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ridership</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sign</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Instance_Tools.html#get_stop_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Instance_Tools.get_stop_type" title="Link to this definition"></a></dt>
+<dd><p>get_stop_type() takes a ridership, signal, and sign point,
+and converts to a list of 0’s and 1’s depending on if each is
+valid or not.</p>
+</dd></dl>
+
+</section>
+<section id="module-reRoute_Dynamics.Object_Params">
+<span id="reroute-dynamics-object-params-module"></span><h2>reRoute_Dynamics.Object_Params module<a class="headerlink" href="#module-reRoute_Dynamics.Object_Params" title="Link to this heading"></a></h2>
+<p>Object_Params.py
+S. Peck</p>
+<p>Object_Params is used to create, save, and load object classes that store relevant parameters for modeling.</p>
+<p>Methods:
+load_bus_params() - method to load a Bus object from a saved txt file.
+load_ESS_params() - method to load an ESS object from a saved txt file.
+load_trip_params() - method ot load a trip object from a saved txt file.
+a_eqn() - method to calculate the acceleration at a given time in accordance to a fitting equation.
+generate_a_profile() - method to create and save an acceleration profile based on a fitting equation.</p>
+<p>Classes:
+Bus - a class that is used to store modeling parameters for a bus vehicle.
+copy() - method to create a copy of the bus class
+save() - method to save the bus object to a txt file
+ESS - a class that is used to store modeling parameters and methods for an Energy Storage System.
+copy() - method to create a copy of the ESS
+save() - method to save the ESS object to a txt file
+bus_E_cap() - method to calculate the energy capacity of the ESS
+R_bus() - method to calculate the resistance of the ESS
+calc_instance_power() - method to calculate the load on the ESS based on the load needed
+calc_voltage_simple() - method to calculate the pack voltage using a simple resistance model at a given power.
+Trip - a class that is used to store modeling parameters for a given vehicle trip.
+copy() - method to create a copy of the Trip
+save() - method to save the trip object to a txt file.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.Bus">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Object_Params.</span></span><span class="sig-name descname"><span class="pre">Bus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bus_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">13300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frontal_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.59</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frontal_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.38</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drag_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">friction_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">braking_accel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">br_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">304.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_prof_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/home/sebastian/Documents/GitHub/reRoute_Dynamics/Examples/KC_Example_Data/Acceleration_Profiles/Braunschweig_Acceleration.csv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_acc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_P</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">160000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#Bus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.Bus" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.Bus.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#Bus.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.Bus.copy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.Bus.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#Bus.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.Bus.save" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.ESS">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Object_Params.</span></span><span class="sig-name descname"><span class="pre">ESS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">motor_eff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.916</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverter_eff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.971</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_eff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.89</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simple_load</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regen_eff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_regen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-100000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_ocv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.008</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_struct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(12,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bus_struct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(16,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_cap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#ESS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.ESS" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.ESS.R_bus">
+<span class="sig-name descname"><span class="pre">R_bus</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#ESS.R_bus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.ESS.R_bus" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.ESS.bus_E_cap">
+<span class="sig-name descname"><span class="pre">bus_E_cap</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#ESS.bus_E_cap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.ESS.bus_E_cap" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.ESS.calc_instance_power">
+<span class="sig-name descname"><span class="pre">calc_instance_power</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#ESS.calc_instance_power"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.ESS.calc_instance_power" title="Link to this definition"></a></dt>
+<dd><p>calc_instance_power takes in a power value,
+and converts it to the corresponding load on the ESS.
+This is a simple stopgap.</p>
+<p>Parameters:
+value: a power value in Watts, as an int or float.</p>
+<p>Returns:
+converted battery power as a float.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.ESS.calc_voltage_simple">
+<span class="sig-name descname"><span class="pre">calc_voltage_simple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#ESS.calc_voltage_simple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.ESS.calc_voltage_simple" title="Link to this definition"></a></dt>
+<dd><p>Use a simple resistance model to calculate the voltage of a module based off of a given power.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.ESS.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#ESS.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.ESS.copy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.ESS.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#ESS.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.ESS.save" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.Trip">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Object_Params.</span></span><span class="sig-name descname"><span class="pre">Trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pass_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">70</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit_MOE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.47</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_rest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_chance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.541666</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_rest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sign_rest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_rest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">air_density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wind_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.78</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wind_heading</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12.788</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_ridership</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">43</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traffic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#Trip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.Trip" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.Trip.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#Trip.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.Trip.copy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.Trip.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#Trip.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.Trip.save" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.a_eqn">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Object_Params.</span></span><span class="sig-name descname"><span class="pre">a_eqn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-4.9661</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.9465</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#a_eqn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.a_eqn" title="Link to this definition"></a></dt>
+<dd><p>a_eqn is used to calculate the acceleration at a given time during the acceleration process from zero.
+the default values are based on a fit of the Braunschweig drive cycle.</p>
+<p>Params:
+t: time, in seconds, since the bus began accelerating, as a float
+m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from Braunschweig <a class="reference external" href="https://www.nrel.gov/transportation/drive-cycle-tool/">https://www.nrel.gov/transportation/drive-cycle-tool/</a> Default of -4.9661.
+b: intercept value of aformentioned fit as float. Default of 2.9465.</p>
+<p>Returns:
+acceleration in m/s^2.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.generate_a_profile">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Object_Params.</span></span><span class="sig-name descname"><span class="pre">generate_a_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-4.9661</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.9465</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">34</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#generate_a_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.generate_a_profile" title="Link to this definition"></a></dt>
+<dd><p>generate_a_profile() takes the fit parameters for an acceleration profile, and
+generates one for a given range and step and saves at a filepath.</p>
+<p>Params:
+filepath: savefile path and filename.
+m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from
+Braunschweig <a class="reference external" href="https://www.nrel.gov/transportation/drive-cycle-tool/">https://www.nrel.gov/transportation/drive-cycle-tool/</a>
+Default of -4.9661.
+b: intercept value of aformentioned fit as float. Default of 2.9465.
+start: starting value for range. Default value of 0
+stop: stop value for range. Default value of 34
+step: step size for range. Default of .5.</p>
+<p>Returns:
+filepath to generated acceleration profile</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.load_ESS_params">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Object_Params.</span></span><span class="sig-name descname"><span class="pre">load_ESS_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#load_ESS_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.load_ESS_params" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.load_bus_params">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Object_Params.</span></span><span class="sig-name descname"><span class="pre">load_bus_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#load_bus_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.load_bus_params" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.load_trip_params">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Object_Params.</span></span><span class="sig-name descname"><span class="pre">load_trip_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#load_trip_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.load_trip_params" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-reRoute_Dynamics.Physics_Engine">
+<span id="reroute-dynamics-physics-engine-module"></span><h2>reRoute_Dynamics.Physics_Engine module<a class="headerlink" href="#module-reRoute_Dynamics.Physics_Engine" title="Link to this heading"></a></h2>
+<p>Physics_Engine.py
+S. Peck</p>
+<p>Physics_Engine.py contains methods used in the calculation of energy, speed changes, and time
+for a bus object based on external conditions, using a Longitudinal Dynamic Model.</p>
+<p>Methods:
+calculate_wind_force() - method for determining the force that wind exerts on a moving vehicle.
+sign() - method to get what sign (positive or negative) a number is
+calculate_grade_froce() - method for determining the force that the road exerts on a moving vehicle.
+get_braking_distance() - method to calculate the distance it will take a vehicle to stop at its current conditions.
+brake() - method that determines the final velocity, power use, and time change to brake a vehicle for a distance.
+maintain() - method that determines the final velocity, power use, and time change to maintain a vehicle’s speed.
+accelerate() - method to determine the final velocity, power use, and time change to accelerate a vehicle with a given profile.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Physics_Engine.accelerate">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Physics_Engine.</span></span><span class="sig-name descname"><span class="pre">accelerate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">velocity,</span> <span class="pre">mass,</span> <span class="pre">travel_distance,</span> <span class="pre">grade_force,</span> <span class="pre">wind_force,</span> <span class="pre">raw_a_prof=</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">1</span> <span class="pre">0</span>&#160;&#160;&#160; <span class="pre">0.0</span>&#160; <span class="pre">0.018375</span> <span class="pre">1</span>&#160;&#160;&#160; <span class="pre">0.5</span>&#160; <span class="pre">0.659044</span> <span class="pre">2</span>&#160;&#160;&#160; <span class="pre">1.0</span>&#160; <span class="pre">1.533375</span> <span class="pre">3</span>&#160;&#160;&#160; <span class="pre">1.5</span>&#160; <span class="pre">1.973464</span> <span class="pre">4</span>&#160;&#160;&#160; <span class="pre">2.0</span>&#160; <span class="pre">2.075316</span> <span class="pre">..</span>&#160;&#160; <span class="pre">...</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">...</span> <span class="pre">62</span>&#160; <span class="pre">31.0</span>&#160; <span class="pre">0.081391</span> <span class="pre">63</span>&#160; <span class="pre">31.5</span>&#160; <span class="pre">0.079062</span> <span class="pre">64</span>&#160; <span class="pre">32.0</span>&#160; <span class="pre">0.076831</span> <span class="pre">65</span>&#160; <span class="pre">32.5</span>&#160; <span class="pre">0.074693</span> <span class="pre">66</span>&#160; <span class="pre">33.0</span>&#160; <span class="pre">0.072643</span>&#160; <span class="pre">[67</span> <span class="pre">rows</span> <span class="pre">x</span> <span class="pre">2</span> <span class="pre">columns],</span> <span class="pre">braking_acceleration=1.5,</span> <span class="pre">braking_factor=0.5,</span> <span class="pre">inertial_factor=1.1,</span> <span class="pre">max_power=160000,</span> <span class="pre">max_acc=0.4,</span> <span class="pre">max_timestep=0.5</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Physics_Engine.html#accelerate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Physics_Engine.accelerate" title="Link to this definition"></a></dt>
+<dd><p>accelerate() is used to determine the velocity change, time change, and power consumption of accelerating
+a mass at a given velocity over a set distance, with a given acceleration profile.</p>
+<p>Params:
+velocity - object’s initial velocity as a float, in m/s.
+mass - mass of the object in kg.
+travel_distance - distance to brake over, in meters.
+grade_force - force, in N, due to the grade of the slope the object experiences.
+wind_force - force, in N, experienced by the object due to wind resistance.
+raw_a_prof - an acceleration profile, with the 0 index column being cumulative time, and the 1 being acceleration at that time (in m/s^2)
+braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2
+braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.
+inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1
+max_power - float representing the maximum motor power. Default 160000 W.</p>
+<p>Returns:
+a dict containing final velocity v_f, time change dt, and power P.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Physics_Engine.brake">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Physics_Engine.</span></span><span class="sig-name descname"><span class="pre">brake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">velocity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">travel_distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grade_force</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wind_force</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">braking_acceleration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">braking_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inertial_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">304.8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Physics_Engine.html#brake"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Physics_Engine.brake" title="Link to this definition"></a></dt>
+<dd><p>brake() is used to determine the velocity change, time change, and power consumption of braking
+a mass at a given velocity over a set distance.</p>
+<p>Params:
+velocity - object’s initial velocity as a float, in m/s.
+mass - mass of the object in kg.
+travel_distance - distance to brake over, in meters.
+grade_force - force, in N, due to the grade of the slope the object experiences.
+wind_force - force, in N, experienced by the object due to wind resistance.
+braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2
+braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.
+inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1
+max_distance - float representing the ideal maximum distance the bust takes to stop. Default 304.8 m. <strong>UNUSED</strong></p>
+<p>Returns:
+a dict containing final velocity v_f, time change dt, power P, and braking factor bf.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Physics_Engine.calculate_grade_force">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Physics_Engine.</span></span><span class="sig-name descname"><span class="pre">calculate_grade_force</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grade</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Physics_Engine.html#calculate_grade_force"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Physics_Engine.calculate_grade_force" title="Link to this definition"></a></dt>
+<dd><p>calculate_grade_force takes a grade of a slope, a mass, and friction
+coefficient, and calculates the force due to gravity against the direction of
+travel of the mass. Negative value means the object is being accelerated,
+rather than decellerated.</p>
+<p>Params:
+grade - grade angle of a point, as a percent float.
+mass - mass of object as a float, in kg
+f_coeff - the coefficient of friction. default .01.</p>
+<p>Returns:
+net force due to gravity as float, in Newtons</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Physics_Engine.calculate_wind_force">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Physics_Engine.</span></span><span class="sig-name descname"><span class="pre">calculate_wind_force</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bearing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wind_bearing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wind_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">air_density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drag_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frontal_area</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8.58</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Physics_Engine.html#calculate_wind_force"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Physics_Engine.calculate_wind_force" title="Link to this definition"></a></dt>
+<dd><p>calculate_wind_force() is used to calculate the force exerted against
+the bus’s direction of travel by the wind.</p>
+<p>Params:
+bearing - compass heading, in degrees (float), the bus is travelling in.
+speed - current bus velocity. (float)
+wind_bearing - compass heading, in degrees (float), the wind is in. Default of SE directon
+wind_speed - current wind velocity in its direction of travel. (float) Default of 4 m/s
+air_density - current air density. (float), default 1.2 kg/m^3
+drag_coeff - drag coefficient of the bus. (float), default .6.
+frontal_area - frontal area of bus.  (float), default 2.6*3.3 m^2</p>
+<p>Returns:
+float representation of force exerted against bus’s direction
+of travel. Negative means the bus is being accelerated by the wind.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Physics_Engine.get_braking_distance">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Physics_Engine.</span></span><span class="sig-name descname"><span class="pre">get_braking_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">velocity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grade_force</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wind_force</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">braking_acceleration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">braking_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inertial_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">304.8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Physics_Engine.html#get_braking_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Physics_Engine.get_braking_distance" title="Link to this definition"></a></dt>
+<dd><p>get_braking_distance() is used to determine how far an object needs to stop.</p>
+<p>Params:
+velocity - object’s initial velocity as a float, in m/s.
+mass - mass of the object in kg.
+grade_force - force, in N, due to the grade of the slope the object experiences.
+wind_force - force, in N, experienced by the object due to wind resistance.
+braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2
+braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.
+inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1
+max_distance - float representing the ideal maximum distance the bust takes to stop. Default 304.8 m.</p>
+<p>Returns:
+a dict containing braking distance dx, braking factor bf, and decelleration rate ad.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Physics_Engine.maintain">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Physics_Engine.</span></span><span class="sig-name descname"><span class="pre">maintain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">velocity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">travel_distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grade_force</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wind_force</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">braking_acceleration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">braking_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inertial_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">160000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Physics_Engine.html#maintain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Physics_Engine.maintain" title="Link to this definition"></a></dt>
+<dd><p>maintain() is used to determine the velocity change, time change, and power consumption of maintaining
+a mass at a given velocity over a set distance.</p>
+<p>Params:
+velocity - object’s initial velocity as a float, in m/s.
+mass - mass of the object in kg.
+travel_distance - distance to brake over, in meters.
+grade_force - force, in N, due to the grade of the slope the object experiences.
+wind_force - force, in N, experienced by the object due to wind resistance.
+braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2
+braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.
+inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1
+max_power - float representing the maximum motor power. Default 160000 W.</p>
+<p>Returns:
+a dict containing final velocity v_f, time change dt, and power P.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Physics_Engine.sign">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Physics_Engine.</span></span><span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Physics_Engine.html#sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Physics_Engine.sign" title="Link to this definition"></a></dt>
+<dd><p>sign checks the sign of a number.</p>
+</dd></dl>
+
+</section>
+<section id="module-reRoute_Dynamics.Trip_Simulator">
+<span id="reroute-dynamics-trip-simulator-module"></span><h2>reRoute_Dynamics.Trip_Simulator module<a class="headerlink" href="#module-reRoute_Dynamics.Trip_Simulator" title="Link to this heading"></a></h2>
+<p>Trip_Simulator.py
+S. Peck</p>
+<p>Trip_Simulator.py contains the method and scripting used to simulate a vehicle trip by passing a vehicle and its driving
+conditions through logic and then into a Longitudinal Dynamics Model in Physics_Engine.py.
+This can also be run as a standalone script.</p>
+<p>Methods:
+simulate_trip.py - method to run a vehicle with a given ESS on a given trip over a given route.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="reRoute_Dynamics.Trip_Simulator.simulate_trip">
+<span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Trip_Simulator.</span></span><span class="sig-name descname"><span class="pre">simulate_trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">route</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trip=&lt;reRoute_Dynamics.Object_Params.Trip</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bus=&lt;reRoute_Dynamics.Object_Params.Bus</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ESS=&lt;reRoute_Dynamics.Object_Params.ESS</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Trip_Simulator.html#simulate_trip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Trip_Simulator.simulate_trip" title="Link to this definition"></a></dt>
+<dd><p>simulate_trip() takes a route, and returns a modeled power consumption and velocity
+for a vehicle on that given trip.</p>
+<p>Params:
+route: a route object as exported by Geography_Tools.py that the vehicle will traverse
+trip: Default - Object_Parameters.Trip(), a trip object from Object_Params that determines the external conditions of the trip
+bus: Default - Object_Parameters.Bus(), a bus object from Object_Params that determines the vehicle design
+ESS: Default - Object_Parameters.ESS(),an ess object from Object_Params that determines the Energy Storage System design</p>
+<p>Return:
+a geodataframe that provides all the relevant driving conditions, positional velocity, and modeled power required (NOT ESS LOAD).</p>
+</dd></dl>
+
+</section>
+<section id="module-reRoute_Dynamics">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-reRoute_Dynamics" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="reRoute_Dynamics_Core" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Sebastian Peck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,554 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reRoute_Dynamics.Object_Params &mdash; reRoute_Dynamics 25w16a documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d146563a"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            reRoute_Dynamics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">reRoute_Dynamics_Core</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">reRoute_Dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">reRoute_Dynamics.Object_Params</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for reRoute_Dynamics.Object_Params</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Object_Params.py</span>
+<span class="sd">S. Peck</span>
+
+<span class="sd">Object_Params is used to create, save, and load object classes that store relevant parameters for modeling.</span>
+
+<span class="sd">Methods:</span>
+<span class="sd">load_bus_params() - method to load a Bus object from a saved txt file.</span>
+<span class="sd">load_ESS_params() - method to load an ESS object from a saved txt file.</span>
+<span class="sd">load_trip_params() - method ot load a trip object from a saved txt file.</span>
+<span class="sd">a_eqn() - method to calculate the acceleration at a given time in accordance to a fitting equation.</span>
+<span class="sd">generate_a_profile() - method to create and save an acceleration profile based on a fitting equation.</span>
+
+<span class="sd">Classes:</span>
+<span class="sd">Bus - a class that is used to store modeling parameters for a bus vehicle. </span>
+<span class="sd">copy() - method to create a copy of the bus class</span>
+<span class="sd">save() - method to save the bus object to a txt file</span>
+<span class="sd">ESS - a class that is used to store modeling parameters and methods for an Energy Storage System.</span>
+<span class="sd">copy() - method to create a copy of the ESS</span>
+<span class="sd">save() - method to save the ESS object to a txt file</span>
+<span class="sd">bus_E_cap() - method to calculate the energy capacity of the ESS</span>
+<span class="sd">R_bus() - method to calculate the resistance of the ESS</span>
+<span class="sd">calc_instance_power() - method to calculate the load on the ESS based on the load needed</span>
+<span class="sd">calc_voltage_simple() - method to calculate the pack voltage using a simple resistance model at a given power.</span>
+<span class="sd">Trip - a class that is used to store modeling parameters for a given vehicle trip.</span>
+<span class="sd">copy() - method to create a copy of the Trip</span>
+<span class="sd">save() - method to save the trip object to a txt file. </span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">ast</span> <span class="kn">import</span> <span class="n">literal_eval</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;../src/reRoute_Dynamics/&quot;</span><span class="p">))</span>
+<span class="n">A_PROF_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;../Examples/KC_Example_Data/Acceleration_Profiles/Braunschweig_Acceleration.csv&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Bus">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.Bus">[docs]</a>
+<span class="k">class</span> <span class="nc">Bus</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="c1"># Bus Params</span>
+                 <span class="n">bus_mass</span> <span class="o">=</span> <span class="mi">13300</span><span class="p">,</span> <span class="c1"># kg, @NF_Excelsior</span>
+                 <span class="n">frontal_width</span> <span class="o">=</span> <span class="mf">2.59</span><span class="p">,</span> <span class="c1"># m, @NF_Excelsior</span>
+                 <span class="n">frontal_height</span> <span class="o">=</span> <span class="mf">3.38</span><span class="p">,</span> <span class="c1">#m, @NF_Excelsior</span>
+                 <span class="n">drag_coeff</span> <span class="o">=</span><span class="mf">.6</span><span class="p">,</span> <span class="c1"># From Aggregate, @Abdelaty_Mohamed</span>
+                 <span class="n">friction_coeff</span> <span class="o">=</span> <span class="mf">.01</span><span class="p">,</span> <span class="c1"># @Abdelaty_Mohamed</span>
+                 <span class="n">braking_accel</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span> <span class="c1">#m/s^2 @APTA_Braking_Standards &lt;-- Possible source, handbrake road minimum is ~1.5</span>
+                 <span class="n">br_factor</span> <span class="o">=</span> <span class="mf">.5</span><span class="p">,</span> <span class="c1"># Not tied to any true value.</span>
+                 <span class="n">a_factor</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="c1"># Not tied to any true value</span>
+                 <span class="n">i_factor</span> <span class="o">=</span> <span class="mf">1.1</span><span class="p">,</span> <span class="c1"># intertial factor, @Asamer_Et_Al</span>
+                 <span class="n">max_dist</span> <span class="o">=</span> <span class="mf">304.8</span><span class="p">,</span> <span class="c1"># m, Assembled from google measurements of offramps from I5</span>
+                 <span class="n">a_prof_path</span> <span class="o">=</span> <span class="n">A_PROF_PATH</span><span class="p">,</span> <span class="c1">#@NREL_Drive_Cycles</span>
+                 <span class="n">max_acc</span> <span class="o">=</span> <span class="mf">.4</span><span class="p">,</span> <span class="c1"># m/s^2, the default accel after profile finishes.</span>
+                 <span class="n">max_dt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="c1"># s, timestep for the default acceleration betond the profile.</span>
+                 <span class="n">max_P</span> <span class="o">=</span> <span class="mi">160000</span> <span class="c1"># Watts, max power output by the motors. Default not tied to a true value.</span>
+                <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a_prof_path</span><span class="o">=</span><span class="n">a_prof_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_w</span> <span class="o">=</span> <span class="n">frontal_width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_h</span> <span class="o">=</span> <span class="n">frontal_height</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="n">bus_mass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">area</span> <span class="o">=</span> <span class="n">frontal_width</span><span class="o">*</span><span class="n">frontal_height</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Cd</span> <span class="o">=</span> <span class="n">drag_coeff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Cf</span> <span class="o">=</span> <span class="n">friction_coeff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a_br</span> <span class="o">=</span> <span class="n">braking_accel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_br</span> <span class="o">=</span> <span class="n">br_factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_i</span> <span class="o">=</span> <span class="n">i_factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dmax</span> <span class="o">=</span> <span class="n">max_dist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a_prof</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">a_prof_path</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a_max</span> <span class="o">=</span> <span class="n">max_acc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt_max</span> <span class="o">=</span> <span class="n">max_dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">P_max</span> <span class="o">=</span> <span class="n">max_P</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_a</span> <span class="o">=</span> <span class="n">a_factor</span>
+        
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">a_prof</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_prof</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">9.81</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a_prof</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt_max</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_prof</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_prof</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_max</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">a_prof</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">a_prof</span><span class="p">,</span>  <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([{</span><span class="mi">0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt_max</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_prof</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_max</span><span class="p">}])])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        
+<div class="viewcode-block" id="Bus.copy">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.Bus.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Bus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Cd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Cf</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_br</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_br</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dmax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a_prof_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">P_max</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Bus.save">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.Bus.save">[docs]</a>
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">_w</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">_h</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">Cd</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">Cf</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">a_br</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">f_br</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">f_a</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">f_i</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">dmax</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">_a_prof_path</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">a_max</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">dt_max</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">P_max</span><span class="p">)</span>
+        
+
+
+        <span class="c1"># Clear the file</span>
+        <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        
+        <span class="c1"># Write the params</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">filepath</span></div>
+</div>
+
+    
+
+<div class="viewcode-block" id="load_bus_params">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.load_bus_params">[docs]</a>
+<span class="k">def</span> <span class="nf">load_bus_params</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">data_list</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+    
+    <span class="n">numerical_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">numerical_indexes</span><span class="p">:</span>
+        <span class="n">data_list</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data_list</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">data_list</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">Bus</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+    
+
+<div class="viewcode-block" id="ESS">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.ESS">[docs]</a>
+<span class="k">class</span> <span class="nc">ESS</span><span class="p">:</span> 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="c1"># ESS instance</span>
+                 <span class="n">motor_eff</span> <span class="o">=</span> <span class="mf">.916</span><span class="p">,</span> <span class="c1">#Approximation</span>
+                 <span class="n">inverter_eff</span> <span class="o">=</span> <span class="mf">.971</span><span class="p">,</span> <span class="c1">#Approximation</span>
+                 <span class="n">aux_eff</span> <span class="o">=</span> <span class="mf">.89</span><span class="p">,</span> <span class="c1"># Approximation</span>
+                 <span class="n">simple_load</span> <span class="o">=</span> <span class="mi">7000</span><span class="p">,</span> <span class="c1"># Watts - @Abdelaty_Mohamed</span>
+                 <span class="n">regen_eff</span> <span class="o">=</span> <span class="mf">.6</span><span class="p">,</span> <span class="c1"># @Gallet</span>
+                 <span class="n">max_regen</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100000</span><span class="p">,</span> <span class="c1"># Watts,Approximation</span>
+                 <span class="n">cell_ocv</span> <span class="o">=</span> <span class="mf">3.3</span><span class="p">,</span> <span class="c1"># Nominal LFP voltage for A123 26650 @A123_26650</span>
+                 <span class="n">cell_res</span> <span class="o">=</span> <span class="mf">.008</span><span class="p">,</span> <span class="c1">#ohms, cell internal resistance LFP A123 26650 @A123_25550</span>
+                 <span class="n">module_struct</span> <span class="o">=</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span><span class="c1"># Series, parallel config for a module of cells</span>
+                 <span class="n">bus_struct</span> <span class="o">=</span> <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="c1"># Series, parallel config for the modules of the bus</span>
+                 <span class="n">cell_cap</span> <span class="o">=</span> <span class="mf">2.3</span> <span class="c1"># Ah, nominal cell capacity @A123_26650</span>
+                <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Em</span> <span class="o">=</span> <span class="n">motor_eff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ei</span> <span class="o">=</span> <span class="n">inverter_eff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ea</span> <span class="o">=</span> <span class="n">aux_eff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Er</span> <span class="o">=</span> <span class="n">regen_eff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">P_aux</span> <span class="o">=</span> <span class="n">simple_load</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">P_regen</span> <span class="o">=</span> <span class="n">max_regen</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">V_cell</span> <span class="o">=</span> <span class="n">cell_ocv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R_cell</span> <span class="o">=</span> <span class="n">cell_res</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module_S_P</span> <span class="o">=</span> <span class="n">module_struct</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bus_S_P</span> <span class="o">=</span> <span class="n">bus_struct</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q_cell</span> <span class="o">=</span> <span class="n">cell_cap</span>
+    
+<div class="viewcode-block" id="ESS.bus_E_cap">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.ESS.bus_E_cap">[docs]</a>
+    <span class="k">def</span> <span class="nf">bus_E_cap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_cell</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">module_S_P</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">bus_S_P</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Q_cell</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">module_S_P</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">bus_S_P</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+        
+        
+<div class="viewcode-block" id="ESS.R_bus">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.ESS.R_bus">[docs]</a>
+    <span class="k">def</span> <span class="nf">R_bus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_cell</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">module_S_P</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">module_S_P</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">bus_S_P</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">bus_S_P</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> </div>
+
+    
+<div class="viewcode-block" id="ESS.calc_instance_power">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.ESS.calc_instance_power">[docs]</a>
+    <span class="k">def</span> <span class="nf">calc_instance_power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        calc_instance_power takes in a power value,</span>
+<span class="sd">        and converts it to the corresponding load on the ESS.</span>
+<span class="sd">        This is a simple stopgap.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        value: a power value in Watts, as an int or float.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        converted battery power as a float.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># set the battery power to zero.</span>
+        <span class="n">bat_pow</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># Including Auxilliary load, though not strictly important at the moment. </span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="c1"># Discharging, converting the needed power into power battery must exert</span>
+            <span class="n">bat_pow</span> <span class="o">=</span> <span class="n">value</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Em</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Ei</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">P_aux</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">Ea</span><span class="p">)</span>
+        <span class="k">elif</span><span class="p">(</span><span class="n">value</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Er</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Em</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">P_regen</span><span class="p">):</span>
+
+            <span class="c1">#charging, the regenerative braking ALL the time, max regen is 100</span>
+            <span class="n">bat_pow</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Er</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Em</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">P_aux</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">Ea</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bat_pow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">P_regen</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">P_aux</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">Ea</span><span class="p">)</span>
+
+
+        <span class="c1"># Return the battery power.</span>
+        <span class="k">return</span> <span class="n">bat_pow</span></div>
+
+    
+    
+<div class="viewcode-block" id="ESS.calc_voltage_simple">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.ESS.calc_voltage_simple">[docs]</a>
+    <span class="k">def</span> <span class="nf">calc_voltage_simple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Use a simple resistance model to calculate the voltage of a module based off of a given power.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">sign</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sign</span> <span class="o">=</span> <span class="mi">1</span>
+            
+
+        <span class="n">I</span> <span class="o">=</span> <span class="n">sign</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">R_bus</span><span class="p">())</span>
+        <span class="n">v_module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">module_S_P</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V_cell</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R_cell</span> <span class="o">*</span> <span class="n">I</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bus_S_P</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">module_S_P</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">v_module</span></div>
+
+        
+        
+<div class="viewcode-block" id="ESS.copy">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.ESS.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ESS</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Em</span><span class="p">,</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">Ei</span><span class="p">,</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">Ea</span><span class="p">,</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">P_aux</span><span class="p">,</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">Er</span><span class="p">,</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">P_regen</span><span class="p">,</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">V_cell</span><span class="p">,</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">R_cell</span><span class="p">,</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">module_S_P</span><span class="p">,</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">bus_S_P</span><span class="p">,</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">Q_cell</span><span class="p">)</span></div>
+
+    
+    
+<div class="viewcode-block" id="ESS.save">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.ESS.save">[docs]</a>
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">|</span><span class="si">{}</span><span class="s2">|</span><span class="si">{}</span><span class="s2">|</span><span class="si">{}</span><span class="s2">|</span><span class="si">{}</span><span class="s2">|</span><span class="si">{}</span><span class="s2">|</span><span class="si">{}</span><span class="s2">|</span><span class="si">{}</span><span class="s2">|</span><span class="si">{}</span><span class="s2">|</span><span class="si">{}</span><span class="s2">|</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Em</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">Ei</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">Ea</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">P_aux</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">Er</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">P_regen</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">V_cell</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">R_cell</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">module_S_P</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">bus_S_P</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">Q_cell</span><span class="p">)</span>
+        
+        <span class="c1"># Clear the file</span>
+        <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        
+        <span class="c1"># Write the params</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">filepath</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="load_ESS_params">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.load_ESS_params">[docs]</a>
+<span class="k">def</span> <span class="nf">load_ESS_params</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">data_list</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
+    
+    <span class="n">numerical_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+    <span class="n">tuple_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+    
+
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">numerical_indexes</span><span class="p">:</span>
+        <span class="n">data_list</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data_list</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">tuple_indexes</span><span class="p">:</span>
+        <span class="n">data_list</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">literal_eval</span><span class="p">(</span><span class="n">data_list</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        
+    <span class="n">args</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">data_list</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ESS</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+          
+        
+<div class="viewcode-block" id="Trip">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.Trip">[docs]</a>
+<span class="k">class</span> <span class="nc">Trip</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">pass_mass</span> <span class="o">=</span> <span class="mi">70</span><span class="p">,</span> <span class="c1"># kg Approximation</span>
+                 <span class="n">limit_MOE</span> <span class="o">=</span> <span class="mf">4.47</span><span class="p">,</span> <span class="c1">#m/s, or 10 mph &lt;- Custom</span>
+                 <span class="n">signal_rest</span> <span class="o">=</span> <span class="mi">65</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="c1"># s, based on @WSDOT_Signals</span>
+                 <span class="n">signal_chance</span><span class="o">=</span><span class="mf">.541666</span><span class="p">,</span> <span class="c1"># Approximation</span>
+                 <span class="n">stop_rest</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span> <span class="c1"># seconds per passenger boarding, Approximation</span>
+                 <span class="n">sign_rest</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span> <span class="c1"># Approximation</span>
+                 <span class="n">end_rest</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="c1"># seconds before engine shutdown/startup - Approxiamaiton</span>
+                 <span class="n">air_density</span> <span class="o">=</span> <span class="mf">1.2</span> <span class="p">,</span> <span class="c1"># kg/m^3, approximate at 20 deg C.</span>
+                 <span class="n">wind_speed</span> <span class="o">=</span> <span class="mf">1.78</span><span class="p">,</span> <span class="c1"># m/s, typical for seattle @Weatherspark_Seattle</span>
+                 <span class="n">wind_heading</span> <span class="o">=</span> <span class="s1">&#39;SE&#39;</span><span class="p">,</span> <span class="c1">#per @Weatherspark_Seattle</span>
+                 <span class="n">temperature</span> <span class="o">=</span> <span class="mf">12.788</span><span class="p">,</span> <span class="c1">#deg C, @Weatherspark_Seattle</span>
+                 <span class="n">interp_length</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="c1"># meters, Approximation</span>
+                 <span class="n">mean_ridership</span> <span class="o">=</span> <span class="mf">3.5</span><span class="p">,</span> <span class="c1"># People. Approximate average value across all trips. Not Accurate. </span>
+                 <span class="n">seed</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span> <span class="c1"># random seed</span>
+                 <span class="n">lg</span><span class="o">=</span><span class="mi">43</span><span class="p">,</span> <span class="c1">#savgol param</span>
+                 <span class="n">deg</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="c1">#savgol param</span>
+                 <span class="n">stop_margin</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="c1">#m/s, margin for the velocity to be considered &#39;stopped&#39;</span>
+                 <span class="n">traffic</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># fraction from zero to 1 representing how slowed the</span>
+                             <span class="c1"># bus is due to traffic</span>
+                <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m_pass</span> <span class="o">=</span> <span class="n">pass_mass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MOE</span> <span class="o">=</span> <span class="n">limit_MOE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chance_sig</span> <span class="o">=</span> <span class="n">signal_chance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_sig</span> <span class="o">=</span> <span class="n">signal_rest</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_stop</span> <span class="o">=</span> <span class="n">stop_rest</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_sign</span> <span class="o">=</span> <span class="n">sign_rest</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_end</span> <span class="o">=</span> <span class="n">end_rest</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_air</span> <span class="o">=</span> <span class="n">air_density</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">T_air</span> <span class="o">=</span> <span class="n">temperature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wind_bearing</span> <span class="o">=</span> <span class="n">wind_heading</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_wind</span> <span class="o">=</span> <span class="n">wind_speed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d_interp</span> <span class="o">=</span> <span class="n">interp_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m_riders</span> <span class="o">=</span> <span class="n">mean_ridership</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lg</span> <span class="o">=</span> <span class="n">lg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deg</span> <span class="o">=</span> <span class="n">deg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_margin</span> <span class="o">=</span> <span class="n">stop_margin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">traffic</span> <span class="o">=</span> <span class="n">traffic</span>
+        
+<div class="viewcode-block" id="Trip.copy">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.Trip.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Trip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_pass</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MOE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chance_sig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_sig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_stop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_sign</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_air</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">T_air</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wind_bearing</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_wind</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_interp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_riders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">deg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_margin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">traffic</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Trip.save">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.Trip.save">[docs]</a>
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_pass</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">MOE</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">chance_sig</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">t_sig</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">t_stop</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">t_sign</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">t_end</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">p_air</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">T_air</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">wind_bearing</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">v_wind</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">d_interp</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">m_riders</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">lg</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">deg</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">stop_margin</span><span class="p">,</span>
+                                                                             <span class="bp">self</span><span class="o">.</span><span class="n">traffic</span><span class="p">)</span>
+        
+        <span class="c1"># Clear the file</span>
+        <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        
+        <span class="c1"># Write the params</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">filepath</span></div>
+</div>
+
+    
+
+<div class="viewcode-block" id="load_trip_params">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.load_trip_params">[docs]</a>
+<span class="k">def</span> <span class="nf">load_trip_params</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> 
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">data_list</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+    
+    <span class="n">numerical_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">numerical_indexes</span><span class="p">:</span>
+        <span class="n">data_list</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data_list</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">data_list</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">Trip</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+    
+    
+
+<div class="viewcode-block" id="a_eqn">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.a_eqn">[docs]</a>
+<span class="k">def</span> <span class="nf">a_eqn</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">m</span><span class="o">=-</span><span class="mf">4.9661</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">2.9465</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    a_eqn is used to calculate the acceleration at a given time during the acceleration process from zero.</span>
+<span class="sd">    the default values are based on a fit of the Braunschweig drive cycle.</span>
+<span class="sd">    </span>
+<span class="sd">    Params:</span>
+<span class="sd">    t: time, in seconds, since the bus began accelerating, as a float</span>
+<span class="sd">    m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from Braunschweig https://www.nrel.gov/transportation/drive-cycle-tool/ Default of -4.9661.</span>
+<span class="sd">    b: intercept value of aformentioned fit as float. Default of 2.9465.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    acceleration in m/s^2.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">m</span><span class="o">/</span><span class="p">(</span><span class="n">t</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">m</span><span class="o">/</span><span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="generate_a_profile">
+<a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.generate_a_profile">[docs]</a>
+<span class="k">def</span> <span class="nf">generate_a_profile</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">m</span><span class="o">=-</span><span class="mf">4.9661</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">2.9465</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">34</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">.5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    generate_a_profile() takes the fit parameters for an acceleration profile, and</span>
+<span class="sd">    generates one for a given range and step and saves at a filepath.</span>
+<span class="sd">    </span>
+<span class="sd">    Params:</span>
+<span class="sd">    filepath: savefile path and filename.</span>
+<span class="sd">    m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from </span>
+<span class="sd">    Braunschweig https://www.nrel.gov/transportation/drive-cycle-tool/ </span>
+<span class="sd">    Default of -4.9661.</span>
+<span class="sd">    b: intercept value of aformentioned fit as float. Default of 2.9465.</span>
+<span class="sd">    start: starting value for range. Default value of 0</span>
+<span class="sd">    stop: stop value for range. Default value of 34</span>
+<span class="sd">    step: step size for range. Default of .5.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    filepath to generated acceleration profile</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="c1"># Get the range of times as a series</span>
+    <span class="n">total_times</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="p">))</span>
+    
+    <span class="c1"># Apply the acceleration fit and then combine into a single dataframe</span>
+    <span class="n">a_prof</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">total_times</span><span class="p">,</span> <span class="n">total_times</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">a_eqn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">))],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    
+    <span class="c1"># fix to fit the proper acceleration profile formatting and return</span>
+    <span class="n">a_prof</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">a_prof</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mf">9.81</span>
+    <span class="n">a_prof</span> <span class="o">=</span> <span class="n">a_prof</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">a_prof</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filepath</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Sebastian Peck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
