@@ -43,6 +43,7 @@ The following two options are the most bare-bones examples. For more detailed an
 ```bash
 /Examples/
 ```
+And for module documentation, please visit the [ReadTheDocs](https://reroute-dynamics.readthedocs.io/en/latest/index.html)!
 1. Using reRoute_Dynamics as a package:
 
 First, get the package set up for use in your current directory
