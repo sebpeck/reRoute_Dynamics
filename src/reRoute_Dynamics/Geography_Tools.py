@@ -443,20 +443,20 @@ def query_stops(geometry, stop_table_path, key='stop_id', epsg_from = 4326, epsg
     if verbose: verbose_line_updater("Processing stops...")
     # loop through the geimetry
     
-    with alive_bar(len(geometry)) as bar:
-        for point in list(geometry):
+    #with alive_bar(len(geometry)) as bar:
+    for point in list(geometry):
 
-            # re-set the pont name because i dont want to re-change them all
-            route_pt = point
+        # re-set the pont name because i dont want to re-change them all
+        route_pt = point
 
-            # get the distances using the geodesic formula, converted to meters
-            stop_table['dist'] = stop_table.geometry.apply(lambda x: geodesic_formula(x.x, x.y, route_pt.x, route_pt.y)*1000)
-            # filter the data to yeild the closest stop
-            closest_stop = stop_table[stop_table['dist'] == stop_table['dist'].min()].reset_index().iloc[0]
+        # get the distances using the geodesic formula, converted to meters
+        stop_table['dist'] = stop_table.geometry.apply(lambda x: geodesic_formula(x.x, x.y, route_pt.x, route_pt.y)*1000)
+        # filter the data to yeild the closest stop
+        closest_stop = stop_table[stop_table['dist'] == stop_table['dist'].min()].reset_index().iloc[0]
 
-            # if the closest stop is within the margin, append it to the list. Otherwise, append -1.
-            stop_id_list.append(int(closest_stop['dist']<margin)*closest_stop[key] - int(closest_stop['dist']>margin))
-            bar()
+        # if the closest stop is within the margin, append it to the list. Otherwise, append -1.
+        stop_id_list.append(int(closest_stop['dist']<margin)*closest_stop[key] - int(closest_stop['dist']>margin))
+            #bar()
     if verbose: verbose_line_updater("Stops processed. Returning values.")
     
     # return the stop id list with repeats removed, and the last index guaranteed to be a stop.
@@ -541,21 +541,21 @@ def query_signals(geometry, signal_data_path, key="SIGNAL_ID", epsg = 4326, marg
     
     # loop through the geometry
     if verbose: verbose_line_updater("Processing signals...")
-    with alive_bar(len(geometry)) as bar:
-        for point in list(geometry):
-            try:
-                # use the geodesic formula to get the distances between the current point and each point in the series, in meters
-                signals['dist'] = signals.geometry.apply(lambda x: geodesic_formula(x.x, x.y, point.x, point.y)*1000)
-                # get the closest signal through the minimum distance
-                closest_signal = signals[signals['dist'] == signals['dist'].min()].reset_index().iloc[0]
+#with alive_bar(len(geometry)) as bar:
+    for point in list(geometry):
+        try:
+            # use the geodesic formula to get the distances between the current point and each point in the series, in meters
+            signals['dist'] = signals.geometry.apply(lambda x: geodesic_formula(x.x, x.y, point.x, point.y)*1000)
+            # get the closest signal through the minimum distance
+            closest_signal = signals[signals['dist'] == signals['dist'].min()].reset_index().iloc[0]
 
-                # check if the signal is within the margin, and if so, append it to the list. If not, append -1.
+            # check if the signal is within the margin, and if so, append it to the list. If not, append -1.
 
-                signal_id_list.append(int((int(closest_signal['dist'])<margin)*closest_signal[key] - int(closest_signal['dist']>margin)))
-            except:
-                signal_id_list.append(int(-1))
-                #verbose_line_updater("No signal data in bounds.")
-            bar()
+            signal_id_list.append(int((int(closest_signal['dist'])<margin)*closest_signal[key] - int(closest_signal['dist']>margin)))
+        except:
+            signal_id_list.append(int(-1))
+            #verbose_line_updater("No signal data in bounds.")
+            #bar()
     if verbose: verbose_line_updater("Signals processed. Returning values.")
     
     # return the list.
