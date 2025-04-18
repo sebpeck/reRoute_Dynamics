@@ -3,13 +3,13 @@ KC_Query_Tools.py
 KC_Query_Tools is used for providing route information from King County Metro's dataset.
 '''
 import sys
-sys.path.append('../src/reRoute_Dynamics_Core/')
+sys.path.append('../src/')
 import pandas as pd
 import geopandas as gpd
 import shapely
 import numpy as np
 import pyogrio as pio
-import Geography_Tools as gt
+from reRoute_Dynamics import Geography_Tools as gt
 import os
 import multiprocessing
 import datetime as dt
@@ -318,10 +318,10 @@ def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_pat
         import traceback
         print("Failed Rendering {}, Error: {}".format(fname, e))
         traceback.print_exc()
-        return fname + " -- 1"
+        return fname + " -- 1 "
     
     
-def batch_render_kc_routes(route_options, route_data_dir, elevation_raster_path, route_savepath, skip_unrendered=False, render_params=(10, 3),batch_size = 5, verbose=False):
+def batch_render_kc_routes(route_options, route_data_dir, elevation_raster_path, route_savepath, skip_unrendered=False, render_params=(10, 3, 25),batch_size = 5, verbose=False):
     '''
     batch_rended_kc_routes takes in a list of route shortnames, path to king county route data,
     a path to an elevation raster, and a path to write the saved .json files to, and then

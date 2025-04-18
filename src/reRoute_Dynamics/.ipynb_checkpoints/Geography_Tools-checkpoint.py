@@ -731,53 +731,53 @@ def reproject_rasterfiles(filepath_sequence, target_crs='EPSG:4326', verbose=Fal
     Notes:
     11/14/2024 - This should be made to have the ability to override if requested. For now, leaving it as-is is fine.
     """
-    
+
     # adjust the reprojection so it can be saved properly:
     crs_split = target_crs.split(":")
     crs_string = crs_split[0] + crs_split[1]
     
     if verbose: verbose_line_updater("Reprojecting raster files to: {}".format(target_crs))
-    with alive_bar(len(filepath_sequence)) as bar:
-        # Loop through each file in the iterable
-        for path in list(filepath_sequence):
+    #with alive_bar(len(filepath_sequence)) as bar:
+    # Loop through each file in the iterable
+    for path in list(filepath_sequence):
 
-            #Check if the reprojection is already there.
-            if (str(path.split(".tif")[1]) != '_{}'.format(crs_string) and (os.path.isfile(path + '_{}.tif'.format(crs_string)) == False)):
+        #Check if the reprojection is already there.
+        if (str(path.split(".tif")[1]) != '_{}'.format(crs_string) and (os.path.isfile(path + '_{}.tif'.format(crs_string)) == False)):
 
-                # open the current rasterfile.
-                with rasterio.open(path) as src:
-                    # use rasterIO to calculate the transform of the file to the desired crs
-                    transform, width, height = calculate_default_transform(src.crs,
-                                                                                         target_crs,
-                                                                                         src.width,
-                                                                                         src.height,
-                                                                                         *src.bounds)
-                    # copy the kwargs from the geotiff
-                    kwargs = src.meta.copy()
+            # open the current rasterfile.
+            with rasterio.open(path) as src:
+                # use rasterIO to calculate the transform of the file to the desired crs
+                transform, width, height = calculate_default_transform(src.crs,
+                                                                                     target_crs,
+                                                                                     src.width,
+                                                                                     src.height,
+                                                                                     *src.bounds)
+                # copy the kwargs from the geotiff
+                kwargs = src.meta.copy()
 
-                    # update the kwargs with the target CRS
-                    kwargs.update({
-                        'crs': target_crs,
-                        'transform': transform,
-                        'width': width,
-                        'height': height
-                    })
+                # update the kwargs with the target CRS
+                kwargs.update({
+                    'crs': target_crs,
+                    'transform': transform,
+                    'width': width,
+                    'height': height
+                })
 
-                    # Create a reprojection file using the target crs
-                    with rasterio.open(path+'_{}.tif'.format(crs_string), 'w', **kwargs) as dst:
+                # Create a reprojection file using the target crs
+                with rasterio.open(path+'_{}.tif'.format(crs_string), 'w', **kwargs) as dst:
 
-                        # loop through the projections in src
-                        for i in range(1, src.count + 1):
+                    # loop through the projections in src
+                    for i in range(1, src.count + 1):
 
-                            # reproject the values in the src.
-                            reproject(source=rasterio.band(src, i),
-                                                    destination=rasterio.band(dst, i),
-                                                    src_transform=src.transform,
-                                                    src_crs=src.crs,
-                                                    dst_transform=transform,
-                                                    dst_crs=target_crs,
-                                                    resampling=Resampling.nearest)
-            bar()
+                        # reproject the values in the src.
+                        reproject(source=rasterio.band(src, i),
+                                                destination=rasterio.band(dst, i),
+                                                src_transform=src.transform,
+                                                src_crs=src.crs,
+                                                dst_transform=transform,
+                                                dst_crs=target_crs,
+                                                resampling=Resampling.nearest)
+        #bar()
     if verbose: verbose_line_updater("Raster files succesfully reprojected.")
     
     return pd.Series(filepath_sequence).apply(lambda x: x + "_{}.tif".format(crs_string)).astype(str)
@@ -813,27 +813,25 @@ def query_elevation_series(geometry, gtiff_dir_ser, verbose=False):
     
     if verbose: verbose_line_updater("Querying elevation data...")
     # loop through each geotiff file in the series passed
-    with alive_bar(len(gtiff_dir_ser)) as bar:
         
-        for path in list(gtiff_dir_ser):
+    for path in list(gtiff_dir_ser):
 
-            # Use rasterio to open the file
-            with rasterio.open(path) as img:
+        # Use rasterio to open the file
+        with rasterio.open(path) as img:
 
-                # sample the elevations using rasterio and the list of lats and lons.
-                route = pd.Series(list(rasterio.sample.sample_gen(img, list(route_ll), masked=True)))
-                
-     
-                # remove any masked values
-                filtered = route[route.apply(lambda x: str(type(x[0]))) != "<class 'numpy.ma.core.MaskedConstant'>"]
-                
-                # loop through the index of the filtered values
-                for index in filtered.index:
+            # sample the elevations using rasterio and the list of lats and lons.
+            route = pd.Series(list(rasterio.sample.sample_gen(img, list(route_ll), masked=True)))
 
-                    # add the filtered value to the data dictionary at the index corresponding to
-                    # its respective point.
-                    data_dict[index] = filtered[index][0]
-                bar()
+
+            # remove any masked values
+            filtered = route[route.apply(lambda x: str(type(x[0]))) != "<class 'numpy.ma.core.MaskedConstant'>"]
+
+            # loop through the index of the filtered values
+            for index in filtered.index:
+
+                # add the filtered value to the data dictionary at the index corresponding to
+                # its respective point.
+                data_dict[index] = filtered[index][0]
                 
     if verbose: verbose_line_updater("Elevation succesfully queried. Returning values.")
                 

@@ -2,15 +2,15 @@
 KC_Route_Testing.py
 '''
 import sys
-sys.path.append('../src/reRoute_Dynamics_Core/')
+sys.path.append('../src/')
 import pandas as pd
 import numpy as np
 import datetime
 import multiprocessing
-import Trip_Simulator as ts
+from reRoute_Dynamics import Trip_Simulator as ts
 import KC_Query_Tools as kqt
-import Object_Params as op
-import Geography_Tools as gt
+from reRoute_Dynamics import Object_Params as op
+from reRoute_Dynamics import Geography_Tools as gt
 import matplotlib.pyplot as plt
 
 
