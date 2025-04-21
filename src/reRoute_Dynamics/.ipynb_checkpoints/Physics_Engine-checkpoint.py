@@ -482,10 +482,11 @@ def accelerate(velocity,
         #print('overforce')
         # get the acceleration from the true net accels.
         a=true_a.iloc[starting_index]
+        
         # calculate the velocity
         v_f = np.sqrt(2*travel_distance*a + velocity**2)
         #print(travel_distance, a, velocity)
-        
+        #print(P_max)
         # Calculate time change.
         dt = abs((velocity-v_f)/a)
         

@@ -91,9 +91,7 @@ def check_hit_signal(stoplight_chance=.541666, seed=None):
     and randomly generates a flag if the light is hit (a stop) or not.
     
     Params:
-    stoplight_chance - float, the fraction of time a stoplight will be hit.
-                       defualt based on 120s cycle, 55s g, 65 red/yellow.
-                       https://wsdot.wa.gov/travel/operations-services/traffic-signals
+    stoplight_chance - float, the fraction of time a stoplight will be hit. defualt based on 120s cycle, 55s g, 65 red/yellow. https://wsdot.wa.gov/travel/operations-services/traffic-signals
     seed - int, default none, used for the seed of randomness.
     
     Returns:

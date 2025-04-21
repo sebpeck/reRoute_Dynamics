@@ -609,23 +609,23 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
     bound_streets['dist'] = 0
     # loop through the geometry:
     if verbose: verbose_line_updater("Processing speed limits...")
-    with alive_bar(len(geometry)) as bar:
-        for i in range(len(list(geometry))):
-            point = list(geometry)[i]
-            # get the speed limit at the point through checking that the distance is within the margin. Use first value that appears.
-            #bound_streets['range'] = bound_streets.geometry.apply(lambda x: x.buffer(margin))
-            bound_streets['contains_point'] = bound_streets['geometry'].apply(lambda x: x.buffer(margin).contains(point))
-            matches_street = bound_streets[bound_streets['contains_point'] == True]
+    #with alive_bar(len(geometry)) as bar:
+    for i in range(len(list(geometry))):
+        point = list(geometry)[i]
+        # get the speed limit at the point through checking that the distance is within the margin. Use first value that appears.
+        #bound_streets['range'] = bound_streets.geometry.apply(lambda x: x.buffer(margin))
+        bound_streets['contains_point'] = bound_streets['geometry'].apply(lambda x: x.buffer(margin).contains(point))
+        matches_street = bound_streets[bound_streets['contains_point'] == True]
 
-            limit = 0
-            if len(matches_street) > 0:
-                limit=matches_street[key].max()
-                
-            
-                
-            # append the limit to the list.
-            limit_list.append(limit*0.00044704)
-            bar()
+        limit = 0
+        if len(matches_street) > 0:
+            limit=matches_street[key].max()
+
+
+
+        # append the limit to the list.
+        limit_list.append(limit*0.00044704)
+            #bar()
     
     # while there is a speed limit of zero, swap them out for the next nearest speed limit that isn't zero
     

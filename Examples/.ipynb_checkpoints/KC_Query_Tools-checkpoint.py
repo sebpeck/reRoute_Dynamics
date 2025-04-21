@@ -257,61 +257,86 @@ def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_pat
                     
     '''
     verb = False
+    val = 0
     try:
         if fname not in saved_route_list:
             print("Rendering File {}".format(fname))
+            val += 1
             shape_id = fname.split('_sh')[1]
+            val += 1
             in_out = int(shape_id.split('_d')[1].split('.json')[0])
+            val += 1
             shape_id = int(shape_id.split('_')[0])
-            
+            val += 1
             # Using geography_tools, process and reproject any DTMs. 
             DTM_rasters_list= gt.get_rasterfiles(dtm_raster_path)#+ "_reproject.tif"
+            val += 1
             DTM_rasters_list = DTM_rasters_list[DTM_rasters_list.apply(lambda x: 'reproject' in x) == False].reset_index(drop=True)
+            val += 1
             reprojected_DTMs = gt.reproject_rasterfiles(DTM_rasters_list, verbose=verb)
+            val += 1
             # load the shape
             shape = query_shape(shape_id, route_data_dir + "shapes.txt", bool(in_out))
+            val += 1
 
             # get the geometry and distances
             geo = shape['geometry']
+            val += 1
             geo = geo.apply(lambda x: shapely.ops.transform(_flip, x))
+            val += 1
             
             dx = gt.query_distance_traveled(geo, verbose=verb)
+            val += 1
 
             # use the geometry to interpolate points
             i_geo = gt.interpolate_geometry_series(geo, render_params[0])
+            val += 1
 
             # Use the interpolated geometry to get interpolated distances
             i_dx = gt.query_distance_traveled(i_geo, verbose=verb)
+            val += 1
 
             # Get the smoothness based on the interpolation ratio
             smoothness=int(np.ceil((len(i_dx)/len(dx))**2))+1
+            val += 1
             
             if len(render_params) > 2:
                 smoothness=render_params[2]
+            val += 1
 
             # get the DTM elevation and sm0oth it.
             idtm_elevation = gt.query_elevation_series(i_geo, reprojected_DTMs, verbose=verb)*0.3048
+            val += 1
             smellev = gt.smooth_elevation(idtm_elevation,smoothness, render_params[1])
+            val += 1
 
             # get the speed limits for the data
             limits = gt.query_speed_limits(i_geo, route_data_dir + "Seattle_Streets/bound_KCM_Streets.shp", verbose=verb)
+            val += 1
 
             # Get the stops for the data
             stops = gt.query_stops(i_geo, route_data_dir + "stops.txt", verbose=verb)
+            val += 1
 
             # validate the stops
             stops = check_valid_stops_by_shape(stops, shape_id, route_data_dir + "trips.txt", route_data_dir + "stop_times.txt")
+            val += 1
 
             # make the ends be zero - Why was this the case??
             stops[0] = 0
+            val += 1
             stops[-1] = 0
+            val += 1
 
             # Get the signal data
             signals = gt.query_signals(i_geo, route_data_dir +"Signals/bound_KCM_signals.shp", verbose=verb)
+            val += 1
 
             # Generate a new test route
             route = gt.Route(i_geo, smellev, limits=limits, stops=stops, signals=signals, signs = [-1]*len(i_geo), smooth_grades=True )
+            val += 1
             route.save_to_json(fname)
+            val += 1
             print("Succesfully Rendered {}".format(fname))
         return fname + ""
     except Exception as e:
@@ -359,7 +384,7 @@ def batch_render_kc_routes(route_options, route_data_dir, elevation_raster_path,
 
     # loop through each route option, and iterate through the shapes and directions
     # to hold the json filenames
-    for selected_route in route_options:
+    for selected_route in route_options[:]:
         # try to load the selected route by shortname
         try:
             # Query the possible shapes of that route.
