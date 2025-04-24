@@ -1,0 +1,1 @@
+13835,2.6,3.38,0.7,0.01,1.5,0.5,0.5,1.1,304.8,KC_Example_Data/Acceleration_Profiles/Braunschweig_Acceleration.csv,0.4,0.5,300000

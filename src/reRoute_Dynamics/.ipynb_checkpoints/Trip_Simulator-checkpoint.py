@@ -30,7 +30,7 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
     ESS: Default - Object_Parameters.ESS(),an ess object from Object_Params that determines the Energy Storage System design
     
     Return:
-    a geodataframe that provides all the relevant driving conditions, positional velocity, and modeled power required (NOT ESS LOAD). 
+    a geodataframe that provides all the relevant driving conditions, positional velocity, and modeled power required. 
     '''
     
     # make copies so there isnt accidental overwriting of params.
@@ -101,6 +101,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                        'v_f':0,
                        'dt':0,
                        'P':0,
+                       'BP':None,
+                       'v':None,
                        'dx':0,
                        'grade':0,
                        'limit':0,
@@ -183,6 +185,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                        'v_f':None,
                        'dt':None,
                        'P':None,
+                       'BP':None,
+                       'v':None,
                        'dx':dx,
                        'grade':grade,
                        'limit':limit,
@@ -213,6 +217,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
             true_result['v_f'] = result['v_f']
             true_result['dt'] = result['dt']
             true_result['P'] = result['P']
+            true_result['BP'] = ESS.calc_instance_power(true_result['P'])
+            true_result['v'] = ESS.calc_voltage_simple(true_result['BP'])
             running_data.append(true_result.copy()) #<-- This has to use the copy, otherwise it will change prev. values
 
             # if the speed is within the stop margin, stop the bus.
@@ -229,6 +235,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                 true_result['v_f'] = 0
                 true_result['dt'] = stop_time
                 true_result['P'] = 0
+                true_result['BP'] = ESS.calc_instance_power(true_result['P'])
+                true_result['v'] = ESS.calc_voltage_simple(true_result['BP'])
                 true_result['dx'] = 0
                 tmp_storage = true_result['stop_clf']
 
@@ -260,6 +268,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                     true_result['v_f'] = result['v_f']
                     true_result['dt'] = result['dt']
                     true_result['P'] = result['P']
+                    true_result['BP'] = ESS.calc_instance_power(true_result['P'])
+                    true_result['v'] = ESS.calc_voltage_simple(true_result['BP'])
                     #print('ac_from_0:',result)
                     running_data.append(true_result.copy())
 
@@ -284,6 +294,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                     true_result['v_f'] = result['v_f']
                     true_result['dt'] = result['dt']
                     true_result['P'] = result['P']
+                    true_result['BP'] = ESS.calc_instance_power(true_result['P'])
+                    true_result['v'] = ESS.calc_voltage_simple(true_result['BP'])
                     #print('ac_below:',result)
                     running_data.append(true_result.copy())
 
@@ -303,6 +315,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                 true_result['v_f'] = result['v_f']
                 true_result['dt'] = result['dt']
                 true_result['P'] = result['P']
+                true_result['BP'] = ESS.calc_instance_power(true_result['P'])
+                true_result['v'] = ESS.calc_voltage_simple(true_result['BP'])
                 #print('br_above:',result)
                 running_data.append(true_result.copy())
 
@@ -321,6 +335,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                 true_result['v_f'] = result['v_f']
                 true_result['dt'] = result['dt']
                 true_result['P'] = result['P']
+                true_result['BP'] = ESS.calc_instance_power(true_result['P'])
+                true_result['v'] = ESS.calc_voltage_simple(true_result['BP'])
                 #print('main:',result)
                 running_data.append(true_result.copy())
 
