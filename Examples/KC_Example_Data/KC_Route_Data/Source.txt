@@ -1,0 +1,3 @@
+routes.txt, shapes.txt, stop_times.txt, stops.txt, trips.txt, all pulled from the GTFS feed here:
+https://kingcounty.gov/en/dept/metro/rider-tools/mobile-and-web-apps
+

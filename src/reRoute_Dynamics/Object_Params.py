@@ -190,7 +190,7 @@ class ESS:
     
     def calc_voltage_simple(self, value):
         '''
-        Use a simple resistance model to calculate the voltage of a module based off of a given power.
+        Use a simple resistance model to calculate the voltage of a cell based off of a given power.
         '''
 
         if value <0:
@@ -200,7 +200,7 @@ class ESS:
             
 
         I = sign*np.sqrt(abs(value)/self.R_bus())
-        v_module = self.module_S_P[0] *(self.V_cell - (self.R_cell * I)/(self.bus_S_P[1] * self.module_S_P[1]))
+        v_module =(self.V_cell - (self.R_cell * I)/(self.bus_S_P[1] * self.module_S_P[1]))
         return v_module
         
         
