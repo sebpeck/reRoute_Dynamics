@@ -98,12 +98,10 @@ def _haversine_formula(x1, y1, x2, y2):
 
 
 def geodesic_formula(x1, y1, x2, y2):
-    """
-    geodesic_formula takex the latitude and longitude of two separate points,
+    """geodesic_formula takes the latitude and longitude of two separate points,
     and calculates the distance in kilometers between those two points as a crow flies,
     according to the geodesic formula as calculated by geopy. 
     
-    Params:
     :param x1: - latitude pt 1 in degrees
     :param y1: - longitude pt 1 in degrees
     :param x2: - latitude pt 2 in degrees
