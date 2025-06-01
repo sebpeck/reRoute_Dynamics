@@ -126,21 +126,22 @@
                          <span class="n">air_density</span> <span class="o">=</span> <span class="n">DEFAULT_AIR_DENSITY</span><span class="p">,</span>
                          <span class="n">drag_coeff</span> <span class="o">=</span> <span class="n">DEFAULT_DRAG_COEFF</span><span class="p">,</span>
                          <span class="n">frontal_area</span> <span class="o">=</span> <span class="n">DEFAULT_FRONTAL_AREA</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    calculate_wind_force() is used to calculate the force exerted against</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;calculate_wind_force() is used to calculate the force exerted against</span>
 <span class="sd">    the bus&#39;s direction of travel by the wind.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    bearing - compass heading, in degrees (float), the bus is travelling in.</span>
-<span class="sd">    speed - current bus velocity. (float)</span>
-<span class="sd">    wind_bearing - compass heading, in degrees (float), the wind is in. Default of SE directon</span>
-<span class="sd">    wind_speed - current wind velocity in its direction of travel. (float) Default of 4 m/s</span>
-<span class="sd">    air_density - current air density. (float), default 1.2 kg/m^3</span>
-<span class="sd">    drag_coeff - drag coefficient of the bus. (float), default .6.</span>
-<span class="sd">    frontal_area - frontal area of bus.  (float), default 2.6*3.3 m^2</span>
+<span class="sd">    :param bearing: compass heading, in degrees (float), the bus is travelling in.</span>
+<span class="sd">    :param speed: current bus velocity. (float)</span>
+<span class="sd">    :param wind_bearing: compass heading, in degrees (float), the wind is in. Default of SE directon</span>
+<span class="sd">    :param wind_speed: current wind velocity in its direction of travel. (float) </span>
+<span class="sd">        Default of 4 m/s.</span>
+<span class="sd">    :param air_density: current air density. (float), </span>
+<span class="sd">        Default 1.2 kg/m^3.</span>
+<span class="sd">    :param drag_coeff: drag coefficient of the bus. (float), </span>
+<span class="sd">        default .6.</span>
+<span class="sd">    :param frontal_area: frontal area of bus.  (float), </span>
+<span class="sd">        default 2.6*3.3 m^2</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    float representation of force exerted against bus&#39;s direction</span>
+<span class="sd">    :return: float representation of force exerted against bus&#39;s direction</span>
 <span class="sd">    of travel. Negative means the bus is being accelerated by the wind.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     
@@ -173,19 +174,16 @@
 <div class="viewcode-block" id="calculate_grade_force">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Physics_Engine.calculate_grade_force">[docs]</a>
 <span class="k">def</span> <span class="nf">calculate_grade_force</span><span class="p">(</span><span class="n">grade</span><span class="p">,</span> <span class="n">mass</span><span class="p">,</span> <span class="n">f_coeff</span><span class="o">=</span><span class="n">DEFAULT_COEFF_F</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    calculate_grade_force takes a grade of a slope, a mass, and friction</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;calculate_grade_force takes a grade of a slope, a mass, and friction</span>
 <span class="sd">    coefficient, and calculates the force due to gravity against the direction of</span>
 <span class="sd">    travel of the mass. Negative value means the object is being accelerated, </span>
 <span class="sd">    rather than decellerated.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    grade - grade angle of a point, as a percent float.</span>
-<span class="sd">    mass - mass of object as a float, in kg</span>
-<span class="sd">    f_coeff - the coefficient of friction. default .01.</span>
+<span class="sd">    :param grade: grade angle of a point, as a percent float.</span>
+<span class="sd">    :param mass: mass of object as a float, in kg</span>
+<span class="sd">    :param f_coeff: the coefficient of friction. default .01.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    net force due to gravity as float, in Newtons</span>
+<span class="sd">    :return: net force due to gravity as float, in Newtons</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     
     <span class="c1"># get the angle of the grade</span>
@@ -214,21 +212,22 @@
                          <span class="n">max_distance</span> <span class="o">=</span> <span class="n">DEFAULT_MAX_DIST</span>
                          <span class="p">):</span>
 <span class="w">    </span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    get_braking_distance() is used to determine how far an object needs to stop.</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;get_braking_distance() is used to determine how far an object needs to stop.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    velocity - object&#39;s initial velocity as a float, in m/s.</span>
-<span class="sd">    mass - mass of the object in kg.</span>
-<span class="sd">    grade_force - force, in N, due to the grade of the slope the object experiences.</span>
-<span class="sd">    wind_force - force, in N, experienced by the object due to wind resistance.</span>
-<span class="sd">    braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2</span>
-<span class="sd">    braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.</span>
-<span class="sd">    inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1</span>
-<span class="sd">    max_distance - float representing the ideal maximum distance the bust takes to stop. Default 304.8 m.</span>
+<span class="sd">    :param velocity: object&#39;s initial velocity as a float, in m/s.</span>
+<span class="sd">    :param mass: mass of the object in kg.</span>
+<span class="sd">    :param grade_force: force, in N, due to the grade of the slope the object experiences.</span>
+<span class="sd">    :param wind_force: force, in N, experienced by the object due to wind resistance.</span>
+<span class="sd">    :param braking_acceleration: the maximum acceleration due to braking, as float. </span>
+<span class="sd">        Default 1.5 m/s^2</span>
+<span class="sd">    :param braking_factor: float between 0 and 1 representing how much of the max braking acceleration is used. </span>
+<span class="sd">        Default .5.</span>
+<span class="sd">    :param inertial_factor: float representing how inertia affects the acceleration of the bus. </span>
+<span class="sd">        Default 1.1</span>
+<span class="sd">    :param max_distance: float representing the ideal maximum distance the bust takes to stop. </span>
+<span class="sd">        Default 304.8 m.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    a dict containing braking distance dx, braking factor bf, and decelleration rate ad.</span>
+<span class="sd">    :return: a dict containing braking distance dx, braking factor bf, and decelleration rate ad.</span>
 <span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="c1"># in other words, the force being applied against the bus&#39;s direction of travel before braking</span>
@@ -279,23 +278,24 @@
           <span class="n">braking_factor</span> <span class="o">=</span> <span class="n">DEFAULT_BR_FACTOR</span><span class="p">,</span>
           <span class="n">inertial_factor</span> <span class="o">=</span> <span class="n">DEFAULT_I_FACTOR</span><span class="p">,</span>
           <span class="n">max_distance</span> <span class="o">=</span> <span class="n">DEFAULT_MAX_DIST</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    brake() is used to determine the velocity change, time change, and power consumption of braking</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;brake() is used to determine the velocity change, time change, and power consumption of braking</span>
 <span class="sd">    a mass at a given velocity over a set distance.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    velocity - object&#39;s initial velocity as a float, in m/s.</span>
-<span class="sd">    mass - mass of the object in kg.</span>
-<span class="sd">    travel_distance - distance to brake over, in meters.</span>
-<span class="sd">    grade_force - force, in N, due to the grade of the slope the object experiences.</span>
-<span class="sd">    wind_force - force, in N, experienced by the object due to wind resistance.</span>
-<span class="sd">    braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2</span>
-<span class="sd">    braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.</span>
-<span class="sd">    inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1</span>
-<span class="sd">    max_distance - float representing the ideal maximum distance the bust takes to stop. Default 304.8 m. **UNUSED**</span>
+<span class="sd">    :param velocity: object&#39;s initial velocity as a float, in m/s.</span>
+<span class="sd">    :param mass: mass of the object in kg.</span>
+<span class="sd">    :param travel_distance: distance to brake over, in meters.</span>
+<span class="sd">    :param grade_force: force, in N, due to the grade of the slope the object experiences.</span>
+<span class="sd">    :param wind_force: force, in N, experienced by the object due to wind resistance.</span>
+<span class="sd">    :param braking_acceleration: the maximum acceleration due to braking, as float.</span>
+<span class="sd">        Default 1.5 m/s^2</span>
+<span class="sd">    :param braking_factor: float between 0 and 1 representing how much of the max braking acceleration is used.</span>
+<span class="sd">        Default .5.</span>
+<span class="sd">    :param inertial_factor: float representing how inertia affects the acceleration of the bus.</span>
+<span class="sd">        Default 1.1</span>
+<span class="sd">    :param max_distance: float representing the ideal maximum distance the bust takes to stop.</span>
+<span class="sd">        Default 304.8 m. **UNUSED**</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    a dict containing final velocity v_f, time change dt, power P, and braking factor bf.</span>
+<span class="sd">    :return: a dict containing final velocity v_f, time change dt, power P, and braking factor bf.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">vf</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">t</span> <span class="o">=</span> <span class="mi">99999</span>
@@ -350,23 +350,24 @@
              <span class="n">braking_factor</span> <span class="o">=</span> <span class="n">DEFAULT_BR_FACTOR</span><span class="p">,</span>
              <span class="n">inertial_factor</span> <span class="o">=</span> <span class="n">DEFAULT_I_FACTOR</span><span class="p">,</span>
              <span class="n">max_power</span> <span class="o">=</span> <span class="n">DEFAULT_MAX_POWER</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    maintain() is used to determine the velocity change, time change, and power consumption of maintaining</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;maintain() is used to determine the velocity change, time change, and power consumption of maintaining</span>
 <span class="sd">    a mass at a given velocity over a set distance.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    velocity - object&#39;s initial velocity as a float, in m/s.</span>
-<span class="sd">    mass - mass of the object in kg.</span>
-<span class="sd">    travel_distance - distance to brake over, in meters.</span>
-<span class="sd">    grade_force - force, in N, due to the grade of the slope the object experiences.</span>
-<span class="sd">    wind_force - force, in N, experienced by the object due to wind resistance.</span>
-<span class="sd">    braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2</span>
-<span class="sd">    braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.</span>
-<span class="sd">    inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1</span>
-<span class="sd">    max_power - float representing the maximum motor power. Default 160000 W.</span>
+<span class="sd">    :param velocity: object&#39;s initial velocity as a float, in m/s.</span>
+<span class="sd">    :param mass: mass of the object in kg.</span>
+<span class="sd">    :param travel_distance: distance to brake over, in meters.</span>
+<span class="sd">    :param grade_force: force, in N, due to the grade of the slope the object experiences.</span>
+<span class="sd">    :param wind_force: force, in N, experienced by the object due to wind resistance.</span>
+<span class="sd">    :param braking_acceleration: the maximum acceleration due to braking, as float. </span>
+<span class="sd">        Default 1.5 m/s^2</span>
+<span class="sd">    :param braking_factor: float between 0 and 1 representing how much of the max braking acceleration is used. </span>
+<span class="sd">        Default .5.</span>
+<span class="sd">    :param inertial_factor: float representing how inertia affects the acceleration of the bus. </span>
+<span class="sd">        Default 1.1</span>
+<span class="sd">    :param max_power: float representing the maximum motor power. </span>
+<span class="sd">        Default 160000 W.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    a dict containing final velocity v_f, time change dt, and power P.</span>
+<span class="sd">    :return: a dict containing final velocity v_f, time change dt, and power P.</span>
 <span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
     
@@ -464,24 +465,21 @@
                <span class="n">max_power</span> <span class="o">=</span> <span class="n">DEFAULT_MAX_POWER</span><span class="p">,</span>
                <span class="n">max_acc</span> <span class="o">=</span> <span class="n">DEFAULT_MAX_ACC</span><span class="p">,</span> <span class="c1"># Depricated</span>
                <span class="n">max_timestep</span> <span class="o">=</span> <span class="n">DEFAULT_MAX_DT</span><span class="p">):</span> <span class="c1"># Depricated</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    accelerate() is used to determine the velocity change, time change, and power consumption of accelerating</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;accelerate() is used to determine the velocity change, time change, and power consumption of accelerating</span>
 <span class="sd">    a mass at a given velocity over a set distance, with a given acceleration profile.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    velocity - object&#39;s initial velocity as a float, in m/s.</span>
-<span class="sd">    mass - mass of the object in kg.</span>
-<span class="sd">    travel_distance - distance to brake over, in meters.</span>
-<span class="sd">    grade_force - force, in N, due to the grade of the slope the object experiences.</span>
-<span class="sd">    wind_force - force, in N, experienced by the object due to wind resistance.</span>
-<span class="sd">    raw_a_prof - an acceleration profile, with the 0 index column being cumulative time, and the 1 being acceleration at that time (in m/s^2)</span>
-<span class="sd">    braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2</span>
-<span class="sd">    braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.</span>
-<span class="sd">    inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1</span>
-<span class="sd">    max_power - float representing the maximum motor power. Default 160000 W.</span>
+<span class="sd">    :param velocity: object&#39;s initial velocity as a float, in m/s.</span>
+<span class="sd">    :param mass: mass of the object in kg.</span>
+<span class="sd">    :param travel_distance: distance to brake over, in meters.</span>
+<span class="sd">    :param grade_force: force, in N, due to the grade of the slope the object experiences.</span>
+<span class="sd">    :param wind_force: force, in N, experienced by the object due to wind resistance.</span>
+<span class="sd">    :param raw_a_prof: an acceleration profile, with the 0 index column being cumulative time, and the 1 being acceleration at that time (in m/s^2)</span>
+<span class="sd">    :param braking_acceleration: the maximum acceleration due to braking, as float. Default 1.5 m/s^2</span>
+<span class="sd">    :param braking_factor : loat between 0 and 1 representing how much of the max braking acceleration is used. Default .5.</span>
+<span class="sd">    :param inertial_factor : loat representing how inertia affects the acceleration of the bus. Default 1.1</span>
+<span class="sd">    :param max_power: float representing the maximum motor power. Default 160000 W.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    a dict containing final velocity v_f, time change dt, and power P.</span>
+<span class="sd">    :return: a dict containing final velocity v_f, time change dt, and power P.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     
     <span class="n">a_counter</span> <span class="o">=</span> <span class="p">(</span><span class="n">grade_force</span> <span class="o">+</span> <span class="n">wind_force</span><span class="p">)</span><span class="o">/</span><span class="n">mass</span>

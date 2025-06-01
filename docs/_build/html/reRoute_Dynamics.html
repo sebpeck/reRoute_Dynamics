@@ -655,11 +655,18 @@ get_distances_to_stop() - method to determine how much distance is between the c
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Instance_Tools.</span></span><span class="sig-name descname"><span class="pre">check_hit_signal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stoplight_chance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.541666</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Instance_Tools.html#check_hit_signal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Instance_Tools.check_hit_signal" title="Link to this definition"></a></dt>
 <dd><p>check_hit_signal() takes a chance to hit a yellow/red,
 and randomly generates a flag if the light is hit (a stop) or not.</p>
-<p>Params:
-stoplight_chance - float, the fraction of time a stoplight will be hit. defualt based on 120s cycle, 55s g, 65 red/yellow. <a class="reference external" href="https://wsdot.wa.gov/travel/operations-services/traffic-signals">https://wsdot.wa.gov/travel/operations-services/traffic-signals</a>
-seed - int, default none, used for the seed of randomness.</p>
-<p>Returns:
-an int, 0 or 1, depending if the light is green or red.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stoplight_chance</strong> – float, the fraction of time a stoplight will be hit. defualt based on 120s cycle, 55s g, 65 red/yellow. <a class="reference external" href="https://wsdot.wa.gov/travel/operations-services/traffic-signals">https://wsdot.wa.gov/travel/operations-services/traffic-signals</a></p></li>
+<li><p><strong>seed</strong> – int, used for the seed of randomness.
+Default None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>an int, 0 or 1, depending if the light is green or red.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -667,13 +674,19 @@ an int, 0 or 1, depending if the light is green or red.</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Instance_Tools.</span></span><span class="sig-name descname"><span class="pre">determine_stop_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rider_changes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hit_signals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Instance_Tools.html#determine_stop_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Instance_Tools.determine_stop_type" title="Link to this definition"></a></dt>
 <dd><p>determine_stop_type() is used to determine the stop types based on
 ridership, signals, and signs, and ends.</p>
-<p>Params:
-rider_changes - iterable of ridership changes for a route
-hit_signals - iterable of signals for a route
-signs - iterable of signs for a route.</p>
-<p>Returns:
-a list of lists containing 0 or 1 for each stop type, with index of the sub-lists
-corresponding to the passed stop types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rider_changes</strong> – iterable of ridership changes for a route</p></li>
+<li><p><strong>hit_signals</strong> – iterable of signals for a route</p></li>
+<li><p><strong>signs</strong> – iterable of signs for a route.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a list of lists containing 0 or 1 for each stop type, with index of the sub-lists</p>
+</dd>
+</dl>
+<p>corresponding to the passed stop types.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -682,12 +695,19 @@ corresponding to the passed stop types.</p>
 <dd><p>generate_riders() uses a number of stops, and mean ridership,
 and then generates a list of riderhsip changes by stops, such that
 the ridership is as close to the ceiling of the mean as possible.</p>
-<p>Params:
-n_stops - int of number of stops.
-mean_ridership - float of the mean ridership for the trip
-seed - int, default None, used for the seed of the randomness.</p>
-<p>Returns:
-list of randomly generated ridership changes at each stop.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_stops</strong> – int of number of stops.</p></li>
+<li><p><strong>mean_ridership</strong> – float of the mean ridership for the trip</p></li>
+<li><p><strong>seed</strong> – int, used for the seed of the randomness.
+Default None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of randomly generated ridership changes at each stop.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -695,11 +715,17 @@ list of randomly generated ridership changes at each stop.</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Instance_Tools.</span></span><span class="sig-name descname"><span class="pre">get_distances_to_stops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stop_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traveled_distance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Instance_Tools.html#get_distances_to_stops"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Instance_Tools.get_distances_to_stops" title="Link to this definition"></a></dt>
 <dd><p>get_distances_to_stops() takes an iterable of stop types, and the corresponding cumulative travel distances,
 and then generates an iterable of distance to the next stop of any type.</p>
-<p>Params:
-stop_types - iterable of stop types as generated by determine_stop_type()
-traveled_distance - iterable of cumulative traveled distance.</p>
-<p>Returns:
-iterable of the distance to the next stop based on current locaton.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stop_types</strong> – iterable of stop types as generated by determine_stop_type()</p></li>
+<li><p><strong>traveled_distance</strong> – iterable of cumulative traveled distance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>iterable of the distance to the next stop based on current locaton.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -772,10 +798,14 @@ save() - method to save the trip object to a txt file.</p>
 <dd><p>calc_instance_power takes in a power value,
 and converts it to the corresponding load on the ESS.
 This is a simple stopgap.</p>
-<p>Parameters:
-value: a power value in Watts, as an int or float.</p>
-<p>Returns:
-converted battery power as a float.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – a power value in Watts, as an int or float.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>converted battery power as a float.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -817,12 +847,20 @@ converted battery power as a float.</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Object_Params.</span></span><span class="sig-name descname"><span class="pre">a_eqn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-4.9661</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.9465</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#a_eqn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.a_eqn" title="Link to this definition"></a></dt>
 <dd><p>a_eqn is used to calculate the acceleration at a given time during the acceleration process from zero.
 the default values are based on a fit of the Braunschweig drive cycle.</p>
-<p>Params:
-t: time, in seconds, since the bus began accelerating, as a float
-m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from Braunschweig <a class="reference external" href="https://www.nrel.gov/transportation/drive-cycle-tool/">https://www.nrel.gov/transportation/drive-cycle-tool/</a> Default of -4.9661.
-b: intercept value of aformentioned fit as float. Default of 2.9465.</p>
-<p>Returns:
-acceleration in m/s^2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> – time, in seconds, since the bus began accelerating, as a float</p></li>
+<li><p><strong>m</strong> – slope value of the linear fit of 1/t vs ln(v) using data aggregated from Braunschweig <a class="reference external" href="https://www.nrel.gov/transportation/drive-cycle-tool/">https://www.nrel.gov/transportation/drive-cycle-tool/</a>
+Default of -4.9661.</p></li>
+<li><p><strong>b</strong> – intercept value of aformentioned fit as float.
+Default of 2.9465.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>acceleration in m/s^2.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -830,17 +868,35 @@ acceleration in m/s^2.</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Object_Params.</span></span><span class="sig-name descname"><span class="pre">generate_a_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-4.9661</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.9465</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">34</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#generate_a_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.generate_a_profile" title="Link to this definition"></a></dt>
 <dd><p>generate_a_profile() takes the fit parameters for an acceleration profile, and
 generates one for a given range and step and saves at a filepath.</p>
-<p>Params:
-filepath: savefile path and filename.
-m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from
-Braunschweig <a class="reference external" href="https://www.nrel.gov/transportation/drive-cycle-tool/">https://www.nrel.gov/transportation/drive-cycle-tool/</a>
-Default of -4.9661.
-b: intercept value of aformentioned fit as float. Default of 2.9465.
-start: starting value for range. Default value of 0
-stop: stop value for range. Default value of 34
-step: step size for range. Default of .5.</p>
-<p>Returns:
-filepath to generated acceleration profile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> – savefile path and filename.</p></li>
+<li><p><strong>m</strong> – slope value of the linear fit of 1/t vs ln(v) using data aggregated from</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Braunschweig <a class="reference external" href="https://www.nrel.gov/transportation/drive-cycle-tool/">https://www.nrel.gov/transportation/drive-cycle-tool/</a></dt><dd><p>Default of -4.9661.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>b</strong> – intercept value of aformentioned fit as float.
+Default of 2.9465.</p></li>
+<li><p><strong>start</strong> – starting value for range.
+Default value of 0</p></li>
+<li><p><strong>stop</strong> – stop value for range.
+Default value of 34</p></li>
+<li><p><strong>step</strong> – step size for range.
+Default of .5.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>filepath to generated acceleration profile</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -878,19 +934,27 @@ accelerate() - method to determine the final velocity, power use, and time chang
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Physics_Engine.</span></span><span class="sig-name descname"><span class="pre">accelerate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">velocity,</span> <span class="pre">mass,</span> <span class="pre">travel_distance,</span> <span class="pre">grade_force,</span> <span class="pre">wind_force,</span> <span class="pre">raw_a_prof=</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">1</span> <span class="pre">0</span>&#160;&#160;&#160; <span class="pre">0.0</span>&#160; <span class="pre">0.018375</span> <span class="pre">1</span>&#160;&#160;&#160; <span class="pre">0.5</span>&#160; <span class="pre">0.659044</span> <span class="pre">2</span>&#160;&#160;&#160; <span class="pre">1.0</span>&#160; <span class="pre">1.533375</span> <span class="pre">3</span>&#160;&#160;&#160; <span class="pre">1.5</span>&#160; <span class="pre">1.973464</span> <span class="pre">4</span>&#160;&#160;&#160; <span class="pre">2.0</span>&#160; <span class="pre">2.075316</span> <span class="pre">..</span>&#160;&#160; <span class="pre">...</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">...</span> <span class="pre">62</span>&#160; <span class="pre">31.0</span>&#160; <span class="pre">0.081391</span> <span class="pre">63</span>&#160; <span class="pre">31.5</span>&#160; <span class="pre">0.079062</span> <span class="pre">64</span>&#160; <span class="pre">32.0</span>&#160; <span class="pre">0.076831</span> <span class="pre">65</span>&#160; <span class="pre">32.5</span>&#160; <span class="pre">0.074693</span> <span class="pre">66</span>&#160; <span class="pre">33.0</span>&#160; <span class="pre">0.072643</span>&#160; <span class="pre">[67</span> <span class="pre">rows</span> <span class="pre">x</span> <span class="pre">2</span> <span class="pre">columns],</span> <span class="pre">braking_acceleration=1.5,</span> <span class="pre">braking_factor=0.5,</span> <span class="pre">inertial_factor=1.1,</span> <span class="pre">max_power=160000,</span> <span class="pre">max_acc=0.4,</span> <span class="pre">max_timestep=0.5</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Physics_Engine.html#accelerate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Physics_Engine.accelerate" title="Link to this definition"></a></dt>
 <dd><p>accelerate() is used to determine the velocity change, time change, and power consumption of accelerating
 a mass at a given velocity over a set distance, with a given acceleration profile.</p>
-<p>Params:
-velocity - object’s initial velocity as a float, in m/s.
-mass - mass of the object in kg.
-travel_distance - distance to brake over, in meters.
-grade_force - force, in N, due to the grade of the slope the object experiences.
-wind_force - force, in N, experienced by the object due to wind resistance.
-raw_a_prof - an acceleration profile, with the 0 index column being cumulative time, and the 1 being acceleration at that time (in m/s^2)
-braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2
-braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.
-inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1
-max_power - float representing the maximum motor power. Default 160000 W.</p>
-<p>Returns:
-a dict containing final velocity v_f, time change dt, and power P.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>velocity</strong> – object’s initial velocity as a float, in m/s.</p></li>
+<li><p><strong>mass</strong> – mass of the object in kg.</p></li>
+<li><p><strong>travel_distance</strong> – distance to brake over, in meters.</p></li>
+<li><p><strong>grade_force</strong> – force, in N, due to the grade of the slope the object experiences.</p></li>
+<li><p><strong>wind_force</strong> – force, in N, experienced by the object due to wind resistance.</p></li>
+<li><p><strong>raw_a_prof</strong> – an acceleration profile, with the 0 index column being cumulative time, and the 1 being acceleration at that time (in m/s^2)</p></li>
+<li><p><strong>braking_acceleration</strong> – the maximum acceleration due to braking, as float. Default 1.5 m/s^2</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param braking_factor : loat between 0 and 1 representing how much of the max braking acceleration is used. Default .5.
+:param inertial_factor : loat representing how inertia affects the acceleration of the bus. Default 1.1
+:param max_power: float representing the maximum motor power. Default 160000 W.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a dict containing final velocity v_f, time change dt, and power P.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -898,18 +962,28 @@ a dict containing final velocity v_f, time change dt, and power P.</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Physics_Engine.</span></span><span class="sig-name descname"><span class="pre">brake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">velocity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">travel_distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grade_force</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wind_force</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">braking_acceleration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">braking_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inertial_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">304.8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Physics_Engine.html#brake"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Physics_Engine.brake" title="Link to this definition"></a></dt>
 <dd><p>brake() is used to determine the velocity change, time change, and power consumption of braking
 a mass at a given velocity over a set distance.</p>
-<p>Params:
-velocity - object’s initial velocity as a float, in m/s.
-mass - mass of the object in kg.
-travel_distance - distance to brake over, in meters.
-grade_force - force, in N, due to the grade of the slope the object experiences.
-wind_force - force, in N, experienced by the object due to wind resistance.
-braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2
-braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.
-inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1
-max_distance - float representing the ideal maximum distance the bust takes to stop. Default 304.8 m. <strong>UNUSED</strong></p>
-<p>Returns:
-a dict containing final velocity v_f, time change dt, power P, and braking factor bf.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>velocity</strong> – object’s initial velocity as a float, in m/s.</p></li>
+<li><p><strong>mass</strong> – mass of the object in kg.</p></li>
+<li><p><strong>travel_distance</strong> – distance to brake over, in meters.</p></li>
+<li><p><strong>grade_force</strong> – force, in N, due to the grade of the slope the object experiences.</p></li>
+<li><p><strong>wind_force</strong> – force, in N, experienced by the object due to wind resistance.</p></li>
+<li><p><strong>braking_acceleration</strong> – the maximum acceleration due to braking, as float.
+Default 1.5 m/s^2</p></li>
+<li><p><strong>braking_factor</strong> – float between 0 and 1 representing how much of the max braking acceleration is used.
+Default .5.</p></li>
+<li><p><strong>inertial_factor</strong> – float representing how inertia affects the acceleration of the bus.
+Default 1.1</p></li>
+<li><p><strong>max_distance</strong> – float representing the ideal maximum distance the bust takes to stop.
+Default 304.8 m. <strong>UNUSED</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a dict containing final velocity v_f, time change dt, power P, and braking factor bf.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -919,12 +993,18 @@ a dict containing final velocity v_f, time change dt, power P, and braking facto
 coefficient, and calculates the force due to gravity against the direction of
 travel of the mass. Negative value means the object is being accelerated,
 rather than decellerated.</p>
-<p>Params:
-grade - grade angle of a point, as a percent float.
-mass - mass of object as a float, in kg
-f_coeff - the coefficient of friction. default .01.</p>
-<p>Returns:
-net force due to gravity as float, in Newtons</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grade</strong> – grade angle of a point, as a percent float.</p></li>
+<li><p><strong>mass</strong> – mass of object as a float, in kg</p></li>
+<li><p><strong>f_coeff</strong> – the coefficient of friction. default .01.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>net force due to gravity as float, in Newtons</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -932,34 +1012,54 @@ net force due to gravity as float, in Newtons</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Physics_Engine.</span></span><span class="sig-name descname"><span class="pre">calculate_wind_force</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bearing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wind_bearing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wind_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">air_density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drag_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frontal_area</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8.58</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Physics_Engine.html#calculate_wind_force"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Physics_Engine.calculate_wind_force" title="Link to this definition"></a></dt>
 <dd><p>calculate_wind_force() is used to calculate the force exerted against
 the bus’s direction of travel by the wind.</p>
-<p>Params:
-bearing - compass heading, in degrees (float), the bus is travelling in.
-speed - current bus velocity. (float)
-wind_bearing - compass heading, in degrees (float), the wind is in. Default of SE directon
-wind_speed - current wind velocity in its direction of travel. (float) Default of 4 m/s
-air_density - current air density. (float), default 1.2 kg/m^3
-drag_coeff - drag coefficient of the bus. (float), default .6.
-frontal_area - frontal area of bus.  (float), default 2.6*3.3 m^2</p>
-<p>Returns:
-float representation of force exerted against bus’s direction
-of travel. Negative means the bus is being accelerated by the wind.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bearing</strong> – compass heading, in degrees (float), the bus is travelling in.</p></li>
+<li><p><strong>speed</strong> – current bus velocity. (float)</p></li>
+<li><p><strong>wind_bearing</strong> – compass heading, in degrees (float), the wind is in. Default of SE directon</p></li>
+<li><p><strong>wind_speed</strong> – current wind velocity in its direction of travel. (float)
+Default of 4 m/s.</p></li>
+<li><p><strong>air_density</strong> – current air density. (float),
+Default 1.2 kg/m^3.</p></li>
+<li><p><strong>drag_coeff</strong> – drag coefficient of the bus. (float),
+default .6.</p></li>
+<li><p><strong>frontal_area</strong> – frontal area of bus.  (float),
+default 2.6*3.3 m^2</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>float representation of force exerted against bus’s direction</p>
+</dd>
+</dl>
+<p>of travel. Negative means the bus is being accelerated by the wind.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="reRoute_Dynamics.Physics_Engine.get_braking_distance">
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Physics_Engine.</span></span><span class="sig-name descname"><span class="pre">get_braking_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">velocity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grade_force</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wind_force</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">braking_acceleration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">braking_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inertial_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">304.8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Physics_Engine.html#get_braking_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Physics_Engine.get_braking_distance" title="Link to this definition"></a></dt>
 <dd><p>get_braking_distance() is used to determine how far an object needs to stop.</p>
-<p>Params:
-velocity - object’s initial velocity as a float, in m/s.
-mass - mass of the object in kg.
-grade_force - force, in N, due to the grade of the slope the object experiences.
-wind_force - force, in N, experienced by the object due to wind resistance.
-braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2
-braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.
-inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1
-max_distance - float representing the ideal maximum distance the bust takes to stop. Default 304.8 m.</p>
-<p>Returns:
-a dict containing braking distance dx, braking factor bf, and decelleration rate ad.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>velocity</strong> – object’s initial velocity as a float, in m/s.</p></li>
+<li><p><strong>mass</strong> – mass of the object in kg.</p></li>
+<li><p><strong>grade_force</strong> – force, in N, due to the grade of the slope the object experiences.</p></li>
+<li><p><strong>wind_force</strong> – force, in N, experienced by the object due to wind resistance.</p></li>
+<li><p><strong>braking_acceleration</strong> – the maximum acceleration due to braking, as float.
+Default 1.5 m/s^2</p></li>
+<li><p><strong>braking_factor</strong> – float between 0 and 1 representing how much of the max braking acceleration is used.
+Default .5.</p></li>
+<li><p><strong>inertial_factor</strong> – float representing how inertia affects the acceleration of the bus.
+Default 1.1</p></li>
+<li><p><strong>max_distance</strong> – float representing the ideal maximum distance the bust takes to stop.
+Default 304.8 m.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a dict containing braking distance dx, braking factor bf, and decelleration rate ad.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -967,18 +1067,28 @@ a dict containing braking distance dx, braking factor bf, and decelleration rate
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Physics_Engine.</span></span><span class="sig-name descname"><span class="pre">maintain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">velocity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">travel_distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grade_force</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wind_force</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">braking_acceleration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">braking_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inertial_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">160000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Physics_Engine.html#maintain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Physics_Engine.maintain" title="Link to this definition"></a></dt>
 <dd><p>maintain() is used to determine the velocity change, time change, and power consumption of maintaining
 a mass at a given velocity over a set distance.</p>
-<p>Params:
-velocity - object’s initial velocity as a float, in m/s.
-mass - mass of the object in kg.
-travel_distance - distance to brake over, in meters.
-grade_force - force, in N, due to the grade of the slope the object experiences.
-wind_force - force, in N, experienced by the object due to wind resistance.
-braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2
-braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.
-inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1
-max_power - float representing the maximum motor power. Default 160000 W.</p>
-<p>Returns:
-a dict containing final velocity v_f, time change dt, and power P.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>velocity</strong> – object’s initial velocity as a float, in m/s.</p></li>
+<li><p><strong>mass</strong> – mass of the object in kg.</p></li>
+<li><p><strong>travel_distance</strong> – distance to brake over, in meters.</p></li>
+<li><p><strong>grade_force</strong> – force, in N, due to the grade of the slope the object experiences.</p></li>
+<li><p><strong>wind_force</strong> – force, in N, experienced by the object due to wind resistance.</p></li>
+<li><p><strong>braking_acceleration</strong> – the maximum acceleration due to braking, as float.
+Default 1.5 m/s^2</p></li>
+<li><p><strong>braking_factor</strong> – float between 0 and 1 representing how much of the max braking acceleration is used.
+Default .5.</p></li>
+<li><p><strong>inertial_factor</strong> – float representing how inertia affects the acceleration of the bus.
+Default 1.1</p></li>
+<li><p><strong>max_power</strong> – float representing the maximum motor power.
+Default 160000 W.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a dict containing final velocity v_f, time change dt, and power P.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1002,13 +1112,22 @@ simulate_trip.py - method to run a vehicle with a given ESS on a given trip over
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Trip_Simulator.</span></span><span class="sig-name descname"><span class="pre">simulate_trip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">route</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trip=&lt;reRoute_Dynamics.Object_Params.Trip</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bus=&lt;reRoute_Dynamics.Object_Params.Bus</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ESS=&lt;reRoute_Dynamics.Object_Params.ESS</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Trip_Simulator.html#simulate_trip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Trip_Simulator.simulate_trip" title="Link to this definition"></a></dt>
 <dd><p>simulate_trip() takes a route, and returns a modeled power consumption and velocity
 for a vehicle on that given trip.</p>
-<p>Params:
-route: a route object as exported by Geography_Tools.py that the vehicle will traverse
-trip: Default - Object_Parameters.Trip(), a trip object from Object_Params that determines the external conditions of the trip
-bus: Default - Object_Parameters.Bus(), a bus object from Object_Params that determines the vehicle design
-ESS: Default - Object_Parameters.ESS(),an ess object from Object_Params that determines the Energy Storage System design</p>
-<p>Return:
-a geodataframe that provides all the relevant driving conditions, positional velocity, and modeled power required.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>route</strong> – a route object as exported by Geography_Tools.py that the vehicle will traverse</p></li>
+<li><p><strong>trip</strong> – a trip object from Object_Params that determines the external conditions of the trip
+Default: Object_Parameters.Trip()</p></li>
+<li><p><strong>bus</strong> – a bus object from Object_Params that determines the vehicle design
+Default: Object_Parameters.Bus()</p></li>
+<li><p><strong>ESS</strong> – an ess object from Object_Params that determines the Energy Storage System design
+Default: Object_Parameters.ESS()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a geodataframe that provides all the relevant driving conditions, positional velocity, and modeled power required.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

@@ -250,16 +250,13 @@
 <div class="viewcode-block" id="ESS.calc_instance_power">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.ESS.calc_instance_power">[docs]</a>
     <span class="k">def</span> <span class="nf">calc_instance_power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        calc_instance_power takes in a power value,</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;calc_instance_power takes in a power value,</span>
 <span class="sd">        and converts it to the corresponding load on the ESS.</span>
 <span class="sd">        This is a simple stopgap.</span>
 
-<span class="sd">        Parameters:</span>
-<span class="sd">        value: a power value in Watts, as an int or float.</span>
+<span class="sd">        :param value: a power value in Watts, as an int or float.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">        converted battery power as a float.</span>
+<span class="sd">        :return: converted battery power as a float.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="c1"># set the battery power to zero.</span>
@@ -471,17 +468,16 @@
 <div class="viewcode-block" id="a_eqn">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.a_eqn">[docs]</a>
 <span class="k">def</span> <span class="nf">a_eqn</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">m</span><span class="o">=-</span><span class="mf">4.9661</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">2.9465</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    a_eqn is used to calculate the acceleration at a given time during the acceleration process from zero.</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;a_eqn is used to calculate the acceleration at a given time during the acceleration process from zero.</span>
 <span class="sd">    the default values are based on a fit of the Braunschweig drive cycle.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    t: time, in seconds, since the bus began accelerating, as a float</span>
-<span class="sd">    m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from Braunschweig https://www.nrel.gov/transportation/drive-cycle-tool/ Default of -4.9661.</span>
-<span class="sd">    b: intercept value of aformentioned fit as float. Default of 2.9465.</span>
+<span class="sd">    :param t: time, in seconds, since the bus began accelerating, as a float</span>
+<span class="sd">    :param m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from Braunschweig https://www.nrel.gov/transportation/drive-cycle-tool/</span>
+<span class="sd">        Default of -4.9661.</span>
+<span class="sd">    :param b: intercept value of aformentioned fit as float.</span>
+<span class="sd">        Default of 2.9465.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    acceleration in m/s^2.</span>
+<span class="sd">    :return: acceleration in m/s^2.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">0</span>
@@ -492,22 +488,23 @@
 <div class="viewcode-block" id="generate_a_profile">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Object_Params.generate_a_profile">[docs]</a>
 <span class="k">def</span> <span class="nf">generate_a_profile</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">m</span><span class="o">=-</span><span class="mf">4.9661</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">2.9465</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">34</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">.5</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    generate_a_profile() takes the fit parameters for an acceleration profile, and</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;generate_a_profile() takes the fit parameters for an acceleration profile, and</span>
 <span class="sd">    generates one for a given range and step and saves at a filepath.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    filepath: savefile path and filename.</span>
-<span class="sd">    m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from </span>
-<span class="sd">    Braunschweig https://www.nrel.gov/transportation/drive-cycle-tool/ </span>
-<span class="sd">    Default of -4.9661.</span>
-<span class="sd">    b: intercept value of aformentioned fit as float. Default of 2.9465.</span>
-<span class="sd">    start: starting value for range. Default value of 0</span>
-<span class="sd">    stop: stop value for range. Default value of 34</span>
-<span class="sd">    step: step size for range. Default of .5.</span>
+<span class="sd">    :param filepath: savefile path and filename.</span>
+<span class="sd">    :param m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from </span>
+<span class="sd">    Braunschweig https://www.nrel.gov/transportation/drive-cycle-tool/</span>
+<span class="sd">        Default of -4.9661.</span>
+<span class="sd">    :param b: intercept value of aformentioned fit as float. </span>
+<span class="sd">        Default of 2.9465.</span>
+<span class="sd">    :param start: starting value for range.</span>
+<span class="sd">        Default value of 0</span>
+<span class="sd">    :param stop: stop value for range. </span>
+<span class="sd">        Default value of 34</span>
+<span class="sd">    :param step: step size for range. </span>
+<span class="sd">        Default of .5.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    filepath to generated acceleration profile</span>
+<span class="sd">    :return: filepath to generated acceleration profile</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     
     <span class="c1"># Get the range of times as a series</span>

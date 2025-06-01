@@ -94,18 +94,16 @@
 <div class="viewcode-block" id="generate_riders">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Instance_Tools.generate_riders">[docs]</a>
 <span class="k">def</span> <span class="nf">generate_riders</span><span class="p">(</span><span class="n">n_stops</span><span class="p">,</span> <span class="n">mean_ridership</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    generate_riders() uses a number of stops, and mean ridership,</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;generate_riders() uses a number of stops, and mean ridership,</span>
 <span class="sd">    and then generates a list of riderhsip changes by stops, such that</span>
 <span class="sd">    the ridership is as close to the ceiling of the mean as possible.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    n_stops - int of number of stops.</span>
-<span class="sd">    mean_ridership - float of the mean ridership for the trip</span>
-<span class="sd">    seed - int, default None, used for the seed of the randomness.</span>
+<span class="sd">    :param n_stops: int of number of stops.</span>
+<span class="sd">    :param mean_ridership: float of the mean ridership for the trip</span>
+<span class="sd">    :param seed: int, used for the seed of the randomness.</span>
+<span class="sd">        Default None.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    list of randomly generated ridership changes at each stop.</span>
+<span class="sd">    :return: list of randomly generated ridership changes at each stop.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     
     <span class="c1"># Check if the seed isn&#39;t None/</span>
@@ -162,16 +160,14 @@
 <div class="viewcode-block" id="check_hit_signal">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Instance_Tools.check_hit_signal">[docs]</a>
 <span class="k">def</span> <span class="nf">check_hit_signal</span><span class="p">(</span><span class="n">stoplight_chance</span><span class="o">=</span><span class="mf">.541666</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    check_hit_signal() takes a chance to hit a yellow/red,</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;check_hit_signal() takes a chance to hit a yellow/red,</span>
 <span class="sd">    and randomly generates a flag if the light is hit (a stop) or not.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    stoplight_chance - float, the fraction of time a stoplight will be hit. defualt based on 120s cycle, 55s g, 65 red/yellow. https://wsdot.wa.gov/travel/operations-services/traffic-signals</span>
-<span class="sd">    seed - int, default none, used for the seed of randomness.</span>
+<span class="sd">    :param stoplight_chance: float, the fraction of time a stoplight will be hit. defualt based on 120s cycle, 55s g, 65 red/yellow. https://wsdot.wa.gov/travel/operations-services/traffic-signals</span>
+<span class="sd">    :param seed: int, used for the seed of randomness.</span>
+<span class="sd">        Default None.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    an int, 0 or 1, depending if the light is green or red.</span>
+<span class="sd">    :return: an int, 0 or 1, depending if the light is green or red.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     
     <span class="c1"># Check if the seed isn&#39;t None/</span>
@@ -191,17 +187,14 @@
 <div class="viewcode-block" id="determine_stop_type">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Instance_Tools.determine_stop_type">[docs]</a>
 <span class="k">def</span> <span class="nf">determine_stop_type</span><span class="p">(</span><span class="n">rider_changes</span><span class="p">,</span> <span class="n">hit_signals</span><span class="p">,</span> <span class="n">signs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    determine_stop_type() is used to determine the stop types based on</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;determine_stop_type() is used to determine the stop types based on</span>
 <span class="sd">    ridership, signals, and signs, and ends.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    rider_changes - iterable of ridership changes for a route</span>
-<span class="sd">    hit_signals - iterable of signals for a route</span>
-<span class="sd">    signs - iterable of signs for a route.</span>
+<span class="sd">    :param rider_changes: iterable of ridership changes for a route</span>
+<span class="sd">    :param hit_signals: iterable of signals for a route</span>
+<span class="sd">    :param signs: iterable of signs for a route.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    a list of lists containing 0 or 1 for each stop type, with index of the sub-lists</span>
+<span class="sd">    :return: a list of lists containing 0 or 1 for each stop type, with index of the sub-lists</span>
 <span class="sd">    corresponding to the passed stop types.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     
@@ -223,8 +216,7 @@
 <div class="viewcode-block" id="get_stop_type">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Instance_Tools.get_stop_type">[docs]</a>
 <span class="k">def</span> <span class="nf">get_stop_type</span><span class="p">(</span><span class="n">ridership</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">sign</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    get_stop_type() takes a ridership, signal, and sign point,</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;get_stop_type() takes a ridership, signal, and sign point,</span>
 <span class="sd">    and converts to a list of 0&#39;s and 1&#39;s depending on if each is</span>
 <span class="sd">    valid or not.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -249,16 +241,13 @@
 <div class="viewcode-block" id="get_distances_to_stops">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Instance_Tools.get_distances_to_stops">[docs]</a>
 <span class="k">def</span> <span class="nf">get_distances_to_stops</span><span class="p">(</span><span class="n">stop_types</span><span class="p">,</span> <span class="n">traveled_distance</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    get_distances_to_stops() takes an iterable of stop types, and the corresponding cumulative travel distances,</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;get_distances_to_stops() takes an iterable of stop types, and the corresponding cumulative travel distances,</span>
 <span class="sd">    and then generates an iterable of distance to the next stop of any type.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    stop_types - iterable of stop types as generated by determine_stop_type()</span>
-<span class="sd">    traveled_distance - iterable of cumulative traveled distance.</span>
+<span class="sd">    :param stop_types: iterable of stop types as generated by determine_stop_type()</span>
+<span class="sd">    :param traveled_distance: iterable of cumulative traveled distance.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    iterable of the distance to the next stop based on current locaton.</span>
+<span class="sd">    :return: iterable of the distance to the next stop based on current locaton.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     
     <span class="c1"># join the two iterables</span>

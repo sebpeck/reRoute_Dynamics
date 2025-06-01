@@ -53,21 +53,22 @@ def calculate_wind_force(bearing,
                          air_density = DEFAULT_AIR_DENSITY,
                          drag_coeff = DEFAULT_DRAG_COEFF,
                          frontal_area = DEFAULT_FRONTAL_AREA):
-    '''
-    calculate_wind_force() is used to calculate the force exerted against
+    '''calculate_wind_force() is used to calculate the force exerted against
     the bus's direction of travel by the wind.
     
-    Params:
-    bearing - compass heading, in degrees (float), the bus is travelling in.
-    speed - current bus velocity. (float)
-    wind_bearing - compass heading, in degrees (float), the wind is in. Default of SE directon
-    wind_speed - current wind velocity in its direction of travel. (float) Default of 4 m/s
-    air_density - current air density. (float), default 1.2 kg/m^3
-    drag_coeff - drag coefficient of the bus. (float), default .6.
-    frontal_area - frontal area of bus.  (float), default 2.6*3.3 m^2
+    :param bearing: compass heading, in degrees (float), the bus is travelling in.
+    :param speed: current bus velocity. (float)
+    :param wind_bearing: compass heading, in degrees (float), the wind is in. Default of SE directon
+    :param wind_speed: current wind velocity in its direction of travel. (float) 
+        Default of 4 m/s.
+    :param air_density: current air density. (float), 
+        Default 1.2 kg/m^3.
+    :param drag_coeff: drag coefficient of the bus. (float), 
+        default .6.
+    :param frontal_area: frontal area of bus.  (float), 
+        default 2.6*3.3 m^2
     
-    Returns:
-    float representation of force exerted against bus's direction
+    :return: float representation of force exerted against bus's direction
     of travel. Negative means the bus is being accelerated by the wind.
     '''
     
@@ -94,19 +95,16 @@ def sign(num):
 
     
 def calculate_grade_force(grade, mass, f_coeff=DEFAULT_COEFF_F):
-    '''
-    calculate_grade_force takes a grade of a slope, a mass, and friction
+    '''calculate_grade_force takes a grade of a slope, a mass, and friction
     coefficient, and calculates the force due to gravity against the direction of
     travel of the mass. Negative value means the object is being accelerated, 
     rather than decellerated.
     
-    Params:
-    grade - grade angle of a point, as a percent float.
-    mass - mass of object as a float, in kg
-    f_coeff - the coefficient of friction. default .01.
+    :param grade: grade angle of a point, as a percent float.
+    :param mass: mass of object as a float, in kg
+    :param f_coeff: the coefficient of friction. default .01.
     
-    Returns:
-    net force due to gravity as float, in Newtons
+    :return: net force due to gravity as float, in Newtons
     '''
     
     # get the angle of the grade
@@ -132,21 +130,22 @@ def get_braking_distance(velocity,
                          max_distance = DEFAULT_MAX_DIST
                          ):
     
-    '''
-    get_braking_distance() is used to determine how far an object needs to stop.
+    '''get_braking_distance() is used to determine how far an object needs to stop.
     
-    Params:
-    velocity - object's initial velocity as a float, in m/s.
-    mass - mass of the object in kg.
-    grade_force - force, in N, due to the grade of the slope the object experiences.
-    wind_force - force, in N, experienced by the object due to wind resistance.
-    braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2
-    braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.
-    inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1
-    max_distance - float representing the ideal maximum distance the bust takes to stop. Default 304.8 m.
+    :param velocity: object's initial velocity as a float, in m/s.
+    :param mass: mass of the object in kg.
+    :param grade_force: force, in N, due to the grade of the slope the object experiences.
+    :param wind_force: force, in N, experienced by the object due to wind resistance.
+    :param braking_acceleration: the maximum acceleration due to braking, as float. 
+        Default 1.5 m/s^2
+    :param braking_factor: float between 0 and 1 representing how much of the max braking acceleration is used. 
+        Default .5.
+    :param inertial_factor: float representing how inertia affects the acceleration of the bus. 
+        Default 1.1
+    :param max_distance: float representing the ideal maximum distance the bust takes to stop. 
+        Default 304.8 m.
     
-    Returns:
-    a dict containing braking distance dx, braking factor bf, and decelleration rate ad.
+    :return: a dict containing braking distance dx, braking factor bf, and decelleration rate ad.
     
     '''
     # in other words, the force being applied against the bus's direction of travel before braking
@@ -194,23 +193,24 @@ def brake(velocity,
           braking_factor = DEFAULT_BR_FACTOR,
           inertial_factor = DEFAULT_I_FACTOR,
           max_distance = DEFAULT_MAX_DIST):
-    '''
-    brake() is used to determine the velocity change, time change, and power consumption of braking
+    '''brake() is used to determine the velocity change, time change, and power consumption of braking
     a mass at a given velocity over a set distance.
     
-    Params:
-    velocity - object's initial velocity as a float, in m/s.
-    mass - mass of the object in kg.
-    travel_distance - distance to brake over, in meters.
-    grade_force - force, in N, due to the grade of the slope the object experiences.
-    wind_force - force, in N, experienced by the object due to wind resistance.
-    braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2
-    braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.
-    inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1
-    max_distance - float representing the ideal maximum distance the bust takes to stop. Default 304.8 m. **UNUSED**
+    :param velocity: object's initial velocity as a float, in m/s.
+    :param mass: mass of the object in kg.
+    :param travel_distance: distance to brake over, in meters.
+    :param grade_force: force, in N, due to the grade of the slope the object experiences.
+    :param wind_force: force, in N, experienced by the object due to wind resistance.
+    :param braking_acceleration: the maximum acceleration due to braking, as float.
+        Default 1.5 m/s^2
+    :param braking_factor: float between 0 and 1 representing how much of the max braking acceleration is used.
+        Default .5.
+    :param inertial_factor: float representing how inertia affects the acceleration of the bus.
+        Default 1.1
+    :param max_distance: float representing the ideal maximum distance the bust takes to stop.
+        Default 304.8 m. **UNUSED**
     
-    Returns:
-    a dict containing final velocity v_f, time change dt, power P, and braking factor bf.
+    :return: a dict containing final velocity v_f, time change dt, power P, and braking factor bf.
     '''
     vf = 0
     t = 99999
@@ -262,23 +262,24 @@ def maintain(velocity,
              braking_factor = DEFAULT_BR_FACTOR,
              inertial_factor = DEFAULT_I_FACTOR,
              max_power = DEFAULT_MAX_POWER):
-    '''
-    maintain() is used to determine the velocity change, time change, and power consumption of maintaining
+    '''maintain() is used to determine the velocity change, time change, and power consumption of maintaining
     a mass at a given velocity over a set distance.
     
-    Params:
-    velocity - object's initial velocity as a float, in m/s.
-    mass - mass of the object in kg.
-    travel_distance - distance to brake over, in meters.
-    grade_force - force, in N, due to the grade of the slope the object experiences.
-    wind_force - force, in N, experienced by the object due to wind resistance.
-    braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2
-    braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.
-    inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1
-    max_power - float representing the maximum motor power. Default 160000 W.
+    :param velocity: object's initial velocity as a float, in m/s.
+    :param mass: mass of the object in kg.
+    :param travel_distance: distance to brake over, in meters.
+    :param grade_force: force, in N, due to the grade of the slope the object experiences.
+    :param wind_force: force, in N, experienced by the object due to wind resistance.
+    :param braking_acceleration: the maximum acceleration due to braking, as float. 
+        Default 1.5 m/s^2
+    :param braking_factor: float between 0 and 1 representing how much of the max braking acceleration is used. 
+        Default .5.
+    :param inertial_factor: float representing how inertia affects the acceleration of the bus. 
+        Default 1.1
+    :param max_power: float representing the maximum motor power. 
+        Default 160000 W.
     
-    Returns:
-    a dict containing final velocity v_f, time change dt, and power P.
+    :return: a dict containing final velocity v_f, time change dt, and power P.
     
     '''
     
@@ -373,24 +374,21 @@ def accelerate(velocity,
                max_power = DEFAULT_MAX_POWER,
                max_acc = DEFAULT_MAX_ACC, # Depricated
                max_timestep = DEFAULT_MAX_DT): # Depricated
-    '''
-    accelerate() is used to determine the velocity change, time change, and power consumption of accelerating
+    '''accelerate() is used to determine the velocity change, time change, and power consumption of accelerating
     a mass at a given velocity over a set distance, with a given acceleration profile.
     
-    Params:
-    velocity - object's initial velocity as a float, in m/s.
-    mass - mass of the object in kg.
-    travel_distance - distance to brake over, in meters.
-    grade_force - force, in N, due to the grade of the slope the object experiences.
-    wind_force - force, in N, experienced by the object due to wind resistance.
-    raw_a_prof - an acceleration profile, with the 0 index column being cumulative time, and the 1 being acceleration at that time (in m/s^2)
-    braking_acceleration - the maximum acceleration due to braking, as float. Default 1.5 m/s^2
-    braking_factor - float between 0 and 1 representing how much of the max braking acceleration is used. Default .5.
-    inertial_factor - float representing how inertia affects the acceleration of the bus. Default 1.1
-    max_power - float representing the maximum motor power. Default 160000 W.
+    :param velocity: object's initial velocity as a float, in m/s.
+    :param mass: mass of the object in kg.
+    :param travel_distance: distance to brake over, in meters.
+    :param grade_force: force, in N, due to the grade of the slope the object experiences.
+    :param wind_force: force, in N, experienced by the object due to wind resistance.
+    :param raw_a_prof: an acceleration profile, with the 0 index column being cumulative time, and the 1 being acceleration at that time (in m/s^2)
+    :param braking_acceleration: the maximum acceleration due to braking, as float. Default 1.5 m/s^2
+    :param braking_factor : loat between 0 and 1 representing how much of the max braking acceleration is used. Default .5.
+    :param inertial_factor : loat representing how inertia affects the acceleration of the bus. Default 1.1
+    :param max_power: float representing the maximum motor power. Default 160000 W.
     
-    Returns:
-    a dict containing final velocity v_f, time change dt, and power P.
+    :return: a dict containing final velocity v_f, time change dt, and power P.
     '''
     
     a_counter = (grade_force + wind_force)/mass

@@ -157,16 +157,13 @@ class ESS:
         return self.R_cell*self.module_S_P[0]/self.module_S_P[1]*self.bus_S_P[0]/self.bus_S_P[1] 
     
     def calc_instance_power(self, value):
-        '''
-        calc_instance_power takes in a power value,
+        '''calc_instance_power takes in a power value,
         and converts it to the corresponding load on the ESS.
         This is a simple stopgap.
 
-        Parameters:
-        value: a power value in Watts, as an int or float.
+        :param value: a power value in Watts, as an int or float.
 
-        Returns:
-        converted battery power as a float.
+        :return: converted battery power as a float.
         '''
 
         # set the battery power to zero.
@@ -350,17 +347,16 @@ def load_trip_params(filepath):
     
 
 def a_eqn(t, m=-4.9661, b=2.9465):
-    '''
-    a_eqn is used to calculate the acceleration at a given time during the acceleration process from zero.
+    '''a_eqn is used to calculate the acceleration at a given time during the acceleration process from zero.
     the default values are based on a fit of the Braunschweig drive cycle.
     
-    Params:
-    t: time, in seconds, since the bus began accelerating, as a float
-    m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from Braunschweig https://www.nrel.gov/transportation/drive-cycle-tool/ Default of -4.9661.
-    b: intercept value of aformentioned fit as float. Default of 2.9465.
+    :param t: time, in seconds, since the bus began accelerating, as a float
+    :param m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from Braunschweig https://www.nrel.gov/transportation/drive-cycle-tool/
+        Default of -4.9661.
+    :param b: intercept value of aformentioned fit as float.
+        Default of 2.9465.
     
-    Returns:
-    acceleration in m/s^2.
+    :return: acceleration in m/s^2.
     '''
     if t <= 0:
         return 0
@@ -368,22 +364,23 @@ def a_eqn(t, m=-4.9661, b=2.9465):
         return -m/(t**2) * np.exp((m/t) + b)
 
 def generate_a_profile(filepath, m=-4.9661, b=2.9465, start=0, stop=34, step=.5):
-    '''
-    generate_a_profile() takes the fit parameters for an acceleration profile, and
+    '''generate_a_profile() takes the fit parameters for an acceleration profile, and
     generates one for a given range and step and saves at a filepath.
     
-    Params:
-    filepath: savefile path and filename.
-    m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from 
-    Braunschweig https://www.nrel.gov/transportation/drive-cycle-tool/ 
-    Default of -4.9661.
-    b: intercept value of aformentioned fit as float. Default of 2.9465.
-    start: starting value for range. Default value of 0
-    stop: stop value for range. Default value of 34
-    step: step size for range. Default of .5.
+    :param filepath: savefile path and filename.
+    :param m: slope value of the linear fit of 1/t vs ln(v) using data aggregated from 
+    Braunschweig https://www.nrel.gov/transportation/drive-cycle-tool/
+        Default of -4.9661.
+    :param b: intercept value of aformentioned fit as float. 
+        Default of 2.9465.
+    :param start: starting value for range.
+        Default value of 0
+    :param stop: stop value for range. 
+        Default value of 34
+    :param step: step size for range. 
+        Default of .5.
     
-    Returns:
-    filepath to generated acceleration profile
+    :return: filepath to generated acceleration profile
     '''
     
     # Get the range of times as a series

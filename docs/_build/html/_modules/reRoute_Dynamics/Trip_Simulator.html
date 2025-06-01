@@ -92,18 +92,18 @@
 <div class="viewcode-block" id="simulate_trip">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Trip_Simulator.simulate_trip">[docs]</a>
 <span class="k">def</span> <span class="nf">simulate_trip</span><span class="p">(</span><span class="n">route</span><span class="p">,</span> <span class="n">trip</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">Trip</span><span class="p">(),</span> <span class="n">bus</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">Bus</span><span class="p">(),</span> <span class="n">ESS</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">ESS</span><span class="p">()):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    simulate_trip() takes a route, and returns a modeled power consumption and velocity</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;simulate_trip() takes a route, and returns a modeled power consumption and velocity</span>
 <span class="sd">    for a vehicle on that given trip. </span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    route: a route object as exported by Geography_Tools.py that the vehicle will traverse</span>
-<span class="sd">    trip: Default - Object_Parameters.Trip(), a trip object from Object_Params that determines the external conditions of the trip</span>
-<span class="sd">    bus: Default - Object_Parameters.Bus(), a bus object from Object_Params that determines the vehicle design</span>
-<span class="sd">    ESS: Default - Object_Parameters.ESS(),an ess object from Object_Params that determines the Energy Storage System design</span>
+<span class="sd">    :param route: a route object as exported by Geography_Tools.py that the vehicle will traverse</span>
+<span class="sd">    :param trip: a trip object from Object_Params that determines the external conditions of the trip</span>
+<span class="sd">        Default: Object_Parameters.Trip()</span>
+<span class="sd">    :param bus: a bus object from Object_Params that determines the vehicle design</span>
+<span class="sd">        Default: Object_Parameters.Bus()</span>
+<span class="sd">    :param ESS: an ess object from Object_Params that determines the Energy Storage System design</span>
+<span class="sd">        Default: Object_Parameters.ESS()</span>
 <span class="sd">    </span>
-<span class="sd">    Return:</span>
-<span class="sd">    a geodataframe that provides all the relevant driving conditions, positional velocity, and modeled power required. </span>
+<span class="sd">    :return: a geodataframe that provides all the relevant driving conditions, positional velocity, and modeled power required. </span>
 <span class="sd">    &#39;&#39;&#39;</span>
     
     <span class="c1"># make copies so there isnt accidental overwriting of params.</span>

@@ -19,18 +19,18 @@ from . import Geography_Tools as gt
 from alive_progress import alive_bar
 
 def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
-    '''
-    simulate_trip() takes a route, and returns a modeled power consumption and velocity
+    '''simulate_trip() takes a route, and returns a modeled power consumption and velocity
     for a vehicle on that given trip. 
     
-    Params:
-    route: a route object as exported by Geography_Tools.py that the vehicle will traverse
-    trip: Default - Object_Parameters.Trip(), a trip object from Object_Params that determines the external conditions of the trip
-    bus: Default - Object_Parameters.Bus(), a bus object from Object_Params that determines the vehicle design
-    ESS: Default - Object_Parameters.ESS(),an ess object from Object_Params that determines the Energy Storage System design
+    :param route: a route object as exported by Geography_Tools.py that the vehicle will traverse
+    :param trip: a trip object from Object_Params that determines the external conditions of the trip
+        Default: Object_Parameters.Trip()
+    :param bus: a bus object from Object_Params that determines the vehicle design
+        Default: Object_Parameters.Bus()
+    :param ESS: an ess object from Object_Params that determines the Energy Storage System design
+        Default: Object_Parameters.ESS()
     
-    Return:
-    a geodataframe that provides all the relevant driving conditions, positional velocity, and modeled power required. 
+    :return: a geodataframe that provides all the relevant driving conditions, positional velocity, and modeled power required. 
     '''
     
     # make copies so there isnt accidental overwriting of params.
