@@ -190,17 +190,15 @@
 <div class="viewcode-block" id="compass_heading">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.compass_heading">[docs]</a>
 <span class="k">def</span> <span class="nf">compass_heading</span><span class="p">(</span><span class="n">bearing</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    compass_heading converts a bearing in degrees to a</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;compass_heading converts a bearing in degrees to a</span>
 <span class="sd">    compass value like North, South, or East.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    bearing - the bearing value, in degrees, as float.</span>
+<span class="sd">    :param bearing: The bearing value, in degrees, as float.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    string representation of compass heading.</span>
+<span class="sd">    :return: String representation of compass heading.</span>
 <span class="sd">    </span>
 <span class="sd">    Notes: </span>
+<span class="sd">    </span>
 <span class="sd">    11/18/2024 - There is a more mathematically elegant solution to this, but I&#39;m not bothering with it right now.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
@@ -225,14 +223,12 @@
 <div class="viewcode-block" id="heading_to_angle">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.heading_to_angle">[docs]</a>
 <span class="k">def</span> <span class="nf">heading_to_angle</span><span class="p">(</span><span class="n">heading</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    heading_to_angle() takes a compass heading of 8 directions,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;heading_to_angle() takes a compass heading of 8 directions,</span>
 <span class="sd">    and converts it to an angle in degrees. </span>
+
+<span class="sd">    :param heading: A string representing heading.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    heading - a string representing heading.</span>
-<span class="sd">    </span>
-<span class="sd">    Returns: a compass bearing angle as float.</span>
+<span class="sd">    :return: A compass bearing angle as float.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;NE&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="s2">&quot;SE&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;SW&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;NW&quot;</span><span class="p">]</span>
     <span class="n">idx</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">heading</span><span class="p">)</span>
@@ -244,20 +240,18 @@
 <div class="viewcode-block" id="point_bearing">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.point_bearing">[docs]</a>
 <span class="k">def</span> <span class="nf">point_bearing</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">bearing_type</span> <span class="o">=</span> <span class="s2">&quot;Angle&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    point_bearing takex in the latitude and longitude of two separate ponts,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;point_bearing takex in the latitude and longitude of two separate ponts,</span>
 <span class="sd">    and calculates the bearing when travelling from point 1 and point 2.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    x1 - latitude pt 1 in degrees</span>
-<span class="sd">    y1 - longitude pt 1 in degrees</span>
-<span class="sd">    x2 - latitude pt 2 in degrees</span>
-<span class="sd">    y2 - longitude pt 2 in degrees</span>
-<span class="sd">    bearing_type - determine the bearing output. Options: Angle - return the angle in degrees. Compass - return the angle as a directional bearing (eg: N, E, S, W)</span>
+<span class="sd">    :param x1: latitude of point 1 in degrees</span>
+<span class="sd">    :param y1: longitude of point 1 in degrees</span>
+<span class="sd">    :param x2: latitude of point 2 in degrees</span>
+<span class="sd">    :param y2: longitude of point 2 in degrees</span>
+<span class="sd">    :param bearing_type:  Determine the bearing output. </span>
+<span class="sd">        &#39;Angle&#39; - return the angle in degrees.</span>
+<span class="sd">        &#39;Compass&#39; - return the angle as a directional bearing (eg: N, E, S, W)</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    bearing of the vector between the two points. </span>
-<span class="sd">    </span>
+<span class="sd">    :return: Bearing of the vector between the two points. </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># convert to radians</span>
     <span class="n">lat1</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
@@ -287,15 +281,12 @@
 <div class="viewcode-block" id="get_bounding_box">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.get_bounding_box">[docs]</a>
 <span class="k">def</span> <span class="nf">get_bounding_box</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;basic&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    get_bounding_box() takes in a shapely shape,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;get_bounding_box() takes in a shapely shape,</span>
 <span class="sd">    and then generates a polygon that is a rectangular bounding box.</span>
 <span class="sd">    </span>
-<span class="sd">    Parameters:</span>
-<span class="sd">    shape: any shapely shape</span>
+<span class="sd">    :param shape: Any shapely shape</span>
 <span class="sd">    </span>
-<span class="sd">    Returns: </span>
-<span class="sd">    shapely.polygon that fits around the provided shape</span>
+<span class="sd">    :return: shapely.polygon that fits around the provided shape</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="k">if</span> <span class="n">how</span><span class="o">==</span><span class="s1">&#39;basic&#39;</span><span class="p">:</span>
@@ -329,17 +320,15 @@
 <div class="viewcode-block" id="interpolate_points">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.interpolate_points">[docs]</a>
 <span class="k">def</span> <span class="nf">interpolate_points</span><span class="p">(</span><span class="n">point_1</span><span class="p">,</span> <span class="n">point_2</span><span class="p">,</span> <span class="n">max_dist</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    interpolate_points takes two shapely points and a maximum distance,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;interpolate_points takes two shapely points and a maximum distance,</span>
 <span class="sd">    and then interpolates between the points if the maximum distance is exceeded.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    point_1 - starting point as a shapely point of lat, lon</span>
-<span class="sd">    point_2 - final point as a shapely point of lat, lon</span>
-<span class="sd">    max_dist - maximum distance the points can be without interpolation. Default int of 1.</span>
+<span class="sd">    :param point_1: starting point as a shapely point of lat, lon</span>
+<span class="sd">    :param point_2: final point as a shapely point of lat, lon</span>
+<span class="sd">    :param max_dist: maximum distance the points can be without interpolation.</span>
+<span class="sd">        Default int of 1.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    an iterable of lon,lat shapely points. </span>
+<span class="sd">    :return: An iterable of (lon,lat) shapely points. </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="c1"># get distance in meters</span>
@@ -380,15 +369,12 @@
 <div class="viewcode-block" id="repeat_id_remover">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.repeat_id_remover">[docs]</a>
 <span class="k">def</span> <span class="nf">repeat_id_remover</span><span class="p">(</span><span class="n">sequence</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    repeat_id_remover takes an iterable of IDs where -1 is invalid,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;repeat_id_remover takes an iterable of IDs where -1 is invalid,</span>
 <span class="sd">    and swaps out any repeat index with an invalid.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    sequence - a sequence of id values in an iterable.</span>
+<span class="sd">    :param sequence: A sequence of id values in an iterable.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    sequence with repeated values swapped for a -1.</span>
+<span class="sd">    :return: Sequence with repeated values swapped for a -1.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="c1"># start the sequence with invalid</span>
@@ -426,16 +412,14 @@
 <div class="viewcode-block" id="verbose_line_updater">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.verbose_line_updater">[docs]</a>
 <span class="k">def</span> <span class="nf">verbose_line_updater</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    verbose_line_updater generates a verbose message with timestamps and</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;verbose_line_updater generates a verbose message with timestamps and</span>
 <span class="sd">    method calls based on a passed message. Can reset printline if specified.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    message - message, as str, to be printed with the line.</span>
-<span class="sd">    reset - boolean to reset carrige or not. Default false.</span>
+<span class="sd">    :param message: message, as str, to be printed with the line.</span>
+<span class="sd">    :param reset: boolean to reset carrige or not. </span>
+<span class="sd">        Default false.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    The string to be printed.</span>
+<span class="sd">    :return: The string to be printed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="c1"># generate the string.</span>
@@ -457,16 +441,13 @@
 <div class="viewcode-block" id="query_elevation_changes">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.query_elevation_changes">[docs]</a>
 <span class="k">def</span> <span class="nf">query_elevation_changes</span><span class="p">(</span><span class="n">elev</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    query_elevation_change takes an iterable of elevation,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;query_elevation_change takes an iterable of elevation,</span>
 <span class="sd">    and returns the elevation change between the point at the</span>
 <span class="sd">    current index, and the next poinnt. </span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    elev - iterable of elevation data</span>
+<span class="sd">    :param elev: iterable of elevation data</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    list of elevation changes to reach the next point.</span>
+<span class="sd">    :return: list of elevation changes to reach the next point.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="c1"># convert to series</span>
@@ -489,22 +470,23 @@
 <div class="viewcode-block" id="query_stops">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.query_stops">[docs]</a>
 <span class="k">def</span> <span class="nf">query_stops</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">stop_table_path</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;stop_id&#39;</span><span class="p">,</span> <span class="n">epsg_from</span> <span class="o">=</span> <span class="mi">4326</span><span class="p">,</span> <span class="n">epsg_to</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    query_stops takes in a geometry point series for a given route, and a path to</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;query_stops takes in a geometry point series for a given route, and a path to</span>
 <span class="sd">    all stop ids and geometry, and then returns a list of stop id&#39;s in the order the</span>
 <span class="sd">    bus will arrive.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    geometry - a series of shapely points representing longitude and latitude</span>
-<span class="sd">    stop_table_path - a path to the dataset containing stop geodata csv, as str</span>
-<span class="sd">    key - column identifier for the stop id (or whatever value you want) as str</span>
-<span class="sd">    epsg_from - the epsg projection the csv is in as an int, default is 4326</span>
-<span class="sd">    epsg_to - the epsg projection the data should be reporojected to as an int, default is 4326</span>
-<span class="sd">    margin - distance, in meters, that the stop is allowed to be from a given point to qualify, as int.</span>
-<span class="sd">    verbose - boolean to enable verbosity. default False.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    list of stop ids (or other queried values from the data), with invalid points being labeled -1.</span>
+<span class="sd">    :param geometry: a series of shapely points representing longitude and latitude</span>
+<span class="sd">    :param stop_table_path: a path to the dataset containing stop geodata csv, as str</span>
+<span class="sd">    :param key: column identifier for the stop id (or whatever value you want) as str</span>
+<span class="sd">    :param epsg_from: the epsg projection the csv is in as an int. </span>
+<span class="sd">        Default is 4326.</span>
+<span class="sd">    :param epsg_to: the epsg projection the data should be reporojected to as an int</span>
+<span class="sd">        Default is 4326.</span>
+<span class="sd">    :param margin: distance, in meters, that the stop is allowed to be from a given point to qualify, as int.</span>
+<span class="sd">    :param verbose: boolean to enable verbosity. </span>
+<span class="sd">        Default false.</span>
+<span class="sd">    </span>
+<span class="sd">    :return: list of stop ids (or other queried values from the data), with invalid points being labeled -1.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="c1"># Check the shape boundaries for the geometric series</span>
@@ -564,16 +546,14 @@
 <div class="viewcode-block" id="query_distance_traveled">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.query_distance_traveled">[docs]</a>
 <span class="k">def</span> <span class="nf">query_distance_traveled</span><span class="p">(</span><span class="n">geometry_series</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    query_distance_traveled takes in a series of points,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;query_distance_traveled takes in a series of points,</span>
 <span class="sd">    and then calculates the distance traveled from point to point, in kilometers.</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">    geometry_series - a series of shapely points of lat and lon.</span>
-<span class="sd">    verbose - boolean to enable verbosity. default False.</span>
+<span class="sd">    :param geometry_series: a series of shapely points of lat and lon.</span>
+<span class="sd">    :param verbose: boolean to enable verbosity. </span>
+<span class="sd">        Default False.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">    an iterable representing the change in distance between each point and the next.</span>
+<span class="sd">    :return: an iterable representing the change in distance between each point and the next.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># get the current geometry series</span>
@@ -608,22 +588,21 @@
 <div class="viewcode-block" id="query_signals">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.query_signals">[docs]</a>
 <span class="k">def</span> <span class="nf">query_signals</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">signal_data_path</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;SIGNAL_ID&quot;</span><span class="p">,</span> <span class="n">epsg</span> <span class="o">=</span> <span class="mi">4326</span><span class="p">,</span> <span class="n">margin</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    query_signals takes in a geometric series of shapely points,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;query_signals takes in a geometric series of shapely points,</span>
 <span class="sd">    a path to stoplight signal data, and returns a list of the signal id at</span>
 <span class="sd">    each point in that series.</span>
 <span class="sd">    </span>
-<span class="sd">    Parameters:</span>
-<span class="sd">    geometry - a series of shapely points of lat and lon.</span>
-<span class="sd">    signal_data_path - path, as str, to a shapefile containing stop signal data.</span>
-<span class="sd">    key - the column identifier of signal id (or other target value) to be queried</span>
-<span class="sd">    epsg - the epsg the data will be re-set as. Default is 4326.</span>
-<span class="sd">    margin - the distance, in meters, that the signal is allowed to be from a given point to qualify.</span>
-<span class="sd">    verbose - boolean to enable verbosity. Default False.</span>
+<span class="sd">    :param geometry: a series of shapely points of lat and lon.</span>
+<span class="sd">    :param signal_data_path: path, as str, to a shapefile containing stop signal data.</span>
+<span class="sd">    :param key: the column identifier of signal id (or other target value) to be queried</span>
+<span class="sd">    :param epsg: the epsg the data will be re-set as.</span>
+<span class="sd">        Default is 4326.</span>
+<span class="sd">    :param margin: the distance, in meters, that the signal is allowed to be from a given point to qualify.</span>
+<span class="sd">    :param verbose: boolean to enable verbosity.</span>
+<span class="sd">        Default False.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    list of signal IDs, or other info about the signal, as specified.</span>
-<span class="sd">    -1 if none found.</span>
+<span class="sd">    :return: list of signal IDs, or other info about the signal, as specified. </span>
+<span class="sd">        -1 if none found.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="c1"># get the bounding box of the geometry</span>
@@ -670,25 +649,26 @@
 <div class="viewcode-block" id="query_speed_limits">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.query_speed_limits">[docs]</a>
 <span class="k">def</span> <span class="nf">query_speed_limits</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">limit_data_path</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;SPEED_LIM&quot;</span><span class="p">,</span> <span class="n">epsg</span> <span class="o">=</span> <span class="mi">4326</span><span class="p">,</span> <span class="n">margin</span> <span class="o">=</span> <span class="mf">3e-4</span><span class="p">,</span> <span class="n">last_known_limit</span><span class="o">=</span> <span class="mi">20</span><span class="o">*</span><span class="mf">0.00044704</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    query_speed_limits takes a geometric iterable of shapely points,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;query_speed_limits takes a geometric iterable of shapely points,</span>
 <span class="sd">    a path to speed limit geodata, and returns the corresponding speed limits at</span>
 <span class="sd">    each point.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    geometry - a series of shapely points of lat and lon</span>
-<span class="sd">    limit_data_path - path to shapefile of speed limit data as str</span>
-<span class="sd">    key - column identifier of a speed limit or other value as str, assumed to be an int in units of mph</span>
-<span class="sd">    margin - distance a point can be from the street to qualify, default 5e-5</span>
-<span class="sd">    last_known_limit - the speed limit int value that the bus will assumedly start at or above. default 20 mph</span>
-<span class="sd">    verbose - boolean to enable verbosity. Default False.</span>
+<span class="sd">    :param geometry: a series of shapely points of lat and lon</span>
+<span class="sd">    :param limit_data_path: path to shapefile of speed limit data as str</span>
+<span class="sd">    :param key: column identifier of a speed limit or other value as str, assumed to be an int in units of mph</span>
+<span class="sd">    :param margin: distance a point can be from the street to qualify.</span>
+<span class="sd">        Default 5e-5.</span>
+<span class="sd">    :param last_known_limit: the speed limit int value that the bus will assumedly start at or above. </span>
+<span class="sd">        Default 20 mph.</span>
+<span class="sd">    :param verbose: boolean to enable verbosity. </span>
+<span class="sd">        Default False.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    list of speed limits corresponding to the geometry.</span>
+<span class="sd">    :return: list of speed limits corresponding to the geometry.</span>
 <span class="sd">    </span>
 <span class="sd">    Notes:</span>
+<span class="sd">    </span>
 <span class="sd">    11/13/2024 - This can be adjusted such that instead of the first value, it&#39;s the true closest. Also can probably be combined with the other queries in such a way that it reduces individual methods. FIXED -- 11/19/2024</span>
-<span class="sd">    11/18/2024 - Currently Broken. - FIXED -- 11/19/2024</span>
+<span class="sd">    11/18/2024 - Currently Broken. FIXED -- 11/19/2024</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># DEPENDING ON THE FILE, THIS CAN TAKE A WHILE.</span>
     
@@ -755,17 +735,17 @@
 <div class="viewcode-block" id="query_bearings">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.query_bearings">[docs]</a>
 <span class="k">def</span> <span class="nf">query_bearings</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">bearing_type</span> <span class="o">=</span> <span class="s2">&quot;Angle&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    query_bearings takes a geometric iterable of shapely points,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;query_bearings takes a geometric iterable of shapely points,</span>
 <span class="sd">    and returns the corresponding bearing when travelling form one point to the next.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    geometry - a series of shapely points of lat and lon</span>
-<span class="sd">    bearing_type - determine the bearing output. Options: Angle - return the angle in degrees. Compass - return the angle as a directional bearing (eg: N, E, S, W)</span>
-<span class="sd">    verbose - boolean to enable verbosity. Default False.</span>
+<span class="sd">    :param geometry: a series of shapely points of lat and lon</span>
+<span class="sd">    :param bearing_type: determine the bearing output. </span>
+<span class="sd">        Angle - return the angle in degrees. </span>
+<span class="sd">        Compass - return the angle as a directional bearing (eg: N, E, S, W)</span>
+<span class="sd">    :param verbose: boolean to enable verbosity. </span>
+<span class="sd">        Default False.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    list of bearings when travelling to subsequent point.</span>
+<span class="sd">    :return: list of bearings when travelling to subsequent point.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># get the current geometry series</span>
@@ -802,15 +782,12 @@
 <div class="viewcode-block" id="get_rasterfiles">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.get_rasterfiles">[docs]</a>
 <span class="k">def</span> <span class="nf">get_rasterfiles</span><span class="p">(</span><span class="n">dir_path</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    get_rasterfiles takes a path to a directory and returns a series of paths to any .tif files</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;get_rasterfiles takes a path to a directory and returns a series of paths to any .tif files</span>
 <span class="sd">    contained therin.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    dir_path - path to directory, as str. </span>
+<span class="sd">    :param dir_path: path to directory, as str. </span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    pandas series of path strings to each .tif file.</span>
+<span class="sd">    :return: pandas series of path strings to each .tif file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="c1"># create a series using the list of items in the specified directory</span>
@@ -830,18 +807,16 @@
 <div class="viewcode-block" id="reproject_rasterfiles">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.reproject_rasterfiles">[docs]</a>
 <span class="k">def</span> <span class="nf">reproject_rasterfiles</span><span class="p">(</span><span class="n">filepath_sequence</span><span class="p">,</span> <span class="n">target_crs</span><span class="o">=</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    reproject_rasterfiles takes an iterable of geotiff files, and</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;reproject_rasterfiles takes an iterable of geotiff files, and</span>
 <span class="sd">    then reprojects them as a target crs and saves them in the same</span>
 <span class="sd">    directory as the original.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    filepath_sequence - an iterable of filepaths to geotiff files.</span>
-<span class="sd">    target_crs - the projection system the rasterfiles are to be re-projected to.</span>
-<span class="sd">    verbose - specify if the output is verbose. Boolean default False.</span>
+<span class="sd">    :param filepath_sequence: an iterable of filepaths to geotiff files.</span>
+<span class="sd">    :param target_crs: the projection system the rasterfiles are to be re-projected to.</span>
+<span class="sd">    :param verbose: specify if the output is verbose. </span>
+<span class="sd">        Default False.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    iterable sequence of the newly reprojected files.</span>
+<span class="sd">    :return: iterable sequence of the newly reprojected files.</span>
 <span class="sd">    </span>
 <span class="sd">    Notes:</span>
 <span class="sd">    11/14/2024 - This should be made to have the ability to override if requested. For now, leaving it as-is is fine.</span>
@@ -902,20 +877,17 @@
 <div class="viewcode-block" id="query_elevation_series">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.query_elevation_series">[docs]</a>
 <span class="k">def</span> <span class="nf">query_elevation_series</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">gtiff_dir_ser</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    query_elevation_series takes a series of geometric shapely points, and an iterable of</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;query_elevation_series takes a series of geometric shapely points, and an iterable of</span>
 <span class="sd">    geotiff filepaths, and generates a pandas series of elevations from each point in</span>
 <span class="sd">    the geometry.</span>
 <span class="sd">    Also for some reason tifs store lat and long in (lon, lat), so i swap em.</span>
 <span class="sd">    </span>
+<span class="sd">    :param geometry: a series of shapely points of lat and lon</span>
+<span class="sd">    :param gtiff_dir_ser: an iterable of geometric shapely points. Must have an identical projection to the raster files.</span>
+<span class="sd">    :param verbose: boolean parameter to specify verbosity. </span>
+<span class="sd">        Defualt false.</span>
 <span class="sd">    </span>
-<span class="sd">    Params: </span>
-<span class="sd">    geometry - a series of shapely points of lat and lon</span>
-<span class="sd">    gtiff_dir_ser - an iterable of geometric shapely points. Must have an identical projection to the raster files.</span>
-<span class="sd">    verbose - boolean parameter to specify verbosity. Defualt False.</span>
-<span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    pandas series of elevations corresponding to the geometry iterable, in km.</span>
+<span class="sd">    :return: pandas series of elevations corresponding to the geometry iterable, in km.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="c1"># Generate the empty dictionary</span>
@@ -992,10 +964,10 @@
 <span class="sd">    between the points, and generates a filtered elevation that provides cleaner road elevation.</span>
 <span class="sd">    </span>
 <span class="sd">    Params:</span>
-<span class="sd">    dsm - digital surface model elevation iterable.</span>
-<span class="sd">    dtm - digital terrain model elevation iterable.</span>
-<span class="sd">    dx - iterable change in distance, in kilometers.</span>
-<span class="sd">    max_grade - maximum possible grade the road can achieve. Default int=7.5.</span>
+<span class="sd">    :param dsm: digital surface model elevation iterable.</span>
+<span class="sd">    :param dtm: digital terrain model elevation iterable.</span>
+<span class="sd">    :param dx: iterable change in distance, in kilometers.</span>
+<span class="sd">    :param max_grade: maximum possible grade the road can achieve. Default int=7.5.</span>
 <span class="sd">    </span>
 <span class="sd">    Returns:</span>
 <span class="sd">    iterable of filtered elevations, in km.</span>
@@ -1027,14 +999,14 @@
 <span class="sd">    calculate_grades takes the distance between points,</span>
 <span class="sd">    as well as the elevations at each point, and returns the grade at each point.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    dx - an iterable of distances between each point</span>
-<span class="sd">    elevations - an iterable of elevations corresponding to each point.</span>
-<span class="sd">    clip - boolean to determine to clip the grades or not. Default True.</span>
-<span class="sd">    max_grade - an int representing the maximum grade a point can be without being clipped to. Default 7.5</span>
+<span class="sd">    :param dx: an iterable of distances between each point</span>
+<span class="sd">    :param elevations: an iterable of elevations corresponding to each point.</span>
+<span class="sd">    :param clip: boolean to determine to clip the grades or not.</span>
+<span class="sd">        Default True.</span>
+<span class="sd">    :param max_grade: an int representing the maximum grade a point can be without being clipped to.</span>
+<span class="sd">        Default 7.5</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    iterable of the slope grade at each point. </span>
+<span class="sd">    :return: iterable of the slope grade at each point. </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># calculate the grade percentage using the elevation difference and distance difference,</span>
@@ -1064,18 +1036,14 @@
 <div class="viewcode-block" id="interpolate_geometry_series">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.interpolate_geometry_series">[docs]</a>
 <span class="k">def</span> <span class="nf">interpolate_geometry_series</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">max_distance</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    interpolate_geometry_series takes an iterable of geospatial shapely points,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;interpolate_geometry_series takes an iterable of geospatial shapely points,</span>
 <span class="sd">    and then generates an interpolated series in the event that</span>
 <span class="sd">    the maximum distance (in meters) is exceeded.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    geometry - a series of shapely points of lat and lon</span>
-<span class="sd">    max_distance - int representing maximum distance the points can be without interpolation</span>
-<span class="sd">                   </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    iterable of lists of shapely points that have been interpolated.</span>
-<span class="sd">    </span>
+<span class="sd">    :param geometry: a series of shapely points of lat and lon.</span>
+<span class="sd">    :param max_distance: int representing maximum distance the points can be without interpolation.</span>
+
+<span class="sd">    :return: iterable of lists of shapely points that have been interpolated.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="n">currents</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
@@ -1127,13 +1095,13 @@
 <span class="sd">    Route class is is used to store route information. </span>
 <span class="sd">    </span>
 <span class="sd">    Params:</span>
-<span class="sd">    geometry - iterable of shapely geometry points</span>
-<span class="sd">    elevation - iterable of elevation data</span>
-<span class="sd">    limits - iterable of speed limit at each point. (optional, defaults to 25mph in km/s)</span>
-<span class="sd">    stops - iterable of stop flags at each point. (optional, defaults to 10 evenly spaced stops.)</span>
-<span class="sd">    signals - iterable of signal flags at each point. (optional, defaults to 8 evenly spaced signals.)</span>
-<span class="sd">    signs - iterable of sign flags at each point. (optional, defaults to 3 evenly spaced stop signs.)</span>
-<span class="sd">    intersperse_empty - boolean flag to intersperse any empty parameters. Default False.</span>
+<span class="sd">    :param geometry: iterable of shapely geometry points</span>
+<span class="sd">    :param elevation: iterable of elevation data</span>
+<span class="sd">    :param limits: iterable of speed limit at each point. (optional, defaults to 25mph in km/s)</span>
+<span class="sd">    :param stops: iterable of stop flags at each point. (optional, defaults to 10 evenly spaced stops.)</span>
+<span class="sd">    :param signals: iterable of signal flags at each point. (optional, defaults to 8 evenly spaced signals.)</span>
+<span class="sd">    :param signs: iterable of sign flags at each point. (optional, defaults to 3 evenly spaced stop signs.)</span>
+<span class="sd">    :param intersperse_empty: boolean flag to intersperse any empty parameters. Default False.</span>
 <span class="sd">    </span>
 <span class="sd">    Methods: </span>
 <span class="sd">    save_to_json() - saves the stored data to a json file. can be loaded again with Geography Tools&#39; load_from_json.</span>
@@ -1229,10 +1197,10 @@
 <span class="sd">        with the option to evenly intersperse those values with an alternate flag. </span>
 <span class="sd">        </span>
 <span class="sd">        Params:</span>
-<span class="sd">        default_value - the value that the list will be populated with initially.</span>
-<span class="sd">        list_size - size of the list to be made, as an int.</span>
-<span class="sd">        intersperse_val - value to be interspersed, default of -1.</span>
-<span class="sd">        intersperse_num - number of ocurrences of the interspersed value, as int. Default 0.</span>
+<span class="sd">        :param default_value: the value that the list will be populated with initially.</span>
+<span class="sd">        :param list_size: size of the list to be made, as an int.</span>
+<span class="sd">        :param intersperse_val: value to be interspersed, default of -1.</span>
+<span class="sd">        :param intersperse_num: number of ocurrences of the interspersed value, as int. Default 0.</span>
 <span class="sd">        </span>
 <span class="sd">        Returns:</span>
 <span class="sd">        the new list.</span>
@@ -1252,14 +1220,11 @@
 <div class="viewcode-block" id="Route.save_to_json">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.Route.save_to_json">[docs]</a>
     <span class="k">def</span> <span class="nf">save_to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        save_to_json() is used to encode and save the Route data to a json file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;save_to_json() is used to encode and save the Route data to a json file.</span>
 <span class="sd">        </span>
-<span class="sd">        Params:</span>
-<span class="sd">        path - path and filename to be saved to, as str. Should end with &#39;.json&#39;.</span>
+<span class="sd">        :param path: path and filename to be saved to, as str. Should end with &#39;.json&#39;.</span>
 <span class="sd">        </span>
-<span class="sd">        Returns:</span>
-<span class="sd">        path to the saved json file.</span>
+<span class="sd">        :return: path to the saved json file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
         <span class="c1"># generate data dictionary and compress the data where possible.</span>
@@ -1287,8 +1252,9 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        query_point() takes an index of a point and returns the data for the corresponding point.</span>
 <span class="sd">        </span>
-<span class="sd">        Params:</span>
-<span class="sd">        index - index of the route which data you would like to query.</span>
+<span class="sd">        :param index: index of the route which data you would like to query.</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Data at that given point, as a dict.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elevation&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">elevation</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
@@ -1310,14 +1276,9 @@
 <div class="viewcode-block" id="Route.to_gdf">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.Route.to_gdf">[docs]</a>
     <span class="k">def</span> <span class="nf">to_gdf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        to_gdf() takes the constituent information in geography_tools and converts it to a geodataframe.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;to_gdf() takes the constituent information in geography_tools and converts it to a geodataframe.</span>
 <span class="sd">        </span>
-<span class="sd">        Params:</span>
-<span class="sd">        N/A</span>
-<span class="sd">        </span>
-<span class="sd">        Returns:</span>
-<span class="sd">        geodataframe of all information contained by a Route object.</span>
+<span class="sd">        :return: geodataframe of all information contained by a Route object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;geometry&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span>
                 <span class="s1">&#39;elevation&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">elevation</span><span class="p">,</span>
@@ -1339,16 +1300,13 @@
             
 
 <span class="k">def</span> <span class="nf">_encode_series</span><span class="p">(</span><span class="n">iterable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    encode_series() takes an iterable and compresses it down so that </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;encode_series() takes an iterable and compresses it down so that </span>
 <span class="sd">    repeating values are stored as the value and number of occurrences.</span>
 <span class="sd">    Warning: Value typings will be lost.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    iterable - an iterable list of values.</span>
+<span class="sd">    :param iterable: an iterable list of values.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns: </span>
-<span class="sd">    a string representation of the compressed information. </span>
+<span class="sd">    :return: a string representation of the compressed information. </span>
 <span class="sd">    </span>
 <span class="sd">    Notes:</span>
 <span class="sd">    1/16/2025 - Privated since it isn&#39;t needed externally. </span>
@@ -1496,15 +1454,13 @@
 <div class="viewcode-block" id="load_from_json">
 <a class="viewcode-back" href="../../reRoute_Dynamics.html#reRoute_Dynamics.Geography_Tools.load_from_json">[docs]</a>
 <span class="k">def</span> <span class="nf">load_from_json</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    load_from_json() takes in a path to a json file from an exported Route object,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;load_from_json() takes in a path to a json file from an exported Route object,</span>
 <span class="sd">    and returns a path object as close as possible to what was saved.</span>
 <span class="sd">    Waring: Some data types may be altered or adjusted. Speed limits are expected to be floats, stops, signals, signs, are expected to be ints.</span>
 <span class="sd">    </span>
-<span class="sd">    Params:</span>
-<span class="sd">    path - path to json file.</span>
+<span class="sd">    :param path: path to json file.</span>
 <span class="sd">    </span>
-<span class="sd">    Returns: a Route object.</span>
+<span class="sd">    :return: a Route object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="c1"># create empty data dictionary.</span>

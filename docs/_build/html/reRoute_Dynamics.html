@@ -180,41 +180,52 @@ to_gdf() - class method used to convert a Route class’s stored information to 
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Route class is is used to store route information.</p>
 <p>Params:
-geometry - iterable of shapely geometry points
-elevation - iterable of elevation data
-limits - iterable of speed limit at each point. (optional, defaults to 25mph in km/s)
-stops - iterable of stop flags at each point. (optional, defaults to 10 evenly spaced stops.)
-signals - iterable of signal flags at each point. (optional, defaults to 8 evenly spaced signals.)
-signs - iterable of sign flags at each point. (optional, defaults to 3 evenly spaced stop signs.)
-intersperse_empty - boolean flag to intersperse any empty parameters. Default False.</p>
+:param geometry: iterable of shapely geometry points
+:param elevation: iterable of elevation data
+:param limits: iterable of speed limit at each point. (optional, defaults to 25mph in km/s)
+:param stops: iterable of stop flags at each point. (optional, defaults to 10 evenly spaced stops.)
+:param signals: iterable of signal flags at each point. (optional, defaults to 8 evenly spaced signals.)
+:param signs: iterable of sign flags at each point. (optional, defaults to 3 evenly spaced stop signs.)
+:param intersperse_empty: boolean flag to intersperse any empty parameters. Default False.</p>
 <p>Methods:
 save_to_json() - saves the stored data to a json file. can be loaded again with Geography Tools’ load_from_json.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.Route.query_point">
 <span class="sig-name descname"><span class="pre">query_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#Route.query_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.Route.query_point" title="Link to this definition"></a></dt>
 <dd><p>query_point() takes an index of a point and returns the data for the corresponding point.</p>
-<p>Params:
-index - index of the route which data you would like to query.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> – index of the route which data you would like to query.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Data at that given point, as a dict.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.Route.save_to_json">
 <span class="sig-name descname"><span class="pre">save_to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#Route.save_to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.Route.save_to_json" title="Link to this definition"></a></dt>
 <dd><p>save_to_json() is used to encode and save the Route data to a json file.</p>
-<p>Params:
-path - path and filename to be saved to, as str. Should end with ‘.json’.</p>
-<p>Returns:
-path to the saved json file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> – path and filename to be saved to, as str. Should end with ‘.json’.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>path to the saved json file.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="reRoute_Dynamics.Geography_Tools.Route.to_gdf">
 <span class="sig-name descname"><span class="pre">to_gdf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#Route.to_gdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.Route.to_gdf" title="Link to this definition"></a></dt>
 <dd><p>to_gdf() takes the constituent information in geography_tools and converts it to a geodataframe.</p>
-<p>Params:
-N/A</p>
-<p>Returns:
-geodataframe of all information contained by a Route object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>geodataframe of all information contained by a Route object.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -224,13 +235,21 @@ geodataframe of all information contained by a Route object.</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">calculate_grades</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elevations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_grade</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#calculate_grades"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.calculate_grades" title="Link to this definition"></a></dt>
 <dd><p>calculate_grades takes the distance between points,
 as well as the elevations at each point, and returns the grade at each point.</p>
-<p>Params:
-dx - an iterable of distances between each point
-elevations - an iterable of elevations corresponding to each point.
-clip - boolean to determine to clip the grades or not. Default True.
-max_grade - an int representing the maximum grade a point can be without being clipped to. Default 7.5</p>
-<p>Returns:
-iterable of the slope grade at each point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dx</strong> – an iterable of distances between each point</p></li>
+<li><p><strong>elevations</strong> – an iterable of elevations corresponding to each point.</p></li>
+<li><p><strong>clip</strong> – boolean to determine to clip the grades or not.
+Default True.</p></li>
+<li><p><strong>max_grade</strong> – an int representing the maximum grade a point can be without being clipped to.
+Default 7.5</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>iterable of the slope grade at each point.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -238,12 +257,16 @@ iterable of the slope grade at each point.</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">compass_heading</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bearing</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#compass_heading"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.compass_heading" title="Link to this definition"></a></dt>
 <dd><p>compass_heading converts a bearing in degrees to a
 compass value like North, South, or East.</p>
-<p>Params:
-bearing - the bearing value, in degrees, as float.</p>
-<p>Returns:
-string representation of compass heading.</p>
-<p>Notes:
-11/18/2024 - There is a more mathematically elegant solution to this, but I’m not bothering with it right now.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>bearing</strong> – The bearing value, in degrees, as float.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>String representation of compass heading.</p>
+</dd>
+</dl>
+<p>Notes:</p>
+<p>11/18/2024 - There is a more mathematically elegant solution to this, but I’m not bothering with it right now.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -272,10 +295,14 @@ according to the geodesic formula as calculated by geopy.</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">get_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">how</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'basic'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#get_bounding_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.get_bounding_box" title="Link to this definition"></a></dt>
 <dd><p>get_bounding_box() takes in a shapely shape,
 and then generates a polygon that is a rectangular bounding box.</p>
-<p>Parameters:
-shape: any shapely shape</p>
-<p>Returns:
-shapely.polygon that fits around the provided shape</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>shape</strong> – Any shapely shape</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>shapely.polygon that fits around the provided shape</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -283,10 +310,14 @@ shapely.polygon that fits around the provided shape</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">get_rasterfiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#get_rasterfiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.get_rasterfiles" title="Link to this definition"></a></dt>
 <dd><p>get_rasterfiles takes a path to a directory and returns a series of paths to any .tif files
 contained therin.</p>
-<p>Params:
-dir_path - path to directory, as str.</p>
-<p>Returns:
-pandas series of path strings to each .tif file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dir_path</strong> – path to directory, as str.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>pandas series of path strings to each .tif file.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -294,9 +325,14 @@ pandas series of path strings to each .tif file.</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">heading_to_angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heading</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#heading_to_angle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.heading_to_angle" title="Link to this definition"></a></dt>
 <dd><p>heading_to_angle() takes a compass heading of 8 directions,
 and converts it to an angle in degrees.</p>
-<p>Params:
-heading - a string representing heading.</p>
-<p>Returns: a compass bearing angle as float.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>heading</strong> – A string representing heading.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A compass bearing angle as float.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -305,11 +341,17 @@ heading - a string representing heading.</p>
 <dd><p>interpolate_geometry_series takes an iterable of geospatial shapely points,
 and then generates an interpolated series in the event that
 the maximum distance (in meters) is exceeded.</p>
-<p>Params:
-geometry - a series of shapely points of lat and lon
-max_distance - int representing maximum distance the points can be without interpolation</p>
-<p>Returns:
-iterable of lists of shapely points that have been interpolated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – a series of shapely points of lat and lon.</p></li>
+<li><p><strong>max_distance</strong> – int representing maximum distance the points can be without interpolation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>iterable of lists of shapely points that have been interpolated.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -317,12 +359,19 @@ iterable of lists of shapely points that have been interpolated.</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">interpolate_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#interpolate_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.interpolate_points" title="Link to this definition"></a></dt>
 <dd><p>interpolate_points takes two shapely points and a maximum distance,
 and then interpolates between the points if the maximum distance is exceeded.</p>
-<p>Params:
-point_1 - starting point as a shapely point of lat, lon
-point_2 - final point as a shapely point of lat, lon
-max_dist - maximum distance the points can be without interpolation. Default int of 1.</p>
-<p>Returns:
-an iterable of lon,lat shapely points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>point_1</strong> – starting point as a shapely point of lat, lon</p></li>
+<li><p><strong>point_2</strong> – final point as a shapely point of lat, lon</p></li>
+<li><p><strong>max_dist</strong> – maximum distance the points can be without interpolation.
+Default int of 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An iterable of (lon,lat) shapely points.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -331,9 +380,14 @@ an iterable of lon,lat shapely points.</p>
 <dd><p>load_from_json() takes in a path to a json file from an exported Route object,
 and returns a path object as close as possible to what was saved.
 Waring: Some data types may be altered or adjusted. Speed limits are expected to be floats, stops, signals, signs, are expected to be ints.</p>
-<p>Params:
-path - path to json file.</p>
-<p>Returns: a Route object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> – path to json file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a Route object.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -341,14 +395,22 @@ path - path to json file.</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">point_bearing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bearing_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Angle'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#point_bearing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.point_bearing" title="Link to this definition"></a></dt>
 <dd><p>point_bearing takex in the latitude and longitude of two separate ponts,
 and calculates the bearing when travelling from point 1 and point 2.</p>
-<p>Params:
-x1 - latitude pt 1 in degrees
-y1 - longitude pt 1 in degrees
-x2 - latitude pt 2 in degrees
-y2 - longitude pt 2 in degrees
-bearing_type - determine the bearing output. Options: Angle - return the angle in degrees. Compass - return the angle as a directional bearing (eg: N, E, S, W)</p>
-<p>Returns:
-bearing of the vector between the two points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x1</strong> – latitude of point 1 in degrees</p></li>
+<li><p><strong>y1</strong> – longitude of point 1 in degrees</p></li>
+<li><p><strong>x2</strong> – latitude of point 2 in degrees</p></li>
+<li><p><strong>y2</strong> – longitude of point 2 in degrees</p></li>
+<li><p><strong>bearing_type</strong> – Determine the bearing output.
+‘Angle’ - return the angle in degrees.
+‘Compass’ - return the angle as a directional bearing (eg: N, E, S, W)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Bearing of the vector between the two points.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -356,12 +418,21 @@ bearing of the vector between the two points.</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">query_bearings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bearing_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Angle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#query_bearings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.query_bearings" title="Link to this definition"></a></dt>
 <dd><p>query_bearings takes a geometric iterable of shapely points,
 and returns the corresponding bearing when travelling form one point to the next.</p>
-<p>Params:
-geometry - a series of shapely points of lat and lon
-bearing_type - determine the bearing output. Options: Angle - return the angle in degrees. Compass - return the angle as a directional bearing (eg: N, E, S, W)
-verbose - boolean to enable verbosity. Default False.</p>
-<p>Returns:
-list of bearings when travelling to subsequent point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – a series of shapely points of lat and lon</p></li>
+<li><p><strong>bearing_type</strong> – determine the bearing output.
+Angle - return the angle in degrees.
+Compass - return the angle as a directional bearing (eg: N, E, S, W)</p></li>
+<li><p><strong>verbose</strong> – boolean to enable verbosity.
+Default False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of bearings when travelling to subsequent point.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -369,11 +440,18 @@ list of bearings when travelling to subsequent point.</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">query_distance_traveled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#query_distance_traveled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.query_distance_traveled" title="Link to this definition"></a></dt>
 <dd><p>query_distance_traveled takes in a series of points,
 and then calculates the distance traveled from point to point, in kilometers.</p>
-<p>Parameters:
-geometry_series - a series of shapely points of lat and lon.
-verbose - boolean to enable verbosity. default False.</p>
-<p>Returns:
-an iterable representing the change in distance between each point and the next.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_series</strong> – a series of shapely points of lat and lon.</p></li>
+<li><p><strong>verbose</strong> – boolean to enable verbosity.
+Default False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>an iterable representing the change in distance between each point and the next.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -382,10 +460,14 @@ an iterable representing the change in distance between each point and the next.
 <dd><p>query_elevation_change takes an iterable of elevation,
 and returns the elevation change between the point at the
 current index, and the next poinnt.</p>
-<p>Params:
-elev - iterable of elevation data</p>
-<p>Returns:
-list of elevation changes to reach the next point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elev</strong> – iterable of elevation data</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of elevation changes to reach the next point.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -395,12 +477,19 @@ list of elevation changes to reach the next point.</p>
 geotiff filepaths, and generates a pandas series of elevations from each point in
 the geometry.
 Also for some reason tifs store lat and long in (lon, lat), so i swap em.</p>
-<p>Params:
-geometry - a series of shapely points of lat and lon
-gtiff_dir_ser - an iterable of geometric shapely points. Must have an identical projection to the raster files.
-verbose - boolean parameter to specify verbosity. Defualt False.</p>
-<p>Returns:
-pandas series of elevations corresponding to the geometry iterable, in km.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – a series of shapely points of lat and lon</p></li>
+<li><p><strong>gtiff_dir_ser</strong> – an iterable of geometric shapely points. Must have an identical projection to the raster files.</p></li>
+<li><p><strong>verbose</strong> – boolean parameter to specify verbosity.
+Defualt false.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>pandas series of elevations corresponding to the geometry iterable, in km.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -409,16 +498,24 @@ pandas series of elevations corresponding to the geometry iterable, in km.</p>
 <dd><p>query_signals takes in a geometric series of shapely points,
 a path to stoplight signal data, and returns a list of the signal id at
 each point in that series.</p>
-<p>Parameters:
-geometry - a series of shapely points of lat and lon.
-signal_data_path - path, as str, to a shapefile containing stop signal data.
-key - the column identifier of signal id (or other target value) to be queried
-epsg - the epsg the data will be re-set as. Default is 4326.
-margin - the distance, in meters, that the signal is allowed to be from a given point to qualify.
-verbose - boolean to enable verbosity. Default False.</p>
-<p>Returns:
-list of signal IDs, or other info about the signal, as specified.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – a series of shapely points of lat and lon.</p></li>
+<li><p><strong>signal_data_path</strong> – path, as str, to a shapefile containing stop signal data.</p></li>
+<li><p><strong>key</strong> – the column identifier of signal id (or other target value) to be queried</p></li>
+<li><p><strong>epsg</strong> – the epsg the data will be re-set as.
+Default is 4326.</p></li>
+<li><p><strong>margin</strong> – the distance, in meters, that the signal is allowed to be from a given point to qualify.</p></li>
+<li><p><strong>verbose</strong> – boolean to enable verbosity.
+Default False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of signal IDs, or other info about the signal, as specified.
 -1 if none found.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -427,18 +524,27 @@ list of signal IDs, or other info about the signal, as specified.
 <dd><p>query_speed_limits takes a geometric iterable of shapely points,
 a path to speed limit geodata, and returns the corresponding speed limits at
 each point.</p>
-<p>Params:
-geometry - a series of shapely points of lat and lon
-limit_data_path - path to shapefile of speed limit data as str
-key - column identifier of a speed limit or other value as str, assumed to be an int in units of mph
-margin - distance a point can be from the street to qualify, default 5e-5
-last_known_limit - the speed limit int value that the bus will assumedly start at or above. default 20 mph
-verbose - boolean to enable verbosity. Default False.</p>
-<p>Returns:
-list of speed limits corresponding to the geometry.</p>
-<p>Notes:
-11/13/2024 - This can be adjusted such that instead of the first value, it’s the true closest. Also can probably be combined with the other queries in such a way that it reduces individual methods. FIXED – 11/19/2024
-11/18/2024 - Currently Broken. - FIXED – 11/19/2024</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – a series of shapely points of lat and lon</p></li>
+<li><p><strong>limit_data_path</strong> – path to shapefile of speed limit data as str</p></li>
+<li><p><strong>key</strong> – column identifier of a speed limit or other value as str, assumed to be an int in units of mph</p></li>
+<li><p><strong>margin</strong> – distance a point can be from the street to qualify.
+Default 5e-5.</p></li>
+<li><p><strong>last_known_limit</strong> – the speed limit int value that the bus will assumedly start at or above.
+Default 20 mph.</p></li>
+<li><p><strong>verbose</strong> – boolean to enable verbosity.
+Default False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of speed limits corresponding to the geometry.</p>
+</dd>
+</dl>
+<p>Notes:</p>
+<p>11/13/2024 - This can be adjusted such that instead of the first value, it’s the true closest. Also can probably be combined with the other queries in such a way that it reduces individual methods. FIXED – 11/19/2024
+11/18/2024 - Currently Broken. FIXED – 11/19/2024</p>
 </dd></dl>
 
 <dl class="py function">
@@ -447,16 +553,25 @@ list of speed limits corresponding to the geometry.</p>
 <dd><p>query_stops takes in a geometry point series for a given route, and a path to
 all stop ids and geometry, and then returns a list of stop id’s in the order the
 bus will arrive.</p>
-<p>Params:
-geometry - a series of shapely points representing longitude and latitude
-stop_table_path - a path to the dataset containing stop geodata csv, as str
-key - column identifier for the stop id (or whatever value you want) as str
-epsg_from - the epsg projection the csv is in as an int, default is 4326
-epsg_to - the epsg projection the data should be reporojected to as an int, default is 4326
-margin - distance, in meters, that the stop is allowed to be from a given point to qualify, as int.
-verbose - boolean to enable verbosity. default False.</p>
-<p>Returns:
-list of stop ids (or other queried values from the data), with invalid points being labeled -1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry</strong> – a series of shapely points representing longitude and latitude</p></li>
+<li><p><strong>stop_table_path</strong> – a path to the dataset containing stop geodata csv, as str</p></li>
+<li><p><strong>key</strong> – column identifier for the stop id (or whatever value you want) as str</p></li>
+<li><p><strong>epsg_from</strong> – the epsg projection the csv is in as an int.
+Default is 4326.</p></li>
+<li><p><strong>epsg_to</strong> – the epsg projection the data should be reporojected to as an int
+Default is 4326.</p></li>
+<li><p><strong>margin</strong> – distance, in meters, that the stop is allowed to be from a given point to qualify, as int.</p></li>
+<li><p><strong>verbose</strong> – boolean to enable verbosity.
+Default false.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of stop ids (or other queried values from the data), with invalid points being labeled -1.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -464,10 +579,14 @@ list of stop ids (or other queried values from the data), with invalid points be
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">repeat_id_remover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#repeat_id_remover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.repeat_id_remover" title="Link to this definition"></a></dt>
 <dd><p>repeat_id_remover takes an iterable of IDs where -1 is invalid,
 and swaps out any repeat index with an invalid.</p>
-<p>Params:
-sequence - a sequence of id values in an iterable.</p>
-<p>Returns:
-sequence with repeated values swapped for a -1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sequence</strong> – A sequence of id values in an iterable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sequence with repeated values swapped for a -1.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -476,12 +595,19 @@ sequence with repeated values swapped for a -1.</p>
 <dd><p>reproject_rasterfiles takes an iterable of geotiff files, and
 then reprojects them as a target crs and saves them in the same
 directory as the original.</p>
-<p>Params:
-filepath_sequence - an iterable of filepaths to geotiff files.
-target_crs - the projection system the rasterfiles are to be re-projected to.
-verbose - specify if the output is verbose. Boolean default False.</p>
-<p>Returns:
-iterable sequence of the newly reprojected files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath_sequence</strong> – an iterable of filepaths to geotiff files.</p></li>
+<li><p><strong>target_crs</strong> – the projection system the rasterfiles are to be re-projected to.</p></li>
+<li><p><strong>verbose</strong> – specify if the output is verbose.
+Default False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>iterable sequence of the newly reprojected files.</p>
+</dd>
+</dl>
 <p>Notes:
 11/14/2024 - This should be made to have the ability to override if requested. For now, leaving it as-is is fine.</p>
 </dd></dl>
@@ -496,11 +622,18 @@ iterable sequence of the newly reprojected files.</p>
 <span class="sig-prename descclassname"><span class="pre">reRoute_Dynamics.Geography_Tools.</span></span><span class="sig-name descname"><span class="pre">verbose_line_updater</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Geography_Tools.html#verbose_line_updater"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Geography_Tools.verbose_line_updater" title="Link to this definition"></a></dt>
 <dd><p>verbose_line_updater generates a verbose message with timestamps and
 method calls based on a passed message. Can reset printline if specified.</p>
-<p>Params:
-message - message, as str, to be printed with the line.
-reset - boolean to reset carrige or not. Default false.</p>
-<p>Returns:
-The string to be printed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> – message, as str, to be printed with the line.</p></li>
+<li><p><strong>reset</strong> – boolean to reset carrige or not.
+Default false.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The string to be printed.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

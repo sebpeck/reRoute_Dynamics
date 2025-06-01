@@ -114,17 +114,15 @@ def geodesic_formula(x1, y1, x2, y2):
     
 
 def compass_heading(bearing):
-    """
-    compass_heading converts a bearing in degrees to a
+    """compass_heading converts a bearing in degrees to a
     compass value like North, South, or East.
     
-    Params:
-    bearing - the bearing value, in degrees, as float.
+    :param bearing: The bearing value, in degrees, as float.
     
-    Returns:
-    string representation of compass heading.
+    :return: String representation of compass heading.
     
     Notes: 
+    
     11/18/2024 - There is a more mathematically elegant solution to this, but I'm not bothering with it right now.
     """
     
@@ -146,14 +144,12 @@ def compass_heading(bearing):
 
 
 def heading_to_angle(heading):
-    """
-    heading_to_angle() takes a compass heading of 8 directions,
+    """heading_to_angle() takes a compass heading of 8 directions,
     and converts it to an angle in degrees. 
+
+    :param heading: A string representing heading.
     
-    Params:
-    heading - a string representing heading.
-    
-    Returns: a compass bearing angle as float.
+    :return: A compass bearing angle as float.
     """
     options = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
     idx = options.index(heading)
@@ -162,20 +158,18 @@ def heading_to_angle(heading):
     
 
 def point_bearing(x1, y1, x2, y2, bearing_type = "Angle"):
-    """
-    point_bearing takex in the latitude and longitude of two separate ponts,
+    """point_bearing takex in the latitude and longitude of two separate ponts,
     and calculates the bearing when travelling from point 1 and point 2.
     
-    Params:
-    x1 - latitude pt 1 in degrees
-    y1 - longitude pt 1 in degrees
-    x2 - latitude pt 2 in degrees
-    y2 - longitude pt 2 in degrees
-    bearing_type - determine the bearing output. Options: Angle - return the angle in degrees. Compass - return the angle as a directional bearing (eg: N, E, S, W)
+    :param x1: latitude of point 1 in degrees
+    :param y1: longitude of point 1 in degrees
+    :param x2: latitude of point 2 in degrees
+    :param y2: longitude of point 2 in degrees
+    :param bearing_type:  Determine the bearing output. 
+        'Angle' - return the angle in degrees.
+        'Compass' - return the angle as a directional bearing (eg: N, E, S, W)
     
-    Returns:
-    bearing of the vector between the two points. 
-    
+    :return: Bearing of the vector between the two points. 
     """
     # convert to radians
     lat1=np.radians(x1)
@@ -202,15 +196,12 @@ def point_bearing(x1, y1, x2, y2, bearing_type = "Angle"):
 
 
 def get_bounding_box(shape, how='basic'):
-    """
-    get_bounding_box() takes in a shapely shape,
+    """get_bounding_box() takes in a shapely shape,
     and then generates a polygon that is a rectangular bounding box.
     
-    Parameters:
-    shape: any shapely shape
+    :param shape: Any shapely shape
     
-    Returns: 
-    shapely.polygon that fits around the provided shape
+    :return: shapely.polygon that fits around the provided shape
     """
     
     if how=='basic':
@@ -241,17 +232,15 @@ def get_bounding_box(shape, how='basic'):
 
 
 def interpolate_points(point_1, point_2, max_dist=1):
-    """
-    interpolate_points takes two shapely points and a maximum distance,
+    """interpolate_points takes two shapely points and a maximum distance,
     and then interpolates between the points if the maximum distance is exceeded.
     
-    Params:
-    point_1 - starting point as a shapely point of lat, lon
-    point_2 - final point as a shapely point of lat, lon
-    max_dist - maximum distance the points can be without interpolation. Default int of 1.
+    :param point_1: starting point as a shapely point of lat, lon
+    :param point_2: final point as a shapely point of lat, lon
+    :param max_dist: maximum distance the points can be without interpolation.
+        Default int of 1.
     
-    Returns:
-    an iterable of lon,lat shapely points. 
+    :return: An iterable of (lon,lat) shapely points. 
     """
     
     # get distance in meters
@@ -289,15 +278,12 @@ def interpolate_points(point_1, point_2, max_dist=1):
     
     
 def repeat_id_remover(sequence):
-    """
-    repeat_id_remover takes an iterable of IDs where -1 is invalid,
+    """repeat_id_remover takes an iterable of IDs where -1 is invalid,
     and swaps out any repeat index with an invalid.
     
-    Params:
-    sequence - a sequence of id values in an iterable.
+    :param sequence: A sequence of id values in an iterable.
     
-    Returns:
-    sequence with repeated values swapped for a -1.
+    :return: Sequence with repeated values swapped for a -1.
     """
     
     # start the sequence with invalid
@@ -332,16 +318,14 @@ def _flip(x, y):
     return y, x
 
 def verbose_line_updater(message, reset=False):
-    """
-    verbose_line_updater generates a verbose message with timestamps and
+    """verbose_line_updater generates a verbose message with timestamps and
     method calls based on a passed message. Can reset printline if specified.
     
-    Params:
-    message - message, as str, to be printed with the line.
-    reset - boolean to reset carrige or not. Default false.
+    :param message: message, as str, to be printed with the line.
+    :param reset: boolean to reset carrige or not. 
+        Default false.
     
-    Returns:
-    The string to be printed.
+    :return: The string to be printed.
     """
     
     # generate the string.
@@ -360,16 +344,13 @@ def verbose_line_updater(message, reset=False):
 
 
 def query_elevation_changes(elev):
-    """
-    query_elevation_change takes an iterable of elevation,
+    """query_elevation_change takes an iterable of elevation,
     and returns the elevation change between the point at the
     current index, and the next poinnt. 
     
-    Params:
-    elev - iterable of elevation data
+    :param elev: iterable of elevation data
     
-    Returns:
-    list of elevation changes to reach the next point.
+    :return: list of elevation changes to reach the next point.
     """
     
     # convert to series
@@ -389,22 +370,23 @@ def query_elevation_changes(elev):
     
     
 def query_stops(geometry, stop_table_path, key='stop_id', epsg_from = 4326, epsg_to=4326, margin=10, verbose=False):
-    """
-    query_stops takes in a geometry point series for a given route, and a path to
+    """query_stops takes in a geometry point series for a given route, and a path to
     all stop ids and geometry, and then returns a list of stop id's in the order the
     bus will arrive.
     
-    Params:
-    geometry - a series of shapely points representing longitude and latitude
-    stop_table_path - a path to the dataset containing stop geodata csv, as str
-    key - column identifier for the stop id (or whatever value you want) as str
-    epsg_from - the epsg projection the csv is in as an int, default is 4326
-    epsg_to - the epsg projection the data should be reporojected to as an int, default is 4326
-    margin - distance, in meters, that the stop is allowed to be from a given point to qualify, as int.
-    verbose - boolean to enable verbosity. default False.
     
-    Returns:
-    list of stop ids (or other queried values from the data), with invalid points being labeled -1.
+    :param geometry: a series of shapely points representing longitude and latitude
+    :param stop_table_path: a path to the dataset containing stop geodata csv, as str
+    :param key: column identifier for the stop id (or whatever value you want) as str
+    :param epsg_from: the epsg projection the csv is in as an int. 
+        Default is 4326.
+    :param epsg_to: the epsg projection the data should be reporojected to as an int
+        Default is 4326.
+    :param margin: distance, in meters, that the stop is allowed to be from a given point to qualify, as int.
+    :param verbose: boolean to enable verbosity. 
+        Default false.
+    
+    :return: list of stop ids (or other queried values from the data), with invalid points being labeled -1.
     """
     
     # Check the shape boundaries for the geometric series
@@ -461,16 +443,14 @@ def query_stops(geometry, stop_table_path, key='stop_id', epsg_from = 4326, epsg
 
 
 def query_distance_traveled(geometry_series, verbose=False):
-    """
-    query_distance_traveled takes in a series of points,
+    """query_distance_traveled takes in a series of points,
     and then calculates the distance traveled from point to point, in kilometers.
 
-    Parameters:
-    geometry_series - a series of shapely points of lat and lon.
-    verbose - boolean to enable verbosity. default False.
+    :param geometry_series: a series of shapely points of lat and lon.
+    :param verbose: boolean to enable verbosity. 
+        Default False.
 
-    Returns:
-    an iterable representing the change in distance between each point and the next.
+    :return: an iterable representing the change in distance between each point and the next.
     """
 
     # get the current geometry series
@@ -502,22 +482,21 @@ def query_distance_traveled(geometry_series, verbose=False):
 
 
 def query_signals(geometry, signal_data_path, key="SIGNAL_ID", epsg = 4326, margin = 10, verbose=False):
-    """
-    query_signals takes in a geometric series of shapely points,
+    """query_signals takes in a geometric series of shapely points,
     a path to stoplight signal data, and returns a list of the signal id at
     each point in that series.
     
-    Parameters:
-    geometry - a series of shapely points of lat and lon.
-    signal_data_path - path, as str, to a shapefile containing stop signal data.
-    key - the column identifier of signal id (or other target value) to be queried
-    epsg - the epsg the data will be re-set as. Default is 4326.
-    margin - the distance, in meters, that the signal is allowed to be from a given point to qualify.
-    verbose - boolean to enable verbosity. Default False.
+    :param geometry: a series of shapely points of lat and lon.
+    :param signal_data_path: path, as str, to a shapefile containing stop signal data.
+    :param key: the column identifier of signal id (or other target value) to be queried
+    :param epsg: the epsg the data will be re-set as.
+        Default is 4326.
+    :param margin: the distance, in meters, that the signal is allowed to be from a given point to qualify.
+    :param verbose: boolean to enable verbosity.
+        Default False.
     
-    Returns:
-    list of signal IDs, or other info about the signal, as specified.
-    -1 if none found.
+    :return: list of signal IDs, or other info about the signal, as specified. 
+        -1 if none found.
     """
     
     # get the bounding box of the geometry
@@ -561,25 +540,26 @@ def query_signals(geometry, signal_data_path, key="SIGNAL_ID", epsg = 4326, marg
 
 
 def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, margin = 3e-4, last_known_limit= 20*0.00044704, verbose=False):
-    """
-    query_speed_limits takes a geometric iterable of shapely points,
+    """query_speed_limits takes a geometric iterable of shapely points,
     a path to speed limit geodata, and returns the corresponding speed limits at
     each point.
     
-    Params:
-    geometry - a series of shapely points of lat and lon
-    limit_data_path - path to shapefile of speed limit data as str
-    key - column identifier of a speed limit or other value as str, assumed to be an int in units of mph
-    margin - distance a point can be from the street to qualify, default 5e-5
-    last_known_limit - the speed limit int value that the bus will assumedly start at or above. default 20 mph
-    verbose - boolean to enable verbosity. Default False.
+    :param geometry: a series of shapely points of lat and lon
+    :param limit_data_path: path to shapefile of speed limit data as str
+    :param key: column identifier of a speed limit or other value as str, assumed to be an int in units of mph
+    :param margin: distance a point can be from the street to qualify.
+        Default 5e-5.
+    :param last_known_limit: the speed limit int value that the bus will assumedly start at or above. 
+        Default 20 mph.
+    :param verbose: boolean to enable verbosity. 
+        Default False.
     
-    Returns:
-    list of speed limits corresponding to the geometry.
+    :return: list of speed limits corresponding to the geometry.
     
     Notes:
+    
     11/13/2024 - This can be adjusted such that instead of the first value, it's the true closest. Also can probably be combined with the other queries in such a way that it reduces individual methods. FIXED -- 11/19/2024
-    11/18/2024 - Currently Broken. - FIXED -- 11/19/2024
+    11/18/2024 - Currently Broken. FIXED -- 11/19/2024
     """
     # DEPENDING ON THE FILE, THIS CAN TAKE A WHILE.
     
@@ -643,17 +623,17 @@ def query_speed_limits(geometry, limit_data_path, key="SPEED_LIM", epsg = 4326, 
 
 
 def query_bearings(geometry, bearing_type = "Angle", verbose=False):
-    """
-    query_bearings takes a geometric iterable of shapely points,
+    """query_bearings takes a geometric iterable of shapely points,
     and returns the corresponding bearing when travelling form one point to the next.
     
-    Params:
-    geometry - a series of shapely points of lat and lon
-    bearing_type - determine the bearing output. Options: Angle - return the angle in degrees. Compass - return the angle as a directional bearing (eg: N, E, S, W)
-    verbose - boolean to enable verbosity. Default False.
+    :param geometry: a series of shapely points of lat and lon
+    :param bearing_type: determine the bearing output. 
+        Angle - return the angle in degrees. 
+        Compass - return the angle as a directional bearing (eg: N, E, S, W)
+    :param verbose: boolean to enable verbosity. 
+        Default False.
     
-    Returns:
-    list of bearings when travelling to subsequent point.
+    :return: list of bearings when travelling to subsequent point.
     """
 
     # get the current geometry series
@@ -687,15 +667,12 @@ def query_bearings(geometry, bearing_type = "Angle", verbose=False):
 ### ---- ELEVATION TOOLS ---- ###
 
 def get_rasterfiles(dir_path):
-    """
-    get_rasterfiles takes a path to a directory and returns a series of paths to any .tif files
+    """get_rasterfiles takes a path to a directory and returns a series of paths to any .tif files
     contained therin.
     
-    Params:
-    dir_path - path to directory, as str. 
+    :param dir_path: path to directory, as str. 
     
-    Returns:
-    pandas series of path strings to each .tif file.
+    :return: pandas series of path strings to each .tif file.
     """
     
     # create a series using the list of items in the specified directory
@@ -712,18 +689,16 @@ def get_rasterfiles(dir_path):
 
 
 def reproject_rasterfiles(filepath_sequence, target_crs='EPSG:4326', verbose=False):
-    """
-    reproject_rasterfiles takes an iterable of geotiff files, and
+    """reproject_rasterfiles takes an iterable of geotiff files, and
     then reprojects them as a target crs and saves them in the same
     directory as the original.
     
-    Params:
-    filepath_sequence - an iterable of filepaths to geotiff files.
-    target_crs - the projection system the rasterfiles are to be re-projected to.
-    verbose - specify if the output is verbose. Boolean default False.
+    :param filepath_sequence: an iterable of filepaths to geotiff files.
+    :param target_crs: the projection system the rasterfiles are to be re-projected to.
+    :param verbose: specify if the output is verbose. 
+        Default False.
     
-    Returns:
-    iterable sequence of the newly reprojected files.
+    :return: iterable sequence of the newly reprojected files.
     
     Notes:
     11/14/2024 - This should be made to have the ability to override if requested. For now, leaving it as-is is fine.
@@ -781,20 +756,17 @@ def reproject_rasterfiles(filepath_sequence, target_crs='EPSG:4326', verbose=Fal
 
 
 def query_elevation_series(geometry, gtiff_dir_ser, verbose=False):
-    """
-    query_elevation_series takes a series of geometric shapely points, and an iterable of
+    """query_elevation_series takes a series of geometric shapely points, and an iterable of
     geotiff filepaths, and generates a pandas series of elevations from each point in
     the geometry.
     Also for some reason tifs store lat and long in (lon, lat), so i swap em.
     
+    :param geometry: a series of shapely points of lat and lon
+    :param gtiff_dir_ser: an iterable of geometric shapely points. Must have an identical projection to the raster files.
+    :param verbose: boolean parameter to specify verbosity. 
+        Defualt false.
     
-    Params: 
-    geometry - a series of shapely points of lat and lon
-    gtiff_dir_ser - an iterable of geometric shapely points. Must have an identical projection to the raster files.
-    verbose - boolean parameter to specify verbosity. Defualt False.
-    
-    Returns:
-    pandas series of elevations corresponding to the geometry iterable, in km.
+    :return: pandas series of elevations corresponding to the geometry iterable, in km.
     """
     
     # Generate the empty dictionary
@@ -867,10 +839,10 @@ def _combine_lidar_data(dsm, dx, max_grade=7.5):
     between the points, and generates a filtered elevation that provides cleaner road elevation.
     
     Params:
-    dsm - digital surface model elevation iterable.
-    dtm - digital terrain model elevation iterable.
-    dx - iterable change in distance, in kilometers.
-    max_grade - maximum possible grade the road can achieve. Default int=7.5.
+    :param dsm: digital surface model elevation iterable.
+    :param dtm: digital terrain model elevation iterable.
+    :param dx: iterable change in distance, in kilometers.
+    :param max_grade: maximum possible grade the road can achieve. Default int=7.5.
     
     Returns:
     iterable of filtered elevations, in km.
@@ -900,14 +872,14 @@ def calculate_grades(dx, elevations, clip = True , max_grade=7.5):
     calculate_grades takes the distance between points,
     as well as the elevations at each point, and returns the grade at each point.
     
-    Params:
-    dx - an iterable of distances between each point
-    elevations - an iterable of elevations corresponding to each point.
-    clip - boolean to determine to clip the grades or not. Default True.
-    max_grade - an int representing the maximum grade a point can be without being clipped to. Default 7.5
+    :param dx: an iterable of distances between each point
+    :param elevations: an iterable of elevations corresponding to each point.
+    :param clip: boolean to determine to clip the grades or not.
+        Default True.
+    :param max_grade: an int representing the maximum grade a point can be without being clipped to.
+        Default 7.5
     
-    Returns:
-    iterable of the slope grade at each point. 
+    :return: iterable of the slope grade at each point. 
     """
 
     # calculate the grade percentage using the elevation difference and distance difference,
@@ -934,18 +906,14 @@ def calculate_grades(dx, elevations, clip = True , max_grade=7.5):
 
 
 def interpolate_geometry_series(geometry, max_distance=1):
-    """
-    interpolate_geometry_series takes an iterable of geospatial shapely points,
+    """interpolate_geometry_series takes an iterable of geospatial shapely points,
     and then generates an interpolated series in the event that
     the maximum distance (in meters) is exceeded.
     
-    Params:
-    geometry - a series of shapely points of lat and lon
-    max_distance - int representing maximum distance the points can be without interpolation
-                   
-    Returns:
-    iterable of lists of shapely points that have been interpolated.
-    
+    :param geometry: a series of shapely points of lat and lon.
+    :param max_distance: int representing maximum distance the points can be without interpolation.
+
+    :return: iterable of lists of shapely points that have been interpolated.
     """
     
     currents = pd.Series(geometry)
@@ -994,13 +962,13 @@ class Route:
     Route class is is used to store route information. 
     
     Params:
-    geometry - iterable of shapely geometry points
-    elevation - iterable of elevation data
-    limits - iterable of speed limit at each point. (optional, defaults to 25mph in km/s)
-    stops - iterable of stop flags at each point. (optional, defaults to 10 evenly spaced stops.)
-    signals - iterable of signal flags at each point. (optional, defaults to 8 evenly spaced signals.)
-    signs - iterable of sign flags at each point. (optional, defaults to 3 evenly spaced stop signs.)
-    intersperse_empty - boolean flag to intersperse any empty parameters. Default False.
+    :param geometry: iterable of shapely geometry points
+    :param elevation: iterable of elevation data
+    :param limits: iterable of speed limit at each point. (optional, defaults to 25mph in km/s)
+    :param stops: iterable of stop flags at each point. (optional, defaults to 10 evenly spaced stops.)
+    :param signals: iterable of signal flags at each point. (optional, defaults to 8 evenly spaced signals.)
+    :param signs: iterable of sign flags at each point. (optional, defaults to 3 evenly spaced stop signs.)
+    :param intersperse_empty: boolean flag to intersperse any empty parameters. Default False.
     
     Methods: 
     save_to_json() - saves the stored data to a json file. can be loaded again with Geography Tools' load_from_json.
@@ -1096,10 +1064,10 @@ class Route:
         with the option to evenly intersperse those values with an alternate flag. 
         
         Params:
-        default_value - the value that the list will be populated with initially.
-        list_size - size of the list to be made, as an int.
-        intersperse_val - value to be interspersed, default of -1.
-        intersperse_num - number of ocurrences of the interspersed value, as int. Default 0.
+        :param default_value: the value that the list will be populated with initially.
+        :param list_size: size of the list to be made, as an int.
+        :param intersperse_val: value to be interspersed, default of -1.
+        :param intersperse_num: number of ocurrences of the interspersed value, as int. Default 0.
         
         Returns:
         the new list.
@@ -1117,14 +1085,11 @@ class Route:
     
     
     def save_to_json(self, path):
-        """
-        save_to_json() is used to encode and save the Route data to a json file.
+        """save_to_json() is used to encode and save the Route data to a json file.
         
-        Params:
-        path - path and filename to be saved to, as str. Should end with '.json'.
+        :param path: path and filename to be saved to, as str. Should end with '.json'.
         
-        Returns:
-        path to the saved json file.
+        :return: path to the saved json file.
         """
         
         # generate data dictionary and compress the data where possible.
@@ -1149,8 +1114,9 @@ class Route:
         """
         query_point() takes an index of a point and returns the data for the corresponding point.
         
-        Params:
-        index - index of the route which data you would like to query.
+        :param index: index of the route which data you would like to query.
+        
+        :return: Data at that given point, as a dict.
         """
         
         data = {'elevation':self.elevation[index],
@@ -1169,14 +1135,9 @@ class Route:
     
     
     def to_gdf(self):
-        """
-        to_gdf() takes the constituent information in geography_tools and converts it to a geodataframe.
+        """to_gdf() takes the constituent information in geography_tools and converts it to a geodataframe.
         
-        Params:
-        N/A
-        
-        Returns:
-        geodataframe of all information contained by a Route object.
+        :return: geodataframe of all information contained by a Route object.
         """
         data = {'geometry':self.geometry,
                 'elevation':self.elevation,
@@ -1196,16 +1157,13 @@ class Route:
             
 
 def _encode_series(iterable):
-    """
-    encode_series() takes an iterable and compresses it down so that 
+    """encode_series() takes an iterable and compresses it down so that 
     repeating values are stored as the value and number of occurrences.
     Warning: Value typings will be lost.
     
-    Params:
-    iterable - an iterable list of values.
+    :param iterable: an iterable list of values.
     
-    Returns: 
-    a string representation of the compressed information. 
+    :return: a string representation of the compressed information. 
     
     Notes:
     1/16/2025 - Privated since it isn't needed externally. 
@@ -1351,15 +1309,13 @@ def _decode_geometry(enc_geo):
             
 
 def load_from_json(path):
-    """
-    load_from_json() takes in a path to a json file from an exported Route object,
+    """load_from_json() takes in a path to a json file from an exported Route object,
     and returns a path object as close as possible to what was saved.
     Waring: Some data types may be altered or adjusted. Speed limits are expected to be floats, stops, signals, signs, are expected to be ints.
     
-    Params:
-    path - path to json file.
+    :param path: path to json file.
     
-    Returns: a Route object.
+    :return: a Route object.
     """
     
     # create empty data dictionary.
