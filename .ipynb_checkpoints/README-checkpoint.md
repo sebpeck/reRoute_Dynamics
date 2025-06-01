@@ -13,7 +13,6 @@ reRoute_Dynamics is a software package that is a more thourouglhly refined versi
 - [Usage](#usage)
 - [Repository Structure](#repository-structure)
 - [Credits & Contribution](#credits-and-contribution)
-- [Misc](#misc)
 - [Licese](#license)
 
 
@@ -43,6 +42,7 @@ The following two options are the most bare-bones examples. For more detailed an
 ```bash
 /Examples/
 ```
+And for module documentation, please visit the [ReadTheDocs](https://reroute-dynamics.readthedocs.io/en/latest/modules.html)!
 1. Using reRoute_Dynamics as a package:
 
 First, get the package set up for use in your current directory
@@ -160,23 +160,13 @@ If you'd like to contribute fixes or changes, please take the following steps:
 - Push branch: `git push origin BranchName`.
 - Create a pull request.
 
-
-
-## Misc 
----
-https://gis-kingcounty.opendata.arcgis.com/maps/284a6b7a12a04016ab8b754e3b354e47
-
 ## Sebastian's To Do List: 
-4/14/2025
-- Finalize in-line parameter citations in Geography_Tools, Object_Params and Physics_Engine
-- Set up ReadTheDocs
-- Draft Joss Paper again
+6/1/2025
+- Revise JOSS paper
 - Adress Issue 1 completely
-    - Verify where Erica's previous code has been presented or published
     - Make sure user guide is user friendly and followable
-    - Are Demos reproducible on Mac?
-    - Fully revise paper from current rough draft state
-    - Contact Erica to review
+    - Are Demos reproducible on Mac? Unncertain. Erica seemed to be having difficulty reproducing them.
+    - Fully revise paper from secondary
     
     
 # License
