@@ -102,12 +102,13 @@ def geodesic_formula(x1, y1, x2, y2):
     and calculates the distance in kilometers between those two points as a crow flies,
     according to the geodesic formula as calculated by geopy. 
     
-    :param x1: latitude pt 1 in degrees
-    :param y1: longitude pt 1 in degrees
-    :param x2: latitude pt 2 in degrees
-    :param y2: longitude pt 2 in degrees
+    :param x1: latitude of point 1 in degrees
+    :param y1: longitude of point 1 in degrees
+    :param x2: latitude of point 2 in degrees
+    :param y2: longitude of point 2 in degrees
     
-    :return: distance between the points in kilometers.
+    :return: 
+        Distance between the points in kilometers.
     """
     return gdist.geodesic((x1, y1), (x2,y2)).km
     
