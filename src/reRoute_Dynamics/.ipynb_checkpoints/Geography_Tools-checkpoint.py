@@ -5,7 +5,7 @@ S. Peck
 Geography_Tools.py is a module that contains the methods primarily used in the interpretation
 of geospatial data for the ultimate creation of Route .json files from position and elevation data.
 
-Methods: 
+Methods:
 geodesic_formula() - method to calculate the geodesic distance between two (lat, lon) points.
 compass_heading() - method to determine cardinal compass heading from an angle off of North.
 heading_to_angle() - method to determine the compass degree angle from a cardinal direction.
@@ -104,12 +104,12 @@ def geodesic_formula(x1, y1, x2, y2):
     according to the geodesic formula as calculated by geopy. 
     
     Params:
-    x1 - latitude pt 1 in degrees
-    y1 - longitude pt 1 in degrees
-    x2 - latitude pt 2 in degrees
-    y2 - longitude pt 2 in degrees
+    :param x1: - latitude pt 1 in degrees
+    :param y1: - longitude pt 1 in degrees
+    :param x2: - latitude pt 2 in degrees
+    :param y2: - longitude pt 2 in degrees
     
-    Returns:
+    :return:
     distance between the points in kilometers.
     """
     return gdist.geodesic((x1, y1), (x2,y2)).km
