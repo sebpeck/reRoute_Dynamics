@@ -132,7 +132,6 @@ If no extra arguments are provided, it will prompt the user for the correct inpu
     - Bus_Model_Info.ipynb - A Notebook used to update and log Bus Models used for modeling and evaulation. 
     - Model_Evaluation.ipynb - Jupyter Notebook used for demonstrating how to run a Monte Carlo simulation as well as for model evaluation.
 - Tests: Contains tests and testing materials for methods in src.
-- Supplimentary: Contains supplimentary materials, initially used in the development. This is unorganized and unruly. 
 - docs: Folder intended for use with ReadTheDocs.
 - Paper: Directory for storing JOSS paper draft and supplimentary information.
 - environment.yml: Environment file, used in Conda to recreate python kernel environment.

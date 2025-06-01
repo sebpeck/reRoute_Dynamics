@@ -1,1 +1,0 @@
-19295,2.6,3.3,0.79,0.01,1.5,0.5,1.1,304.8,./..//..//..//..//..//..//media/sebastian/Slepnir/Route_Data//Accel_Prof/braun_acceleration.csv,0.4,1
