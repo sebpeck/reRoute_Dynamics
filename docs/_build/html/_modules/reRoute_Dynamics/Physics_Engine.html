@@ -573,10 +573,11 @@
         <span class="c1">#print(&#39;overforce&#39;)</span>
         <span class="c1"># get the acceleration from the true net accels.</span>
         <span class="n">a</span><span class="o">=</span><span class="n">true_a</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">starting_index</span><span class="p">]</span>
+        
         <span class="c1"># calculate the velocity</span>
         <span class="n">v_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">travel_distance</span><span class="o">*</span><span class="n">a</span> <span class="o">+</span> <span class="n">velocity</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
         <span class="c1">#print(travel_distance, a, velocity)</span>
-        
+        <span class="c1">#print(P_max)</span>
         <span class="c1"># Calculate time change.</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">((</span><span class="n">velocity</span><span class="o">-</span><span class="n">v_f</span><span class="p">)</span><span class="o">/</span><span class="n">a</span><span class="p">)</span>
         

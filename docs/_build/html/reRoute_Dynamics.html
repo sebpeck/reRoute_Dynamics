@@ -253,12 +253,16 @@ string representation of compass heading.</p>
 and calculates the distance in kilometers between those two points as a crow flies,
 according to the geodesic formula as calculated by geopy.</p>
 <p>Params:
-x1 - latitude pt 1 in degrees
-y1 - longitude pt 1 in degrees
-x2 - latitude pt 2 in degrees
-y2 - longitude pt 2 in degrees</p>
-<p>Returns:
-distance between the points in kilometers.</p>
+:param x1: - latitude pt 1 in degrees
+:param y1: - longitude pt 1 in degrees
+:param x2: - latitude pt 2 in degrees
+:param y2: - longitude pt 2 in degrees</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+<p>distance between the points in kilometers.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -642,7 +646,7 @@ converted battery power as a float.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="reRoute_Dynamics.Object_Params.ESS.calc_voltage_simple">
 <span class="sig-name descname"><span class="pre">calc_voltage_simple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reRoute_Dynamics/Object_Params.html#ESS.calc_voltage_simple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reRoute_Dynamics.Object_Params.ESS.calc_voltage_simple" title="Link to this definition"></a></dt>
-<dd><p>Use a simple resistance model to calculate the voltage of a module based off of a given power.</p>
+<dd><p>Use a simple resistance model to calculate the voltage of a cell based off of a given power.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -869,7 +873,7 @@ trip: Default - Object_Parameters.Trip(), a trip object from Object_Params that 
 bus: Default - Object_Parameters.Bus(), a bus object from Object_Params that determines the vehicle design
 ESS: Default - Object_Parameters.ESS(),an ess object from Object_Params that determines the Energy Storage System design</p>
 <p>Return:
-a geodataframe that provides all the relevant driving conditions, positional velocity, and modeled power required (NOT ESS LOAD).</p>
+a geodataframe that provides all the relevant driving conditions, positional velocity, and modeled power required.</p>
 </dd></dl>
 
 </section>

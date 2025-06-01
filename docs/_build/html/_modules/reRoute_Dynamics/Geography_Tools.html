@@ -76,7 +76,7 @@
 <span class="sd">Geography_Tools.py is a module that contains the methods primarily used in the interpretation</span>
 <span class="sd">of geospatial data for the ultimate creation of Route .json files from position and elevation data.</span>
 
-<span class="sd">Methods: </span>
+<span class="sd">Methods:</span>
 <span class="sd">geodesic_formula() - method to calculate the geodesic distance between two (lat, lon) points.</span>
 <span class="sd">compass_heading() - method to determine cardinal compass heading from an angle off of North.</span>
 <span class="sd">heading_to_angle() - method to determine the compass degree angle from a cardinal direction.</span>
@@ -177,12 +177,12 @@
 <span class="sd">    according to the geodesic formula as calculated by geopy. </span>
 <span class="sd">    </span>
 <span class="sd">    Params:</span>
-<span class="sd">    x1 - latitude pt 1 in degrees</span>
-<span class="sd">    y1 - longitude pt 1 in degrees</span>
-<span class="sd">    x2 - latitude pt 2 in degrees</span>
-<span class="sd">    y2 - longitude pt 2 in degrees</span>
+<span class="sd">    :param x1: - latitude pt 1 in degrees</span>
+<span class="sd">    :param y1: - longitude pt 1 in degrees</span>
+<span class="sd">    :param x2: - latitude pt 2 in degrees</span>
+<span class="sd">    :param y2: - longitude pt 2 in degrees</span>
 <span class="sd">    </span>
-<span class="sd">    Returns:</span>
+<span class="sd">    :return:</span>
 <span class="sd">    distance between the points in kilometers.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">gdist</span><span class="o">.</span><span class="n">geodesic</span><span class="p">((</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span> <span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="n">y2</span><span class="p">))</span><span class="o">.</span><span class="n">km</span></div>
@@ -543,20 +543,20 @@
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="n">verbose_line_updater</span><span class="p">(</span><span class="s2">&quot;Processing stops...&quot;</span><span class="p">)</span>
     <span class="c1"># loop through the geimetry</span>
     
-    <span class="k">with</span> <span class="n">alive_bar</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">geometry</span><span class="p">))</span> <span class="k">as</span> <span class="n">bar</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">geometry</span><span class="p">):</span>
+    <span class="c1">#with alive_bar(len(geometry)) as bar:</span>
+    <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">geometry</span><span class="p">):</span>
 
-            <span class="c1"># re-set the pont name because i dont want to re-change them all</span>
-            <span class="n">route_pt</span> <span class="o">=</span> <span class="n">point</span>
+        <span class="c1"># re-set the pont name because i dont want to re-change them all</span>
+        <span class="n">route_pt</span> <span class="o">=</span> <span class="n">point</span>
 
-            <span class="c1"># get the distances using the geodesic formula, converted to meters</span>
-            <span class="n">stop_table</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stop_table</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">geodesic_formula</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">route_pt</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">route_pt</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="mi">1000</span><span class="p">)</span>
-            <span class="c1"># filter the data to yeild the closest stop</span>
-            <span class="n">closest_stop</span> <span class="o">=</span> <span class="n">stop_table</span><span class="p">[</span><span class="n">stop_table</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">stop_table</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># get the distances using the geodesic formula, converted to meters</span>
+        <span class="n">stop_table</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stop_table</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">geodesic_formula</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">route_pt</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">route_pt</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="c1"># filter the data to yeild the closest stop</span>
+        <span class="n">closest_stop</span> <span class="o">=</span> <span class="n">stop_table</span><span class="p">[</span><span class="n">stop_table</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">stop_table</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-            <span class="c1"># if the closest stop is within the margin, append it to the list. Otherwise, append -1.</span>
-            <span class="n">stop_id_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">closest_stop</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="n">margin</span><span class="p">)</span><span class="o">*</span><span class="n">closest_stop</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">closest_stop</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="n">margin</span><span class="p">))</span>
-            <span class="n">bar</span><span class="p">()</span>
+        <span class="c1"># if the closest stop is within the margin, append it to the list. Otherwise, append -1.</span>
+        <span class="n">stop_id_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">closest_stop</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="n">margin</span><span class="p">)</span><span class="o">*</span><span class="n">closest_stop</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">closest_stop</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="n">margin</span><span class="p">))</span>
+            <span class="c1">#bar()</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="n">verbose_line_updater</span><span class="p">(</span><span class="s2">&quot;Stops processed. Returning values.&quot;</span><span class="p">)</span>
     
     <span class="c1"># return the stop id list with repeats removed, and the last index guaranteed to be a stop.</span>
@@ -647,21 +647,21 @@
     
     <span class="c1"># loop through the geometry</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="n">verbose_line_updater</span><span class="p">(</span><span class="s2">&quot;Processing signals...&quot;</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">alive_bar</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">geometry</span><span class="p">))</span> <span class="k">as</span> <span class="n">bar</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">geometry</span><span class="p">):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="c1"># use the geodesic formula to get the distances between the current point and each point in the series, in meters</span>
-                <span class="n">signals</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">geodesic_formula</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="mi">1000</span><span class="p">)</span>
-                <span class="c1"># get the closest signal through the minimum distance</span>
-                <span class="n">closest_signal</span> <span class="o">=</span> <span class="n">signals</span><span class="p">[</span><span class="n">signals</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">signals</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1">#with alive_bar(len(geometry)) as bar:</span>
+    <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">geometry</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># use the geodesic formula to get the distances between the current point and each point in the series, in meters</span>
+            <span class="n">signals</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">signals</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">geodesic_formula</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="mi">1000</span><span class="p">)</span>
+            <span class="c1"># get the closest signal through the minimum distance</span>
+            <span class="n">closest_signal</span> <span class="o">=</span> <span class="n">signals</span><span class="p">[</span><span class="n">signals</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">signals</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-                <span class="c1"># check if the signal is within the margin, and if so, append it to the list. If not, append -1.</span>
+            <span class="c1"># check if the signal is within the margin, and if so, append it to the list. If not, append -1.</span>
 
-                <span class="n">signal_id_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">closest_signal</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">])</span><span class="o">&lt;</span><span class="n">margin</span><span class="p">)</span><span class="o">*</span><span class="n">closest_signal</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">closest_signal</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="n">margin</span><span class="p">)))</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="n">signal_id_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-                <span class="c1">#verbose_line_updater(&quot;No signal data in bounds.&quot;)</span>
-            <span class="n">bar</span><span class="p">()</span>
+            <span class="n">signal_id_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">closest_signal</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">])</span><span class="o">&lt;</span><span class="n">margin</span><span class="p">)</span><span class="o">*</span><span class="n">closest_signal</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">closest_signal</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="n">margin</span><span class="p">)))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">signal_id_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="c1">#verbose_line_updater(&quot;No signal data in bounds.&quot;)</span>
+            <span class="c1">#bar()</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="n">verbose_line_updater</span><span class="p">(</span><span class="s2">&quot;Signals processed. Returning values.&quot;</span><span class="p">)</span>
     
     <span class="c1"># return the list.</span>
@@ -718,23 +718,23 @@
     <span class="n">bound_streets</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="c1"># loop through the geometry:</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="n">verbose_line_updater</span><span class="p">(</span><span class="s2">&quot;Processing speed limits...&quot;</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">alive_bar</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">geometry</span><span class="p">))</span> <span class="k">as</span> <span class="n">bar</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">geometry</span><span class="p">))):</span>
-            <span class="n">point</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">geometry</span><span class="p">)[</span><span class="n">i</span><span class="p">]</span>
-            <span class="c1"># get the speed limit at the point through checking that the distance is within the margin. Use first value that appears.</span>
-            <span class="c1">#bound_streets[&#39;range&#39;] = bound_streets.geometry.apply(lambda x: x.buffer(margin))</span>
-            <span class="n">bound_streets</span><span class="p">[</span><span class="s1">&#39;contains_point&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bound_streets</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="n">margin</span><span class="p">)</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">point</span><span class="p">))</span>
-            <span class="n">matches_street</span> <span class="o">=</span> <span class="n">bound_streets</span><span class="p">[</span><span class="n">bound_streets</span><span class="p">[</span><span class="s1">&#39;contains_point&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">]</span>
+    <span class="c1">#with alive_bar(len(geometry)) as bar:</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">geometry</span><span class="p">))):</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">geometry</span><span class="p">)[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c1"># get the speed limit at the point through checking that the distance is within the margin. Use first value that appears.</span>
+        <span class="c1">#bound_streets[&#39;range&#39;] = bound_streets.geometry.apply(lambda x: x.buffer(margin))</span>
+        <span class="n">bound_streets</span><span class="p">[</span><span class="s1">&#39;contains_point&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bound_streets</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="n">margin</span><span class="p">)</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">point</span><span class="p">))</span>
+        <span class="n">matches_street</span> <span class="o">=</span> <span class="n">bound_streets</span><span class="p">[</span><span class="n">bound_streets</span><span class="p">[</span><span class="s1">&#39;contains_point&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">]</span>
 
-            <span class="n">limit</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches_street</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">limit</span><span class="o">=</span><span class="n">matches_street</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-                
-            
-                
-            <span class="c1"># append the limit to the list.</span>
-            <span class="n">limit_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">limit</span><span class="o">*</span><span class="mf">0.00044704</span><span class="p">)</span>
-            <span class="n">bar</span><span class="p">()</span>
+        <span class="n">limit</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches_street</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">limit</span><span class="o">=</span><span class="n">matches_street</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+
+
+        <span class="c1"># append the limit to the list.</span>
+        <span class="n">limit_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">limit</span><span class="o">*</span><span class="mf">0.00044704</span><span class="p">)</span>
+            <span class="c1">#bar()</span>
     
     <span class="c1"># while there is a speed limit of zero, swap them out for the next nearest speed limit that isn&#39;t zero</span>
     
@@ -849,53 +849,53 @@
 <span class="sd">    Notes:</span>
 <span class="sd">    11/14/2024 - This should be made to have the ability to override if requested. For now, leaving it as-is is fine.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    
+
     <span class="c1"># adjust the reprojection so it can be saved properly:</span>
     <span class="n">crs_split</span> <span class="o">=</span> <span class="n">target_crs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
     <span class="n">crs_string</span> <span class="o">=</span> <span class="n">crs_split</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">crs_split</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="n">verbose_line_updater</span><span class="p">(</span><span class="s2">&quot;Reprojecting raster files to: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">target_crs</span><span class="p">))</span>
-    <span class="k">with</span> <span class="n">alive_bar</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filepath_sequence</span><span class="p">))</span> <span class="k">as</span> <span class="n">bar</span><span class="p">:</span>
-        <span class="c1"># Loop through each file in the iterable</span>
-        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">filepath_sequence</span><span class="p">):</span>
+    <span class="c1">#with alive_bar(len(filepath_sequence)) as bar:</span>
+    <span class="c1"># Loop through each file in the iterable</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">filepath_sequence</span><span class="p">):</span>
 
-            <span class="c1">#Check if the reprojection is already there.</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.tif&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="o">!=</span> <span class="s1">&#39;_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">crs_string</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;_</span><span class="si">{}</span><span class="s1">.tif&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">crs_string</span><span class="p">))</span> <span class="o">==</span> <span class="kc">False</span><span class="p">)):</span>
+        <span class="c1">#Check if the reprojection is already there.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.tif&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="o">!=</span> <span class="s1">&#39;_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">crs_string</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;_</span><span class="si">{}</span><span class="s1">.tif&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">crs_string</span><span class="p">))</span> <span class="o">==</span> <span class="kc">False</span><span class="p">)):</span>
 
-                <span class="c1"># open the current rasterfile.</span>
-                <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
-                    <span class="c1"># use rasterIO to calculate the transform of the file to the desired crs</span>
-                    <span class="n">transform</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">calculate_default_transform</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
-                                                                                         <span class="n">target_crs</span><span class="p">,</span>
-                                                                                         <span class="n">src</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-                                                                                         <span class="n">src</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
-                                                                                         <span class="o">*</span><span class="n">src</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
-                    <span class="c1"># copy the kwargs from the geotiff</span>
-                    <span class="n">kwargs</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="c1"># open the current rasterfile.</span>
+            <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+                <span class="c1"># use rasterIO to calculate the transform of the file to the desired crs</span>
+                <span class="n">transform</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">calculate_default_transform</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+                                                                                     <span class="n">target_crs</span><span class="p">,</span>
+                                                                                     <span class="n">src</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+                                                                                     <span class="n">src</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+                                                                                     <span class="o">*</span><span class="n">src</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
+                <span class="c1"># copy the kwargs from the geotiff</span>
+                <span class="n">kwargs</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-                    <span class="c1"># update the kwargs with the target CRS</span>
-                    <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
-                        <span class="s1">&#39;crs&#39;</span><span class="p">:</span> <span class="n">target_crs</span><span class="p">,</span>
-                        <span class="s1">&#39;transform&#39;</span><span class="p">:</span> <span class="n">transform</span><span class="p">,</span>
-                        <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="n">width</span><span class="p">,</span>
-                        <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="n">height</span>
-                    <span class="p">})</span>
+                <span class="c1"># update the kwargs with the target CRS</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                    <span class="s1">&#39;crs&#39;</span><span class="p">:</span> <span class="n">target_crs</span><span class="p">,</span>
+                    <span class="s1">&#39;transform&#39;</span><span class="p">:</span> <span class="n">transform</span><span class="p">,</span>
+                    <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="n">width</span><span class="p">,</span>
+                    <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="n">height</span>
+                <span class="p">})</span>
 
-                    <span class="c1"># Create a reprojection file using the target crs</span>
-                    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="o">+</span><span class="s1">&#39;_</span><span class="si">{}</span><span class="s1">.tif&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">crs_string</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+                <span class="c1"># Create a reprojection file using the target crs</span>
+                <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="o">+</span><span class="s1">&#39;_</span><span class="si">{}</span><span class="s1">.tif&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">crs_string</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
 
-                        <span class="c1"># loop through the projections in src</span>
-                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">src</span><span class="o">.</span><span class="n">count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="c1"># loop through the projections in src</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">src</span><span class="o">.</span><span class="n">count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
 
-                            <span class="c1"># reproject the values in the src.</span>
-                            <span class="n">reproject</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">band</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span>
-                                                    <span class="n">destination</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">band</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span>
-                                                    <span class="n">src_transform</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span>
-                                                    <span class="n">src_crs</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
-                                                    <span class="n">dst_transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
-                                                    <span class="n">dst_crs</span><span class="o">=</span><span class="n">target_crs</span><span class="p">,</span>
-                                                    <span class="n">resampling</span><span class="o">=</span><span class="n">Resampling</span><span class="o">.</span><span class="n">nearest</span><span class="p">)</span>
-            <span class="n">bar</span><span class="p">()</span>
+                        <span class="c1"># reproject the values in the src.</span>
+                        <span class="n">reproject</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">band</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span>
+                                                <span class="n">destination</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">band</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span>
+                                                <span class="n">src_transform</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span>
+                                                <span class="n">src_crs</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+                                                <span class="n">dst_transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+                                                <span class="n">dst_crs</span><span class="o">=</span><span class="n">target_crs</span><span class="p">,</span>
+                                                <span class="n">resampling</span><span class="o">=</span><span class="n">Resampling</span><span class="o">.</span><span class="n">nearest</span><span class="p">)</span>
+        <span class="c1">#bar()</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="n">verbose_line_updater</span><span class="p">(</span><span class="s2">&quot;Raster files succesfully reprojected.&quot;</span><span class="p">)</span>
     
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">filepath_sequence</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="s2">&quot;_</span><span class="si">{}</span><span class="s2">.tif&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">crs_string</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span></div>
@@ -934,27 +934,25 @@
     
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="n">verbose_line_updater</span><span class="p">(</span><span class="s2">&quot;Querying elevation data...&quot;</span><span class="p">)</span>
     <span class="c1"># loop through each geotiff file in the series passed</span>
-    <span class="k">with</span> <span class="n">alive_bar</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gtiff_dir_ser</span><span class="p">))</span> <span class="k">as</span> <span class="n">bar</span><span class="p">:</span>
         
-        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">gtiff_dir_ser</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">gtiff_dir_ser</span><span class="p">):</span>
 
-            <span class="c1"># Use rasterio to open the file</span>
-            <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">img</span><span class="p">:</span>
+        <span class="c1"># Use rasterio to open the file</span>
+        <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">img</span><span class="p">:</span>
 
-                <span class="c1"># sample the elevations using rasterio and the list of lats and lons.</span>
-                <span class="n">route</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rasterio</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">sample_gen</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">route_ll</span><span class="p">),</span> <span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
-                
-     
-                <span class="c1"># remove any masked values</span>
-                <span class="n">filtered</span> <span class="o">=</span> <span class="n">route</span><span class="p">[</span><span class="n">route</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span> <span class="o">!=</span> <span class="s2">&quot;&lt;class &#39;numpy.ma.core.MaskedConstant&#39;&gt;&quot;</span><span class="p">]</span>
-                
-                <span class="c1"># loop through the index of the filtered values</span>
-                <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">filtered</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="c1"># sample the elevations using rasterio and the list of lats and lons.</span>
+            <span class="n">route</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rasterio</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">sample_gen</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">route_ll</span><span class="p">),</span> <span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
 
-                    <span class="c1"># add the filtered value to the data dictionary at the index corresponding to</span>
-                    <span class="c1"># its respective point.</span>
-                    <span class="n">data_dict</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">filtered</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">bar</span><span class="p">()</span>
+
+            <span class="c1"># remove any masked values</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="n">route</span><span class="p">[</span><span class="n">route</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span> <span class="o">!=</span> <span class="s2">&quot;&lt;class &#39;numpy.ma.core.MaskedConstant&#39;&gt;&quot;</span><span class="p">]</span>
+
+            <span class="c1"># loop through the index of the filtered values</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">filtered</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+
+                <span class="c1"># add the filtered value to the data dictionary at the index corresponding to</span>
+                <span class="c1"># its respective point.</span>
+                <span class="n">data_dict</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">filtered</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                 
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="n">verbose_line_updater</span><span class="p">(</span><span class="s2">&quot;Elevation succesfully queried. Returning values.&quot;</span><span class="p">)</span>
                 

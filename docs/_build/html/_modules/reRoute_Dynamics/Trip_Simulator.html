@@ -103,7 +103,7 @@
 <span class="sd">    ESS: Default - Object_Parameters.ESS(),an ess object from Object_Params that determines the Energy Storage System design</span>
 <span class="sd">    </span>
 <span class="sd">    Return:</span>
-<span class="sd">    a geodataframe that provides all the relevant driving conditions, positional velocity, and modeled power required (NOT ESS LOAD). </span>
+<span class="sd">    a geodataframe that provides all the relevant driving conditions, positional velocity, and modeled power required. </span>
 <span class="sd">    &#39;&#39;&#39;</span>
     
     <span class="c1"># make copies so there isnt accidental overwriting of params.</span>
@@ -174,6 +174,8 @@
                        <span class="s1">&#39;v_f&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
                        <span class="s1">&#39;dt&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
                        <span class="s1">&#39;P&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                       <span class="s1">&#39;BP&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="s1">&#39;v&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
                        <span class="s1">&#39;dx&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
                        <span class="s1">&#39;grade&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
                        <span class="s1">&#39;limit&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
@@ -256,6 +258,8 @@
                        <span class="s1">&#39;v_f&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
                        <span class="s1">&#39;dt&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
                        <span class="s1">&#39;P&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="s1">&#39;BP&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="s1">&#39;v&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
                        <span class="s1">&#39;dx&#39;</span><span class="p">:</span><span class="n">dx</span><span class="p">,</span>
                        <span class="s1">&#39;grade&#39;</span><span class="p">:</span><span class="n">grade</span><span class="p">,</span>
                        <span class="s1">&#39;limit&#39;</span><span class="p">:</span><span class="n">limit</span><span class="p">,</span>
@@ -286,6 +290,8 @@
             <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span>
             <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
             <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span>
+            <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;BP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ESS</span><span class="o">.</span><span class="n">calc_instance_power</span><span class="p">(</span><span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">])</span>
+            <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ESS</span><span class="o">.</span><span class="n">calc_voltage_simple</span><span class="p">(</span><span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;BP&#39;</span><span class="p">])</span>
             <span class="n">running_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">true_result</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span> <span class="c1">#&lt;-- This has to use the copy, otherwise it will change prev. values</span>
 
             <span class="c1"># if the speed is within the stop margin, stop the bus.</span>
@@ -302,6 +308,8 @@
                 <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stop_time</span>
                 <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;BP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ESS</span><span class="o">.</span><span class="n">calc_instance_power</span><span class="p">(</span><span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">])</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ESS</span><span class="o">.</span><span class="n">calc_voltage_simple</span><span class="p">(</span><span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;BP&#39;</span><span class="p">])</span>
                 <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="n">tmp_storage</span> <span class="o">=</span> <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;stop_clf&#39;</span><span class="p">]</span>
 
@@ -333,6 +341,8 @@
                     <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span>
                     <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
                     <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span>
+                    <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;BP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ESS</span><span class="o">.</span><span class="n">calc_instance_power</span><span class="p">(</span><span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">])</span>
+                    <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ESS</span><span class="o">.</span><span class="n">calc_voltage_simple</span><span class="p">(</span><span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;BP&#39;</span><span class="p">])</span>
                     <span class="c1">#print(&#39;ac_from_0:&#39;,result)</span>
                     <span class="n">running_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">true_result</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
@@ -357,6 +367,8 @@
                     <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span>
                     <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
                     <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span>
+                    <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;BP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ESS</span><span class="o">.</span><span class="n">calc_instance_power</span><span class="p">(</span><span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">])</span>
+                    <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ESS</span><span class="o">.</span><span class="n">calc_voltage_simple</span><span class="p">(</span><span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;BP&#39;</span><span class="p">])</span>
                     <span class="c1">#print(&#39;ac_below:&#39;,result)</span>
                     <span class="n">running_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">true_result</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
@@ -376,6 +388,8 @@
                 <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span>
                 <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
                 <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;BP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ESS</span><span class="o">.</span><span class="n">calc_instance_power</span><span class="p">(</span><span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">])</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ESS</span><span class="o">.</span><span class="n">calc_voltage_simple</span><span class="p">(</span><span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;BP&#39;</span><span class="p">])</span>
                 <span class="c1">#print(&#39;br_above:&#39;,result)</span>
                 <span class="n">running_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">true_result</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
@@ -394,6 +408,8 @@
                 <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;v_f&#39;</span><span class="p">]</span>
                 <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
                 <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;BP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ESS</span><span class="o">.</span><span class="n">calc_instance_power</span><span class="p">(</span><span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">])</span>
+                <span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ESS</span><span class="o">.</span><span class="n">calc_voltage_simple</span><span class="p">(</span><span class="n">true_result</span><span class="p">[</span><span class="s1">&#39;BP&#39;</span><span class="p">])</span>
                 <span class="c1">#print(&#39;main:&#39;,result)</span>
                 <span class="n">running_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">true_result</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
