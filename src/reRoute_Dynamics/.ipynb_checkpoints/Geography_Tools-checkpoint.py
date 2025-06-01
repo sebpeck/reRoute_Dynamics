@@ -107,8 +107,7 @@ def geodesic_formula(x1, y1, x2, y2):
     :param x2: latitude of point 2 in degrees
     :param y2: longitude of point 2 in degrees
     
-    :return: 
-        Distance between the points in kilometers.
+    :return: Distance between the points in kilometers.
     """
     return gdist.geodesic((x1, y1), (x2,y2)).km
     
