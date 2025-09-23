@@ -346,7 +346,7 @@ def render_kc_route_file(fname, saved_route_list, route_data_dir, dtm_raster_pat
         return fname + " -- 1 "
     
     
-def batch_render_kc_routes(route_options, route_data_dir, elevation_raster_path, route_savepath, skip_unrendered=False, render_params=(10, 3, 25),batch_size = 5, verbose=False):
+def batch_render_kc_routes(route_options, route_data_dir, elevation_raster_path, route_savepath, skip_unrendered=False, render_params=(10, 3, 25),batch_size = 5, verbose=False, overwrite_save = False):
     '''
     batch_rended_kc_routes takes in a list of route shortnames, path to king county route data,
     a path to an elevation raster, and a path to write the saved .json files to, and then
@@ -362,6 +362,7 @@ def batch_render_kc_routes(route_options, route_data_dir, elevation_raster_path,
     render_params: tuple containing the parameters for (interpolation distance, savgol degree) as ints. Default (10, 3)
     batch_size: (default 5) - int representing how many batches/cpu cores to use while rendering.
     verbose: boolean to enable verbosity.
+    overwrite_save: boolean to overwrite saved files
     
     Returns:
     a list to hold the paths of all files that have been processed. 
@@ -401,15 +402,18 @@ def batch_render_kc_routes(route_options, route_data_dir, elevation_raster_path,
                     # generate the json filename based on shortname, shape, and direction
                     filename = route_savepath + 'rt{}_sh{}_d{}.json'.format(selected_route, shape_id, in_out)
                     # Check if the filename doesn't exist in the route list
-                    if filename not in saved_route_list:
-
-                        # if not, add the name to the list of json files that need to be generated
+                    if overwrite_save:
                         fname_list.append(filename)
-
                     else:
-                        # if it does exist, add it to the first list of valid files in the data list.
-                        data_list[0].append(filename)
-                        if verbose: verbose_line_updater('Filename {} exists already. Skipping...'.format(filename))
+                        if filename not in saved_route_list:
+
+                            # if not, add the name to the list of json files that need to be generated
+                            fname_list.append(filename)
+
+                        else:
+                            # if it does exist, add it to the first list of valid files in the data list.
+                            data_list[0].append(filename)
+                            if verbose: verbose_line_updater('Filename {} exists already. Skipping...'.format(filename))
         except Exception as e:
             if verbose: verbose_line_updater("Skipping route {}... Possible error: {}".format(selected_route, e))
 
@@ -429,10 +433,12 @@ def batch_render_kc_routes(route_options, route_data_dir, elevation_raster_path,
                      [route_data_dir]*len(fname_batch),
                      [elevation_raster_path]*len(fname_batch),
                      [render_params]*len(fname_batch)))
+            print(batch[0])
 
             # use multiprocessing with a batch size for the pool
             with multiprocessing.Pool(batch_size) as pool:
                 # use starmap to process each file's route map.
+                #print(batch)
                 data_list.append(pool.starmap(render_kc_route_file, batch))
     
     return data_list

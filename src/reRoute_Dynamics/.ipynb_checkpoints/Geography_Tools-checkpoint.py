@@ -1040,7 +1040,8 @@ class Route:
         self.cum_d_X = list(pd.Series(self.d_X).cumsum())
         self.grades = calculate_grades(self.dx, elevation, max_grade=7.5)
         if smooth_grades:
-            self.grades = smooth_elevation(self.grades, 43, 3)
+            print("alksjdfa lksdjfhalskdjfhalskdjfhalksjdhfaa")
+        self.grades = smooth_elevation(self.grades, 25, 3)
         
         
         # return None
@@ -1049,7 +1050,7 @@ class Route:
     
     def __str__(self):
         """
-        String method.
+        Strng method.
         """
         return "Route(l:{},{},{},{},{})".format(self._params[0],
                                                 self._params[1],

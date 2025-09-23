@@ -36,6 +36,8 @@ The field of public transportation is steadily comitting to fully-electric vehic
 The reRoute_Dynamics Package is a suite of highly adaptable tools that can be used to generate data-driven models of transit routes, vehicles, and their drive cycles. Through its use, users are able to create Longitudinal Dynamic Models that can allow for specific insights into not only a vehicle's energy use, but its pack use behavior as well. Ultimately, this opens up the avenue for high-throughput insights into route optimization, and even the dis-aggregation of use-specific battery ageing modes. 
 
 # Background of Vehicle Energy Modeling
+In the pursuit of modern transit infrastructure electrification, many organizations and research studies have been done with the goal of identifying and accounting for the different drivers of electric vehicle energy use, and how best to reduce the adverse effects that fully-electric vehicles may have on the grid. 
+
 The EPA is responsible for laying out the standard for testing the milage of modern electric vehicles[@epa_range_testing]. This standard procedure has the vehicle run on a dynamometer following one of several standard drive cycles. The resulting milage is reduced by a factor of .7 to account for variability in less controllable factors like driving conditions, driver behavior, and HVAC use. This one-size-fits-all approach has been used by many previous transit researchers to help determine the aspects of transit that most influence energy consumption.
 
 ![Longitudinal Dynamics Model.](LDM.png)<br>

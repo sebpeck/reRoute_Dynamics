@@ -199,6 +199,49 @@ class ESS:
         I = sign*np.sqrt(abs(value)/self.R_bus())
         v_module =(self.V_cell - (self.R_cell * I)/(self.bus_S_P[1] * self.module_S_P[1]))
         return v_module
+    
+    def _calc_voltage_BV(self, value):
+        '''
+        Use the Butler-Volmer equation to predict cell voltage from a given power, assuming T=25 C and symmetric cell
+        Notes:
+        9/3/2025 - beta constant needs to be a variable, including changing temperature. This should always assume a symmetric li-ion cell for the math to work.
+                   Also needs ot be tested. 
+        '''
+
+        # constant for symmetric cell at 25 C
+        beta_const = .5*1* 9.648*10**4 /( 8.314 * 25 + 273.15 )
+        p_cell = value/self.bus_s_p[1]*self.module_s_p[1]*self.bus_s_p[0]*self.module_s_p[0]
+        
+        v_cell = np.arcsinh(np.sqrt(p_cell/self.R_cell)/(self.V_cell/self.R_cell*2))/beta_const - self.V_cell
+        
+        return v_cell
+        
+        
+    def decay_by_c_rate(self, c_rate):
+        '''
+        Determine the capacity decay coefficient from the c-rate.
+        '''
+        c=abs(c_rate)
+        '''
+
+
+        if c<5:
+            return .01*c/100
+        elif c>5:
+            return .15*c/100
+        else:
+            return 0
+        '''
+        if c < .1:
+            return 0
+        elif .1 <= c < .5:
+            return .000011*c
+        elif .5 <= c < 1.5:
+            return .000022*c
+        else:
+            return .000066*c
+
+            
         
         
     def copy(self):

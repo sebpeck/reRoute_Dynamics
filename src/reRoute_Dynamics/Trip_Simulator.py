@@ -111,7 +111,11 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                         'elevation':0,
                         'dx_to_next':0,
                         'b_dx':0,
-                        'geometry':0}
+                        'geometry':0,
+                        'c_rate':0,
+                        'SOH_loss':0,
+                        'n_dec':0,
+                        'dQ':0}
 
     # Initialize the running data with the initialize dict.
     running_data = [initialize_result]
@@ -195,7 +199,11 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                        'elevation':elevation,
                        'dx_to_next':dx_to_next_stop,
                        'b_dx':(braking_distance, adjusted_braking_factor),
-                       'geometry':position}
+                       'geometry':position,
+                       'c_rate':None,
+                       'SOH_loss':None,
+                        'n_dec':None,
+                        'dQ':None}
 
         # Check if there's a stop upcoming and if the bus is still moving
         if stop_upcoming and not stopped:
@@ -219,6 +227,10 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
             true_result['P'] = result['P']
             true_result['BP'] = ESS.calc_instance_power(true_result['P'])
             true_result['v'] = ESS.calc_voltage_simple(true_result['BP'])
+            true_result['c_rate'] = (true_result['BP']/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])/(ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])
+            true_result['n_dec'] = ESS.decay_by_c_rate(true_result['c_rate'])
+            true_result['dQ'] = (true_result['BP']*true_result['dt']/3600/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])
+            true_result['SOH_loss'] = true_result['dQ']*true_result['n_dec']/ (ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])*100
             running_data.append(true_result.copy()) #<-- This has to use the copy, otherwise it will change prev. values
 
             # if the speed is within the stop margin, stop the bus.
@@ -237,6 +249,10 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                 true_result['P'] = 0
                 true_result['BP'] = ESS.calc_instance_power(true_result['P'])
                 true_result['v'] = ESS.calc_voltage_simple(true_result['BP'])
+                true_result['c_rate'] = (true_result['BP']/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])/(ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])
+                true_result['n_dec'] = ESS.decay_by_c_rate(true_result['c_rate'])
+                true_result['dQ'] = (true_result['BP']*true_result['dt']/3600/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])
+                true_result['SOH_loss'] = true_result['dQ']*true_result['n_dec']/ (ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])*100
                 true_result['dx'] = 0
                 tmp_storage = true_result['stop_clf']
 
@@ -270,6 +286,10 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                     true_result['P'] = result['P']
                     true_result['BP'] = ESS.calc_instance_power(true_result['P'])
                     true_result['v'] = ESS.calc_voltage_simple(true_result['BP'])
+                    true_result['c_rate'] = (true_result['BP']/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])/(ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])
+                    true_result['n_dec'] = ESS.decay_by_c_rate(true_result['c_rate'])
+                    true_result['dQ'] = (true_result['BP']*true_result['dt']/3600/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])
+                    true_result['SOH_loss'] = true_result['dQ']*true_result['n_dec']/ (ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])*100
                     #print('ac_from_0:',result)
                     running_data.append(true_result.copy())
 
@@ -296,6 +316,10 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                     true_result['P'] = result['P']
                     true_result['BP'] = ESS.calc_instance_power(true_result['P'])
                     true_result['v'] = ESS.calc_voltage_simple(true_result['BP'])
+                    true_result['c_rate'] = (true_result['BP']/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])/(ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])
+                    true_result['n_dec'] = ESS.decay_by_c_rate(true_result['c_rate'])
+                    true_result['dQ'] = (true_result['BP']*true_result['dt']/3600/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])
+                    true_result['SOH_loss'] = true_result['dQ']*true_result['n_dec']/ (ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])*100
                     #print('ac_below:',result)
                     running_data.append(true_result.copy())
 
@@ -317,6 +341,10 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                 true_result['P'] = result['P']
                 true_result['BP'] = ESS.calc_instance_power(true_result['P'])
                 true_result['v'] = ESS.calc_voltage_simple(true_result['BP'])
+                true_result['c_rate'] = (true_result['BP']/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])/(ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])
+                true_result['n_dec'] = ESS.decay_by_c_rate(true_result['c_rate'])
+                true_result['dQ'] = (true_result['BP']*true_result['dt']/3600/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])
+                true_result['SOH_loss'] = true_result['dQ']*true_result['n_dec']/ (ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])*100
                 #print('br_above:',result)
                 running_data.append(true_result.copy())
 
@@ -337,12 +365,17 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                 true_result['P'] = result['P']
                 true_result['BP'] = ESS.calc_instance_power(true_result['P'])
                 true_result['v'] = ESS.calc_voltage_simple(true_result['BP'])
+                true_result['c_rate'] = (true_result['BP']/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])/(ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])
+                true_result['n_dec'] = ESS.decay_by_c_rate(true_result['c_rate'])
+                true_result['dQ'] = (true_result['BP']*true_result['dt']/3600/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])
+                true_result['SOH_loss'] = true_result['dQ']*true_result['n_dec']/ (ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])*100
                 #print('main:',result)
                 running_data.append(true_result.copy())
 
             #print(running_data[-1])
             #bar()
 
+    
     # Not converted to ESS yet
     return running_data.copy()
 
