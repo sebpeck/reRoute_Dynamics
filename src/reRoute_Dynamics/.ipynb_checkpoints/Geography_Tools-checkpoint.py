@@ -1040,7 +1040,7 @@ class Route:
         self.cum_d_X = list(pd.Series(self.d_X).cumsum())
         self.grades = calculate_grades(self.dx, elevation, max_grade=7.5)
         if smooth_grades:
-            print("alksjdfa lksdjfhalskdjfhalskdjfhalksjdhfaa")
+            smooth_grades=True
         self.grades = smooth_elevation(self.grades, 25, 3)
         
         

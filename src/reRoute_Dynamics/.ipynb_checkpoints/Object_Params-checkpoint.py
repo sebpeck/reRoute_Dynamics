@@ -231,7 +231,7 @@ class ESS:
             return .15*c/100
         else:
             return 0
-        '''
+            
         if c < .1:
             return 0
         elif .1 <= c < .5:
@@ -240,6 +240,11 @@ class ESS:
             return .000022*c
         else:
             return .000066*c
+        '''
+        
+        # Per Dan's Advisment, I should just use a linear function for this, rather than a piecewise
+        return c*.000022
+
 
             
         
