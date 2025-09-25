@@ -243,7 +243,8 @@ class ESS:
         '''
         
         # Per Dan's Advisment, I should just use a linear function for this, rather than a piecewise
-        return c*.000022
+        #.000042
+        return (c)*.000042
 
 
             
