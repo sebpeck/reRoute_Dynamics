@@ -11,7 +11,7 @@ import unittest
 import sys
 import os
 import os
-sys.path.append('../src/reRoute_Dynamics_Core')
+sys.path.append('../src/reRoute_Dynamics')
 import pandas as pd
 import numpy as np
 import itertools

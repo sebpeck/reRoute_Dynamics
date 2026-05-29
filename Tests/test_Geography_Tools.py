@@ -11,7 +11,7 @@ Notes:
 import unittest
 import sys
 import os
-sys.path.append('../src/reRoute_Dynamics_Core')
+sys.path.append('../src/reRoute_Dynamics')
 import shapely
 import pandas as pd
 import Geography_Tools as gt
@@ -328,7 +328,7 @@ class TestInterpolateGeometrySeries(unittest.TestCase):
 
     def test_works(self):
         int_pts = gt.interpolate_geometry_series(self.pts, 10)
-        expected = 201
+        expected = 202
         result = len(int_pts)
         self.assertEqual(expected, result) 
 

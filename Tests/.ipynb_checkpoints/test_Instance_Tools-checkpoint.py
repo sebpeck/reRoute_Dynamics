@@ -6,7 +6,7 @@ tests the methods in Instance_Tools.py
 
 import unittest
 import sys
-sys.path.append('../src/reRoute_Dynamics_Core')
+sys.path.append('../src/reRoute_Dynamics')
 import Instance_Tools as it
 import numpy as np
 

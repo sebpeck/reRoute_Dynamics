@@ -11,11 +11,11 @@ simulate_trip.py - method to run a vehicle with a given ESS on a given trip over
 
 
 '''
-from . import Instance_Tools as it
+import Instance_Tools as it
 import pandas as pd
-from . import Object_Params as op
-from . import Physics_Engine as pe
-from . import Geography_Tools as gt
+import Object_Params as op
+import Physics_Engine as pe
+import Geography_Tools as gt
 from alive_progress import alive_bar
 
 def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
@@ -230,7 +230,7 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
             true_result['c_rate'] = (true_result['BP']/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])/(ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])
             true_result['n_dec'] = ESS.decay_by_c_rate(true_result['c_rate'])
             true_result['dQ'] = (true_result['BP']*true_result['dt']/3600/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])
-            true_result['SOH_loss'] = true_result['dQ']*true_result['n_dec']/ (ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])*100
+            true_result['SOH_loss'] = ESS.cell_SOH_loss_by_DB(true_result['dQ']/ESS.module_S_P[1]/ESS.bus_S_P[1], true_result['c_rate'])/ (ESS.Q_cell)*100
             running_data.append(true_result.copy()) #<-- This has to use the copy, otherwise it will change prev. values
 
             # if the speed is within the stop margin, stop the bus.
@@ -252,7 +252,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                 true_result['c_rate'] = (true_result['BP']/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])/(ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])
                 true_result['n_dec'] = ESS.decay_by_c_rate(true_result['c_rate'])
                 true_result['dQ'] = (true_result['BP']*true_result['dt']/3600/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])
-                true_result['SOH_loss'] = true_result['dQ']*true_result['n_dec']/ (ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])*100
+                #true_result['SOH_loss'] = true_result['dQ']*true_result['n_dec']/ (ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])*100
+                true_result['SOH_loss'] = ESS.cell_SOH_loss_by_DB(true_result['dQ']/ESS.module_S_P[1]/ESS.bus_S_P[1], true_result['c_rate'])/ (ESS.Q_cell)*100
                 true_result['dx'] = 0
                 tmp_storage = true_result['stop_clf']
 
@@ -289,7 +290,8 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                     true_result['c_rate'] = (true_result['BP']/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])/(ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])
                     true_result['n_dec'] = ESS.decay_by_c_rate(true_result['c_rate'])
                     true_result['dQ'] = (true_result['BP']*true_result['dt']/3600/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])
-                    true_result['SOH_loss'] = true_result['dQ']*true_result['n_dec']/ (ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])*100
+                    #print(true_result)
+                    true_result['SOH_loss'] = ESS.cell_SOH_loss_by_DB(true_result['dQ']/ESS.module_S_P[1]/ESS.bus_S_P[1], true_result['c_rate'])/ (ESS.Q_cell)*100
                     #print('ac_from_0:',result)
                     running_data.append(true_result.copy())
 
@@ -319,7 +321,7 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                     true_result['c_rate'] = (true_result['BP']/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])/(ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])
                     true_result['n_dec'] = ESS.decay_by_c_rate(true_result['c_rate'])
                     true_result['dQ'] = (true_result['BP']*true_result['dt']/3600/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])
-                    true_result['SOH_loss'] = true_result['dQ']*true_result['n_dec']/ (ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])*100
+                    true_result['SOH_loss'] = ESS.cell_SOH_loss_by_DB(true_result['dQ']/ESS.module_S_P[1]/ESS.bus_S_P[1], true_result['c_rate'])/ (ESS.Q_cell)*100
                     #print('ac_below:',result)
                     running_data.append(true_result.copy())
 
@@ -344,7 +346,7 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                 true_result['c_rate'] = (true_result['BP']/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])/(ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])
                 true_result['n_dec'] = ESS.decay_by_c_rate(true_result['c_rate'])
                 true_result['dQ'] = (true_result['BP']*true_result['dt']/3600/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])
-                true_result['SOH_loss'] = true_result['dQ']*true_result['n_dec']/ (ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])*100
+                true_result['SOH_loss'] = ESS.cell_SOH_loss_by_DB(true_result['dQ']/ESS.module_S_P[1]/ESS.bus_S_P[1], true_result['c_rate'])/ (ESS.Q_cell)*100
                 #print('br_above:',result)
                 running_data.append(true_result.copy())
 
@@ -368,7 +370,7 @@ def simulate_trip(route, trip=op.Trip(), bus=op.Bus(), ESS=op.ESS()):
                 true_result['c_rate'] = (true_result['BP']/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])/(ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])
                 true_result['n_dec'] = ESS.decay_by_c_rate(true_result['c_rate'])
                 true_result['dQ'] = (true_result['BP']*true_result['dt']/3600/true_result['v']/ESS.module_S_P[0]/ESS.bus_S_P[0])
-                true_result['SOH_loss'] = true_result['dQ']*true_result['n_dec']/ (ESS.Q_cell*ESS.module_S_P[1]*ESS.bus_S_P[1])*100
+                true_result['SOH_loss'] = ESS.cell_SOH_loss_by_DB(true_result['dQ']/ESS.module_S_P[1]/ESS.bus_S_P[1], true_result['c_rate'])/ (ESS.Q_cell)*100
                 #print('main:',result)
                 running_data.append(true_result.copy())
 

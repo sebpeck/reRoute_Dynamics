@@ -17,9 +17,11 @@ accelerate() - method to determine the final velocity, power use, and time chang
 '''
 import numpy as np
 import pandas as pd
-from . import Geography_Tools as gt
+import Geography_Tools as gt
 import os
 import sys
+import math
+import decimal
 sys.path.insert(0, os.path.abspath("../src/reRoute_Dynamics/"))
 A_PROF_PATH = os.path.abspath('../Examples/KC_Example_Data/Acceleration_Profiles/Braunschweig_Acceleration.csv')
 
@@ -248,6 +250,8 @@ def brake(velocity,
                'dt':t,
                'P':P,
                'bf':braking_factor}
+    #if math.isnan(results['v_f']):
+    #    print(velocity, mass, travel_distance, grade_force, wind_force, braking_acceleration, braking_factor, intertial_factor, max_distance)
     
     # return the results
     return results
@@ -468,8 +472,11 @@ def accelerate(velocity,
         # Calculate final velocity
         v_f = np.sqrt(2*travel_distance*ea_prof['net_a'] + velocity**2)
         
-        # Calculate change in time
-        dt = -(velocity - v_f) / ea_prof['net_a']
+        # Determine time change
+        dt = travel_distance*2/(velocity + v_f)
+        if (ea_prof['net_a'] != 0):
+            dt = -(velocity - v_f) / ea_prof['net_a']
+
         
         # Calculate power.
         P = mass*ea_prof['int_a']*travel_distance/dt
@@ -509,7 +516,7 @@ def accelerate(velocity,
             step_dv = row['dv']
             step_a = row['net_a']
             
-            # Adjust the initial dv based on the regulated velocity2
+            # Adjust the initial dv based on the regulated velocity
             i_dv = 0
             if col==0:
                 i_dv = step_dv - (velocity-reg_vel[starting_index])
@@ -520,19 +527,21 @@ def accelerate(velocity,
             i_dx = .5*(v_f_i + v_f_i-i_dv)*row['dt']# <--- Should this be dt or i_dt? 
 
             # if acceleration is zero, recalculate it based on the velocity change.
-            if step_a == 0: 
+            if step_a == 0:
                 step_a = i_dv/row['dt']
+
 
             # if the travel distance is less than using the whole next step of the profile,
             # and if the travel distance is the same as the cumulative distance,
-            if i_dx > (travel_distance-dx):
-                
+            # as long as the acceleration is still not zero,
+            if i_dx > (travel_distance-dx) and step_a != 0:
+
                 i_dx = travel_distance-dx
                 
                 # back-calculate the time, velocity, distance, and energy change
                 # starting with the quadratic formula from the kinematic eqn
                 # for time without final velocity.
-
+                #print(v_f, i_dx, step_a)
                 i_dt = (-v_f + np.sqrt(v_f**2 + 2*i_dx*step_a))/step_a
 
                 # Calculate the cumulative values
@@ -553,6 +562,7 @@ def accelerate(velocity,
         # calculate the power.
         #print(en/dt, dx)
         P = en/dt
+
         
     # Get the results.
     results = {'v_f':v_f,

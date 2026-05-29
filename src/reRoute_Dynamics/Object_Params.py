@@ -135,7 +135,8 @@ class ESS:
                  cell_res = .008, #ohms, cell internal resistance LFP A123 26650 @A123_25550
                  module_struct = (12, 8),# Series, parallel config for a module of cells
                  bus_struct = (16, 1), # Series, parallel config for the modules of the bus
-                 cell_cap = 2.3 # Ah, nominal cell capacity @A123_26650
+                 cell_cap = 2.3, # Ah, nominal cell capacity @A123_26650
+                 b_param = 0.0000472605 # Aging parameter for LFP
                 ):
         self.Em = motor_eff
         self.Ei = inverter_eff
@@ -148,6 +149,7 @@ class ESS:
         self.module_S_P = module_struct
         self.bus_S_P = bus_struct
         self.Q_cell = cell_cap
+        self.B_param = b_param
     
     def bus_E_cap(self):
         return self.V_cell*self.module_S_P[0]*self.bus_S_P[0]*self.Q_cell*self.module_S_P[1]*self.bus_S_P[1]
@@ -220,11 +222,13 @@ class ESS:
     def decay_by_c_rate(self, c_rate):
         '''
         Determine the capacity decay coefficient from the c-rate.
+        
+        :param c_rate: a C rate being experienced by a battery, as an int or float.
+        
+        :return: a flat decay coefficient based on the c-rate. 
         '''
         c=abs(c_rate)
         '''
-
-
         if c<5:
             return .01*c/100
         elif c>5:
@@ -243,8 +247,21 @@ class ESS:
         '''
         
         # Per Dan's Advisment, I should just use a linear function for this, rather than a piecewise
-        #.000042
-        return (c)*.000042
+        return (c)*.000019
+    
+    def cell_SOH_loss_by_DB(self, dq, c):
+        '''Use the DB equation to determine cell capacity decay using a linear fit aging parameter.
+        
+        :param dq: Change in charge of a cell, in units corresponding the the decay parameter (default kWh)
+        :param c: C-rate the battery is operating at. 
+        
+        :return: a value, in the same units as dq, corresponding to the modeled linear aging.
+        '''
+
+        c=abs(c)
+        dq=abs(dq)
+
+        return (c*self.B_param*dq/2)
 
 
             
@@ -261,11 +278,12 @@ class ESS:
                    self.R_cell,
                    self.module_S_P,
                    self.bus_S_P,
-                   self.Q_cell)
+                   self.Q_cell,
+                   self.B_param)
     
     
     def save(self, filepath):
-        data = "{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}".format(self.Em,
+        data = "{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}".format(self.Em,
                                              self.Ei,
                                              self.Ea,
                                              self.P_aux,
@@ -275,7 +293,8 @@ class ESS:
                                              self.R_cell,
                                              self.module_S_P,
                                              self.bus_S_P,
-                                             self.Q_cell)
+                                             self.Q_cell,
+                                             self.B_param)
         
         # Clear the file
         open(filepath, 'w').close()
@@ -292,7 +311,7 @@ def load_ESS_params(filepath):
         data = f.read()
     data_list = data.split('|')
     
-    numerical_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 10]
+    numerical_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 10, 11]
     tuple_indexes = [8, 9]
     
 

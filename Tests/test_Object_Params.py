@@ -11,7 +11,7 @@ Notes:
 
 import unittest
 import sys
-sys.path.append('../src/reRoute_Dynamics_Core')
+sys.path.append('../src/reRoute_Dynamics')
 import Object_Params as op
 import pandas as pd
 from pandas.testing import assert_frame_equal

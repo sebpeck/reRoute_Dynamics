@@ -160,12 +160,12 @@ If you'd like to contribute fixes or changes, please take the following steps:
 - Create a pull request.
 
 ## Sebastian's To Do List: 
-6/1/2025
-- Revise JOSS paper
-- Adress Issue 1 completely
-    - Make sure user guide is user friendly and followable
-    - Are Demos reproducible on Mac? Unncertain. Erica seemed to be having difficulty reproducing them.
-    - Fully revise paper from secondary
+5/29/2026
+- Add statement of Need to readme
+- Add community Guideline Clarity to readme
+- upload and adjust MD version of paper draft
+- Request erica/others try using the software.
+
     
     
 # License
